@@ -1,0 +1,5 @@
+SubDir TOP ;
+
+LOCAL_TARGET = output ;
+
+SubInclude TOP Framework ;

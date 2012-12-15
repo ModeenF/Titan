@@ -1,0 +1,21 @@
+SubDir TOP Framework ;
+
+LOCATE_TARGET = "../output/Framework" ;
+
+SubDirHdrs Globals ;
+
+
+Library TitanFramework :
+	EmBeFactory.cpp
+	EmBeResourceRespository.cpp
+	EmBeSemaphoree.cpp
+	EmBeThread.cpp
+	EmCommand.cpp
+	EMListener.cpp
+	EMListenerRepository.cpp
+	EMMediaUtility.cpp
+	EMProjectDataContainer.cpp
+	EMSemaphore.cpp
+	EMThread.cpp
+	EMThreadListener.cpp
+;
