@@ -2,7 +2,7 @@
 * Creator: Martin Rudefelt
 * Portability: native
 *-------------------------------------------------------
-* 
+*
 *******************************************************/
 
 #include "EMGlobals.h"
@@ -25,7 +25,7 @@ public:
 	void Draw(BRect p_oUpdateRect);
 	void MouseDown(BPoint p_oPoint);
 	void ValueChanged(float p_vValue);
-	
+
 private:
 	EMBeScrollbarContainer* m_opContainer;
 };

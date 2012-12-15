@@ -2,13 +2,13 @@
 * Creator: Richard Kronfalt
 * Portability: Native
 *-------------------------------------------------------
-* 
+*
 * This class is a repository of all the clips that exist
 * within a song/project. To find out which track a clip
-* belongs to one has to ask the clip, since it has a 
+* belongs to one has to ask the clip, since it has a
 * pointer to the owning EMMediaTrack.
 *
-* This class supplies a way of accessing the data in 
+* This class supplies a way of accessing the data in
 * the clips, through the GetNextBuffers method.
 * It returns a number of EMMediaDataBuffers (through adding
 * them to a list which is sent in). The buffers returned
@@ -23,19 +23,19 @@
 * When asking GetNextBuffers for the next set of buffers
 * one has to supply a filtering-flag, for deciding which
 * clip-types to read buffers from, e.g. EM_TYPE_RAW_VIDEO,
-* EM_TYPE_ANY, EM_TYPE_ANY_AUDIO, etc. 
+* EM_TYPE_ANY, EM_TYPE_ANY_AUDIO, etc.
 *
 * If there are no active clips at "this" point in songtime
-* (as reported by ThenTime - see above), the method 
+* (as reported by ThenTime - see above), the method
 * just returns the sent in list unchanged, i.e., naturally,
 * without adding any EMMediaDataBuffers to it.
-* 
+*
 * This class also contains methods for investigating the
 * "song" as a whole, e.g. HasAudio and HasVideo returns
 * true if there are any audio or video clips respectively
-* in the song/project. 
+* in the song/project.
 *
-* FramesToNextClip returns the number of audio frames 
+* FramesToNextClip returns the number of audio frames
 * (calculated using the global audio format) to the start
 * of the next clip, from a certain point in time.
 *
@@ -52,7 +52,7 @@
 #ifndef __EM_BE_AUDIO_CLIP_REPOSITORY
 #define __EM_BE_AUDIO_CLIP_REPOSITORY
 
-#include "EMMediaGlobals.h"
+#include "../../GlobalsEMMediaGlobals.h"
 #include "EMMediaClip.h"
 #include "EMMediaDataBuffer.h"
 #include "EMMediaClipRepository.h"

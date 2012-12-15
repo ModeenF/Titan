@@ -2,7 +2,7 @@
 * Creator: Martin Rudefelt
 * Portability: non-native
 *-------------------------------------------------------
-* 
+*
 *******************************************************/
 
 #include "EMGlobals.h"
@@ -16,15 +16,16 @@
 class __declspec(dllexport) EMBitmap
 {
 public:
-	virtual ~EMBitmap();
-	virtual EMRect Bounds() const = 0;
-	virtual void* GetBits() = 0;
-	virtual EMColorSpace GetColorSpace() const = 0;
-	virtual	void* GetNativeBitmap() const = 0;
-	virtual int32 GetSize() const = 0;
+	virtual 				~EMBitmap();
+
+	virtual EMRect 			Bounds() const = 0;
+	virtual void* 			GetBits() = 0;
+	virtual EMColorSpace 	GetColorSpace() const = 0;
+	virtual	void* 			GetNativeBitmap() const = 0;
+	virtual int32			GetSize() const = 0;
 
 protected:
-	EMBitmap();
+							EMBitmap();
 };
 
 #endif

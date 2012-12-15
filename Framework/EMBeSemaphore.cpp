@@ -6,7 +6,7 @@
 
 #include <OS.h>
 
-EMBeSemaphore::EMBeSemaphore(char* p_vName)
+EMBeSemaphore::EMBeSemaphore(const char* p_vName)
 {
 	m_vSemaphore = create_sem(1, p_vName);
 	m_oSemaphoreName = p_vName;

@@ -20,7 +20,7 @@
 class EMBeSemaphore : public EMSemaphore
 {
 public:
-						EMBeSemaphore(char* p_vName);
+						EMBeSemaphore(const char* p_vName);
 						~EMBeSemaphore();
 
 		bool 			Acquire();

@@ -2,7 +2,7 @@
 * Creator: Martin Rudefelt
 * Portability: native
 *-------------------------------------------------------
-* 
+*
 *******************************************************/
 
 #include "EMGlobals.h"
@@ -23,24 +23,31 @@
 class EMBeMenuItemContainer : public EMMenuItem
 {
 public:
-	EMBeMenuItemContainer(string* p_opName, uint32 p_vCommand);
-	~EMBeMenuItemContainer();
-//	EMRect Bounds() const;
-	bool GetEnabled();
-	bool GetMarked();
-	const char* GetName();
-	void* GetNativeView() const;
-//	void Hide();
-//	void Init();
-	void SetEnabled(bool p_vIsEnabled);
-	void SetMarked(bool p_vIsMarked);
-	void SetName(char* p_vpName);
-//	void Show();
+							EMBeMenuItemContainer(string* name, uint32 p_vCommand);
+							~EMBeMenuItemContainer();
+
+//			EMRect			Bounds() const;
+
+			bool			GetEnabled();
+			bool 			GetMarked();
+			const char* 	GetName();
+			void* 			GetNativeView() const;
+			uint32			GetCommand();
+
+			void			SetName(const char*);
+
+//			void 			Hide();
+//			void			Init();
+
+			void 			SetEnabled(bool p_vIsEnabled);
+			void 			SetMarked(bool p_vIsMarked);
+			void 			SetName(char* p_vpName);
+//			void 			Show();
 
 private:
-//	EMBeMenuItem* m_opNativeItem;
-	BMenuItem* m_opNativeItem;
-	uint32 m_vCommand;
+//			EMBeMenuItem*	m_opNativeItem;
+			BMenuItem* 		m_opNativeItem;
+			uint32 			m_vCommand;
 };
 
 #endif

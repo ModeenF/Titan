@@ -3,7 +3,7 @@
 * Component: none
 * Portability: non-native
 *-------------------------------------------------------
-* 
+*
 *******************************************************/
 
 #include "EMGlobals.h"
@@ -34,7 +34,7 @@ public:
 	bool NotifyKey(EMGUIComponent* p_opOrigin, char p_vKey, bool p_vKeyStatus, uint32 p_vModifiers);
 	//void SetEnabled(bool p_vEnabled);
 	//void ThreadRun(EMThread* p_opThread);
-	
+
 protected:
 	EMKeyboard();
 
@@ -55,5 +55,4 @@ private:
 
 #endif
 
-	
-	
+

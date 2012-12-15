@@ -29,38 +29,52 @@ const int32 EM_THREAD_HIGH_REALTIME_PRIORITY = 120;
 class __declspec(dllexport) EMThread
 {
 public:
-	virtual ~EMThread();
-	void AddListener(EMThreadListener* p_opListener);
-	static EMThread* CreateEMThread(const char* p_vpName, int32 p_vPriority = EM_THREAD_MEDIUM_PRIORITY, int32 p_vSleepTime = 1000);
-	bool IsListening(EMThreadListener* p_opListener);
-	bool IsRunning() const;
-	virtual void Kill(bool p_vCalledFromThreadRun = false) = 0;
-	void Notify();
-	void NotifyCreated();
-	void NotifyKilled();
-	void RemoveListener(EMThreadListener* p_opListener);
-	virtual void SetPriority(int32 p_vPriority) = 0;
-	virtual void Sleep(int64 p_vMicroSeconds) = 0;
-	virtual void Start() = 0;
-	virtual void StartSuspended() = 0;
-	virtual void Suspend(bool p_vCalledFromThreadRun = false) = 0;
-	virtual void Resume() = 0;
-	virtual void WaitForThread() = 0;
+	virtual 				~EMThread();
+
+			void 			AddListener(EMThreadListener*);
+			void 			RemoveListener(EMThreadListener*);
+
+	static 	EMThread* 		CreateEMThread(const char* p_vpName,
+								int32 p_vPriority = EM_THREAD_MEDIUM_PRIORITY,
+								int32 p_vSleepTime = 1000);
+
+			bool 			IsListening(EMThreadListener*);
+			bool 			IsRunning() const;
+
+	virtual void 			Kill(bool p_vCalledFromThreadRun = false) = 0;
+
+			void 			Notify();
+			void 			NotifyCreated();
+			void 			NotifyKilled();
+
+
+	virtual void			SetPriority(int32 p_vPriority) = 0;
+	virtual void			Sleep(int64 p_vMicroSeconds) = 0;
+
+	virtual void 			Start() = 0;
+	virtual void 			StartSuspended() = 0;
+
+	virtual void 			Suspend(bool p_vCalledFromThreadRun = false) = 0;
+	virtual void 			Resume() = 0;
+
+	virtual void 			WaitForThread() = 0;
 
 protected:
-	EMThread(const char* p_vpName);
+							EMThread(const char* p_vpName);
 
 protected:
-	string m_oThreadName;
-	bool m_vIsAlive;
-	bool m_vShouldRun;
-	int32 m_vSleepTime;
+			string			m_oThreadName;
+			bool			m_vIsAlive;
+			bool			m_vShouldRun;
+			int32			m_vSleepTime;
 
 private:
-	list<EMThreadListener*> m_oListeners; // Does not own its listeners
-	list<EMThreadListener*> m_oScheduledAdditions;
-	list<EMThreadListener*> m_oScheduledRemovals;
-	bool m_vDoNotModify;
+			list<EMThreadListener*>
+							m_oListeners,
+							m_oScheduledAdditions,
+							m_oScheduledRemovals;
+
+			bool 			m_vDoNotModify;
 };
 
 #endif

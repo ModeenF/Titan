@@ -8,13 +8,13 @@
 #include "EMThreadListener.h"
 #include "EMSemaphore.h"
 
-EMBeThread::EMBeThread(const char* p_vpName, int32 p_vPriority, int32 p_vSleepTime) : 
+EMBeThread::EMBeThread(const char* p_vpName, int32 p_vPriority, int32 p_vSleepTime) :
 EMThread(p_vpName)
 {
 	m_opSemaphore = EMSemaphore::CreateSemaphore();
 	m_vSleepTime = p_vSleepTime;
 	m_sThreadID = spawn_thread(ThreadEntry, p_vpName, p_vPriority, this);
-	
+
 }
 
 EMBeThread::~EMBeThread()
@@ -41,9 +41,9 @@ void EMBeThread::Kill(bool p_vCalledFromThreadRun)
 
 status_t EMBeThread::ThreadEntry(void* obj)
 {
-	if(!obj) 
+	if(!obj)
 		return B_ERROR;
-	
+
 	// Each thread must set the new handler individually
 	// The new handler manages the reserve memory buffers
 	// that are released when the system has run out of RAM
@@ -64,7 +64,7 @@ void EMBeThread::Run(void)
 			Notify();
 			m_opSemaphore -> Release();
 		}
-			
+
 		Sleep(m_vSleepTime);
 	}
 }
@@ -106,7 +106,7 @@ void EMBeThread::WaitForThread()
 //		if(vIndex == 100)
 //			EMDebug("Waiting for a thread to die");
 //	}
-		
+
 }
 
 #endif

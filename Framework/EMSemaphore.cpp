@@ -17,7 +17,8 @@ EMSemaphore* EMSemaphore::CreateEMSemaphore()
 	return 0;
 }
 
-EMSemaphore* EMSemaphore::CreateEMSemaphore(const char* p_vName, uint32 p_vInitialCount, uint32 p_vMaxCount)
+EMSemaphore* EMSemaphore::CreateEMSemaphore(const char* p_vName,
+		uint32 p_vInitialCount, uint32 p_vMaxCount)
 {
 	return EM_new EMBeSemaphore(p_vName);
 	return 0;

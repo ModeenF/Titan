@@ -2,12 +2,10 @@
 * Creator: Martin Rudefelt
 * Portability: non-native
 *-------------------------------------------------------
-* 
+*
 *******************************************************/
 
 #include "EMGlobals.h"
-
-#ifdef PLATFORM_BEOS
 
 #ifndef __EM_BE_FACTORY
 #define __EM_BE_FACTORY
@@ -38,9 +36,9 @@ public:
 	EMBitmap* CreateBitmap(const void* p_opNativeBitmap);
 	EMBorder* CreateBorder(EMRect p_oFrame, uint32 p_vResizingMode, EMBorderStyle p_vStyle, const char* p_vLabel);
 	EMButton* CreateButton(const EMRect p_oFrame, const char* p_vpLabel, uint32 p_vMessage, uint32 p_vResizingMode, uint32 p_vCommandID);
-	EMFileWindow* CreateFileWindow(EMFilePanelMode p_eFilePanelMode/*bool p_vIsLoadWindow*/, 
+	EMFileWindow* CreateFileWindow(EMFilePanelMode p_eFilePanelMode/*bool p_vIsLoadWindow*/,
 									const char* p_vpWindowTitle,
-									bool p_vMultipleSelection, 
+									bool p_vMultipleSelection,
 									const char* p_vpSaveDefaultText,
 									vector<string>* p_vpVisibleExtensions,
 									const char* p_vpStartDirectory, uint32 p_vMessage);
@@ -57,4 +55,3 @@ public:
 
 #endif
 
-#endif

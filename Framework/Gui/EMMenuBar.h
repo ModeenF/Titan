@@ -2,7 +2,7 @@
 * Creator: Martin Rudefelt
 * Portability: non-native
 *-------------------------------------------------------
-* 
+*
 *******************************************************/
 
 #include "EMGlobals.h"
@@ -25,28 +25,35 @@ const uint32 COMMAND_NOT_TRIGGERED_MENU_ITEM_OFFSET = 10000;
 class EMMenuBar : public EMGUIComponent
 {
 public:
-	virtual ~EMMenuBar();
-	virtual bool AddItem(EMMenu* p_opMenu) = 0;
-	virtual bool AddItem(EMMenu* p_opMenu, int32 p_vIndex) = 0;
-	virtual EMMenuItem* GetLastTriggeredMenuItem() = 0;
-	virtual EMMenu* GetMenu(string* p_opName) = 0;
-	static EMMenuBar* Instance();
-//	virtual EMMenuItem* GetMenuItem(string* p_opName) = 0;
-	virtual bool RemoveItem(EMMenu* p_opMenu) = 0;
-//	virtual bool RemoveItem(EMMenuItem* p_opMenuItem) = 0;
-	static void SetInstance(EMMenuBar* p_opMenuBar);
-	virtual bool SetMarked(uint32 p_vMenuNameID, uint32 p_vMenuItemNameID, bool p_vMarked) = 0;
-	virtual bool SetEnabled(uint32 p_vMenuNameID, bool p_vEnabled) = 0;
-	virtual bool SetEnabled(uint32 p_vMenuNameID, uint32 p_vMenuItemNameID, bool p_vEnabled) = 0;
+	virtual 				~EMMenuBar();
+
+	virtual bool 			AddItem(EMMenu*) = 0;
+	virtual bool 			AddItem(EMMenu*, int32 index) = 0;
+
+	virtual EMMenuItem* 	GetLastTriggeredMenuItem() = 0;
+
+	virtual EMMenu* 		GetMenu(string* name) = 0;
+	static	EMMenuBar* 		Instance();
+
+	virtual bool 			RemoveItem(EMMenu*) = 0;
+//	virtual bool 			RemoveItem(EMMenuItem*) = 0;
+
+	static	void 			SetInstance(EMMenuBar*);
+	virtual bool 			SetMarked(uint32 menu, uint32 menuItem, bool) = 0;
+	virtual bool 			SetEnabled(uint32 menu, bool) = 0;
+	virtual bool 			SetEnabled(uint32 menu, uint32 menuItem, bool) = 0;
+
+//	virtual EMMenuItem* 	GetMenuItem(string* p_opName) = 0;
+
 
 protected:
-	EMMenuBar();
+							EMMenuBar();
 
 //protected:
-//	static uint32 m_vLastTriggeredMenuItemID;
- 
+//	static	uint32 			m_vLastTriggeredMenuItemID;
+
 private:
-	static EMMenuBar* m_opInstance;
+	static	EMMenuBar* 		m_opInstance;
 };
 
 #endif

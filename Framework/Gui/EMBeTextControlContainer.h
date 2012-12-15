@@ -2,7 +2,7 @@
 * Creator: Martin Rudefelt
 * Portability: native
 *-------------------------------------------------------
-* 
+*
 *******************************************************/
 
 #include "EMGlobals.h"
@@ -33,7 +33,7 @@ public:
 	void SetMaxBytes(int32 p_vMaxBytes);
 //	void SetWordWrap(bool p_vWrap);
 	const char* Text();
-	
+
 private:
 	EMBeTextControl* m_opTextControl;
 };

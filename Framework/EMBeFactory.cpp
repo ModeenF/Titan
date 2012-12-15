@@ -1,7 +1,5 @@
 #include "EMBeFactory.h"
 
-#ifdef PLATFORM_BEOS
-
 #include "EMBeBitmapContainer.h"
 #include "EMBeBoxContainer.h"
 #include "EMBeButtonContainer.h"
@@ -34,9 +32,9 @@ EMButton* EMBeFactory::CreateButton(const EMRect p_oFrame, const char* p_vpLabel
 	return new EMBeButtonContainer(p_oFrame, p_vpLabel, p_vMessage, p_vResizingMode, p_vCommandID);
 }
 
-EMFileWindow* EMBeFactory::CreateFileWindow(EMFilePanelMode p_eFilePanelMode/*bool p_vIsLoadWindow*/, 
+EMFileWindow* EMBeFactory::CreateFileWindow(EMFilePanelMode p_eFilePanelMode/*bool p_vIsLoadWindow*/,
 											const char* p_vpWindowTitle,
-											bool p_vMultipleSelection, 
+											bool p_vMultipleSelection,
 											const char* p_vpSaveDefaultText,
 											vector<string>* p_vpVisibleExtensions,
 											const char* p_vpStartDirectory, uint32 p_vMessage)
@@ -92,4 +90,3 @@ EMWindow* EMBeFactory::CreateWindow(const EMRect p_oFrame, const char* p_vpName,
 	return new EMBeWindowContainer(p_oFrame, p_vpName, p_oType);
 }
 
-#endif

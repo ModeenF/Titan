@@ -2,7 +2,7 @@
 * Creator: Martin Rudefelt
 * Portability: non-native
 *-------------------------------------------------------
-* 
+*
 *******************************************************/
 
 #include "EMGlobals.h"
@@ -23,4 +23,3 @@ protected:
 };
 
 #endif
-	

@@ -2,7 +2,7 @@
 * Creator: Martin Rudefelt
 * Portability: native
 *-------------------------------------------------------
-* 
+*
 *******************************************************/
 
 #include "EMGlobals.h"
@@ -19,6 +19,7 @@ class EMBeMenuItem : public BMenuItem
 public:
 	EMBeMenuItem(const char* p_vpLabel);
 	~EMBeMenuItem();
+
 //	status_t Invoke(BMessage* p_opMessage = NULL);
 	void SetLabel(char const* p_vpLabel);
 //	void ExecuteCommand();
