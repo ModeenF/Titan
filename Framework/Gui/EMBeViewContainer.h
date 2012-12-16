@@ -117,15 +117,15 @@ public:
 			bool 			WindowIsLocked();
 
 private:
-			EMBeView* 		m_opDrawView;
-			EMBeView* 		m_opPlainView;
-			float 			M_vBufferScrollOffsetX;
-			float 			m_vBufferScrollOffsetY;
-	static	BBitmap* 		m_opBuffer;
-	static	EMBeView* 		m_opBufferView;
+			EMBeView* 		fDrawView;
+			EMBeView* 		fPlainView;
+			float 			fBufferScrollOffsetX;
+			float 			fBufferScrollOffsetY;
+	static	BBitmap* 		fBuffer;
+	static	EMBeView* 		fBufferView;
 
-			bool 			m_vIsDoubleBuffered;
-	static 	int 			m_vExistingDoubleBufferedViews;
+			bool 			fDoubleBuffered;
+	static 	int 			fExistingDoubleBufferedViews;
 };
 
 #endif

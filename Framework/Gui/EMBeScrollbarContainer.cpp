@@ -1,133 +1,139 @@
 #include "EMBeScrollbarContainer.h"
 
-#ifdef PLATFORM_BEOS
-
 #include "EMListener.h"
 
 #include <Rect.h>
 #include <View.h>
 
-EMBeScrollbarContainer::EMBeScrollbarContainer(EMRect p_oFrame, float p_vMinValue, float p_vMaxValue, EMOrientation p_vOrientation)
+EMBeScrollbarContainer::EMBeScrollbarContainer(EMRect frame, float minValue,
+		float maxValue, EMOrientation orient)
 {
 	BRect oRect;
 
-/*
-	if(p_vOrientation == EM_VERTICAL)
-		oRect.right = oRect.left + B_V_SCROLL_BAR_WIDTH; // The standard BeOS scrollbar size
-	else
-		oRect.bottom = oRect.top + B_V_SCROLL_BAR_WIDTH; // The standard BeOS scrollbar size, should really be B_H_SCROLL_BAR_HEIGTH
-*/
-	if(p_vOrientation == EM_HORIZONTAL)
+	if(orient == EM_HORIZONTAL)
 	{
-//		oRect.left = p_oFrame.m_vLeft + 1;
-		oRect.top = p_oFrame.m_vTop + 1;
-//		oRect.right = p_oFrame.m_vRight - 1;
-//		oRect.bottom = p_oFrame.m_vBottom - 1;
+//		oRect.left = frame.m_vLeft + 1;
+		oRect.top = frame.m_vTop + 1;
+//		oRect.right = frame.m_vRight - 1;
+//		oRect.bottom = frame.m_vBottom - 1;
 	}
 	else
-		oRect.bottom = p_oFrame.m_vBottom - 1;
+		oRect.bottom = frame.m_vBottom - 1;
 	orientation vOrientation;
-	if(p_vOrientation == EM_VERTICAL)
+	if(orient == EM_VERTICAL)
 		vOrientation = B_VERTICAL;
 	else
 		vOrientation = B_HORIZONTAL;
-		
-	m_opScrollbar = new EMBeScrollbar(this, oRect, p_vMinValue, p_vMaxValue, vOrientation);
+
+	fScrollbar = new EMBeScrollbar(this, oRect, minValue, maxValue, vOrientation);
 }
+
 
 EMBeScrollbarContainer::~EMBeScrollbarContainer()
 {
 }
 
+
 EMRect EMBeScrollbarContainer::Frame() const
 {
-	BRect oRect = m_opScrollbar -> Frame();
+	BRect oRect = fScrollbar -> Frame();
 //	return EMRect(oRect.left - 1, oRect.top - 1, oRect.right + 1, oRect.bottom + 1);
-	if(m_opScrollbar -> Orientation() == B_HORIZONTAL)
+	if(fScrollbar -> Orientation() == B_HORIZONTAL)
 		return EMRect(oRect.left, oRect.top - 1, oRect.right, oRect.bottom);
-	return EMRect(oRect.left, oRect.top, oRect.right, oRect.bottom);	
+	return EMRect(oRect.left, oRect.top, oRect.right, oRect.bottom);
 }
+
 
 void* EMBeScrollbarContainer::GetNativeView() const
 {
-	return static_cast<void*>(m_opScrollbar);
+	return static_cast<void*>(fScrollbar);
 }
 
-void EMBeScrollbarContainer::GetRange(float& p_vMin, float& p_vMax)
+
+void EMBeScrollbarContainer::GetRange(int32& min, int32& max)
 {
-	m_opScrollbar -> GetRange(&p_vMin, &p_vMax);
+	fScrollbar -> GetRange((float*)&min, (float*)&max);
 }
 
-void EMBeScrollbarContainer::GetSteps(float& p_vSmallStep, float& p_vBigStep)
+
+void EMBeScrollbarContainer::GetSteps(int32& small, int32& big)
 {
-	m_opScrollbar -> GetSteps(&p_vSmallStep, &p_vBigStep);
+	fScrollbar -> GetSteps((float*)&small, (float*)&big);
 }
 
-float EMBeScrollbarContainer::GetValue()
+
+int32 EMBeScrollbarContainer::GetValue()
 {
-	return m_opScrollbar -> Value();
+	return (int32)fScrollbar -> Value();
 }
+
 
 void EMBeScrollbarContainer::Hide()
 {
-	m_opScrollbar -> Hide();
+	fScrollbar -> Hide();
 }
+
 
 EMOrientation EMBeScrollbarContainer::Orientation()
 {
-	if(m_opScrollbar -> Orientation() == B_HORIZONTAL)
+	if(fScrollbar -> Orientation() == B_HORIZONTAL)
 		return EM_HORIZONTAL;
 	return EM_VERTICAL;
 }
 
-void EMBeScrollbarContainer::SetFrame(EMRect p_oFrame)
+
+void EMBeScrollbarContainer::SetFrame(EMRect frame)
 {
-	if(Frame() == p_oFrame)
+	if(Frame() == frame)
 		return;
 /*
-	if(m_opScrollbar -> Orientation() == B_VERTICAL)
-		p_oFrame.m_vRight = p_oFrame.m_vLeft + B_V_SCROLL_BAR_WIDTH; // The standard BeOS scrollbar size
+	if(fScrollbar -> Orientation() == B_VERTICAL)
+		frame.m_vRight = frame.m_vLeft + B_V_SCROLL_BAR_WIDTH; // The standard BeOS scrollbar size
 	else
-		p_oFrame.m_vBottom = p_oFrame.m_vTop + B_V_SCROLL_BAR_WIDTH; // The standard BeOS scrollbar size, should really be B_H_SCROLL_BAR_HEIGTH
+		frame.m_vBottom = frame.m_vTop + B_V_SCROLL_BAR_WIDTH; // The standard BeOS scrollbar size, should really be B_H_SCROLL_BAR_HEIGTH
 */
-	if(m_opScrollbar -> Orientation() == B_HORIZONTAL)
+	if(fScrollbar -> Orientation() == B_HORIZONTAL)
 	{
-//		p_oFrame.m_vLeft++;
-		p_oFrame.m_vTop++;
-//		p_oFrame.m_vRight--;
-//		p_oFrame.m_vBottom--;
+//		frame.m_vLeft++;
+		frame.m_vTop++;
+//		frame.m_vRight--;
+//		frame.m_vBottom--;
 	}
-	
-	m_opScrollbar -> ResizeTo(p_oFrame.GetWidth(), p_oFrame.GetHeight());
-	m_opScrollbar -> MoveTo(p_oFrame.m_vLeft, p_oFrame.m_vTop);
+
+	fScrollbar -> ResizeTo(frame.GetWidth(), frame.GetHeight());
+	fScrollbar -> MoveTo(frame.m_vLeft, frame.m_vTop);
 }
 
-void EMBeScrollbarContainer::SetProportion(float p_vProportion)
+
+void EMBeScrollbarContainer::SetProportion(float proportion)
 {
-	m_opScrollbar -> SetProportion(p_vProportion);
+	fScrollbar -> SetProportion(proportion);
 }
 
-void EMBeScrollbarContainer::SetRange(float p_vMin, float p_vMax)
+
+void EMBeScrollbarContainer::SetRange(float min, float max)
 {
-	if(p_vMax <= p_vMin)
-		m_opScrollbar -> SetRange(0, 0); // This should be handled by BeOS, oh well
+	if(max <= min)
+		fScrollbar -> SetRange(0, 0);
 	else
-		m_opScrollbar -> SetRange(p_vMin, p_vMax);
+		fScrollbar -> SetRange(min, max);
 }
 
-void EMBeScrollbarContainer::SetSteps(float p_vSmallStep, float p_vBigStep)
+
+void EMBeScrollbarContainer::SetSteps(int32 small, int32 big)
 {
-	m_opScrollbar -> SetSteps(p_vSmallStep, p_vBigStep);
+	fScrollbar -> SetSteps((float)small, (float)big);
 }
 
-void EMBeScrollbarContainer::SetValue(float p_vValue)
+
+void EMBeScrollbarContainer::SetValue(int32 value)
 {
-	m_opScrollbar -> SetValue(p_vValue);
+	fScrollbar -> SetValue((float)value);
 }
+
 
 void EMBeScrollbarContainer::Show()
 {
-	m_opScrollbar -> Show();
+	fScrollbar -> Show();
 }
 
-#endif

@@ -6,99 +6,110 @@
 
 #include <TextView.h>
 
-EMBeTextControlContainer::EMBeTextControlContainer(EMRect p_oFrame, const char* p_vpText, uint32 p_vResizingMode)
+EMBeTextControlContainer::EMBeTextControlContainer(EMRect frame,
+	const char* text, uint32 resizeMode)
+	:
+	EMTextControl(false)
 {
 	uint32 vResizingMode = 0;
-	
-	if((p_vResizingMode & EM_FOLLOW_LEFT) == EM_FOLLOW_LEFT)
+
+	if((resizeMode & EM_FOLLOW_LEFT) == EM_FOLLOW_LEFT)
 		vResizingMode = vResizingMode | B_FOLLOW_LEFT;
-	if((p_vResizingMode & EM_FOLLOW_RIGHT) == EM_FOLLOW_RIGHT)
+	if((resizeMode & EM_FOLLOW_RIGHT) == EM_FOLLOW_RIGHT)
 		vResizingMode = vResizingMode | B_FOLLOW_RIGHT;
-	if((p_vResizingMode & EM_FOLLOW_H_CENTER) == EM_FOLLOW_H_CENTER)
+	if((resizeMode & EM_FOLLOW_H_CENTER) == EM_FOLLOW_H_CENTER)
 		vResizingMode = vResizingMode | B_FOLLOW_H_CENTER;
-	if((p_vResizingMode & EM_FOLLOW_TOP) == EM_FOLLOW_TOP)
+	if((resizeMode & EM_FOLLOW_TOP) == EM_FOLLOW_TOP)
 		vResizingMode = vResizingMode | B_FOLLOW_TOP;
-	if((p_vResizingMode & EM_FOLLOW_BOTTOM) == EM_FOLLOW_BOTTOM)
+	if((resizeMode & EM_FOLLOW_BOTTOM) == EM_FOLLOW_BOTTOM)
 		vResizingMode = vResizingMode | B_FOLLOW_BOTTOM;
-	if((p_vResizingMode & EM_FOLLOW_V_CENTER) == EM_FOLLOW_V_CENTER)
+	if((resizeMode & EM_FOLLOW_V_CENTER) == EM_FOLLOW_V_CENTER)
 		vResizingMode = vResizingMode | B_FOLLOW_V_CENTER;
 
-	BRect oRect(p_oFrame.m_vLeft, p_oFrame.m_vTop, p_oFrame.m_vRight, p_oFrame.m_vBottom);
+	BRect oRect(frame.m_vLeft, frame.m_vTop, frame.m_vRight, frame.m_vBottom);
 
-	m_opTextControl = new EMBeTextControl(this, oRect, p_vpText, vResizingMode);
+	fTextControl = new EMBeTextControl(this, oRect, text, vResizingMode);
 }
+
 
 EMBeTextControlContainer::~EMBeTextControlContainer()
 {
 }
 
+
 EMRect EMBeTextControlContainer::Frame() const
 {
-	BRect oRect = m_opTextControl -> Frame();
+	BRect oRect = fTextControl -> Frame();
 	return EMRect(oRect.left, oRect.top, oRect.right, oRect.bottom);
 }
 
+
 void* EMBeTextControlContainer::GetNativeView() const
 {
-	return static_cast<void*>(m_opTextControl);
+	return static_cast<void*>(fTextControl);
 }
+
 
 void EMBeTextControlContainer::Hide()
 {
-	m_opTextControl -> Hide();
+	fTextControl -> Hide();
 }
+
 
 void EMBeTextControlContainer::InitComponent()
 {
-	m_opTextControl -> SetTarget(m_opTextControl);
+	fTextControl -> SetTarget(fTextControl);
 }
+
 
 void EMBeTextControlContainer::Invalidate()
 {
-	m_opTextControl -> Invalidate();
+	fTextControl -> Invalidate();
 }
+
 
 void EMBeTextControlContainer::SelectAll()
 {
-	m_opTextControl -> TextView() -> SelectAll();
+	fTextControl -> TextView() -> SelectAll();
 }
+
 
 void EMBeTextControlContainer::SetFocus()
 {
-	m_opTextControl -> MakeFocus();
+	fTextControl -> MakeFocus();
 }
 
-void EMBeTextControlContainer::SetFrame(EMRect p_oFrame)
+
+void EMBeTextControlContainer::SetFrame(EMRect frame)
 {
-	if(Frame() == p_oFrame)
+	if(Frame() == frame)
 		return;
-	m_opTextControl -> ResizeTo(p_oFrame.GetWidth(), p_oFrame.GetHeight());
-	m_opTextControl -> MoveTo(p_oFrame.m_vLeft, p_oFrame.m_vTop);
+	fTextControl -> ResizeTo(frame.GetWidth(), frame.GetHeight());
+	fTextControl -> MoveTo(frame.m_vLeft, frame.m_vTop);
 }
 
-void EMBeTextControlContainer::SetText(const char* p_vpText)
+
+void EMBeTextControlContainer::SetText(const char* text)
 {
-	m_opTextControl -> SetText(p_vpText);
+	fTextControl -> SetText(text);
 }
+
 
 void EMBeTextControlContainer::Show()
 {
-	m_opTextControl -> Show();
+	fTextControl -> Show();
 }
 
-void EMBeTextControlContainer::SetMaxBytes(int32 p_vMaxBytes)
+
+void EMBeTextControlContainer::SetMaxBytes(int32 maxBytes)
 {
-	m_opTextControl -> TextView() -> SetMaxBytes(p_vMaxBytes);
+	fTextControl -> TextView() -> SetMaxBytes(maxBytes);
 }
-/*
-void EMBeTextControlContainer::SetWordWrap(bool p_vWrap)
-{
-	m_opTextControl -> SetWordWrap(p_vWrap);
-}
-*/
+
+
 const char* EMBeTextControlContainer::Text()
 {
-	return m_opTextControl -> Text();
+	return fTextControl -> Text();
 }
 
 #endif

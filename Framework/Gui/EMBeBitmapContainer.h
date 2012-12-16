@@ -7,8 +7,6 @@
 
 #include "EMGlobals.h"
 
-#ifdef PLATFORM_BEOS
-
 #ifndef __EM_BE_BITMAP_CONTAINER
 #define __EM_BE_BITMAP_CONTAINER
 
@@ -21,8 +19,8 @@ class BBitmap;
 class EMBeBitmapContainer : public EMBitmap
 {
 public:
-							EMBeBitmapContainer(const EMBitmap* p_opBitmap);
-							EMBeBitmapContainer(const void* p_opNativeBitmap);
+							EMBeBitmapContainer(const EMBitmap*);
+							EMBeBitmapContainer(const void* nativeBitmap);
 	virtual 				~EMBeBitmapContainer();
 
 			EMRect			Bounds() const;
@@ -32,10 +30,8 @@ public:
 			int32 			GetSize() const;
 
 private:
-			BBitmap* 		m_opNativeBitmap;
+			BBitmap* 		fNativeBitmap;
 };
-
-#endif
 
 #endif
 

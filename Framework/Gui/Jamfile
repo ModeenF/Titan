@@ -1,0 +1,73 @@
+SubDir TOP Framework Gui ;
+
+LOCATE_TARGET = [ FDirName $(TOP) output Framework Gui ] ;
+
+SubDirHdrs [ FDirName $(TOP) Application Commands ] ;
+
+SubDirHdrs [ FDirName $(TOP) Framework ] ;
+SubDirHdrs [ FDirName $(TOP) Framework Globals ] ;
+SubDirHdrs [ FDirName $(TOP) Framework Media ] ;
+
+SubDirHdrs [ FDirName $(TOP) Components ] ;
+SubDirHdrs [ FDirName $(TOP) Components Gui ] ;
+
+Library TitanFrameworkGUI :
+	EMBeBitmapContainer.cpp
+	EMBeBox.cpp
+	EMBeBoxContainer.cpp
+	EMBeButton.cpp
+	EMBeButtonContainer.cpp
+	EMBeFilePanelContainer.cpp
+	EMBeKeyboard.cpp
+	EMBEMenu.cpp
+	EMBEMenuBar.cpp
+	EMBEMenuBarContainer.cpp
+	EMBEMenuContainer.cpp
+	EMBEMenuItem.cpp
+	EMBEMenuItEMContainer.cpp
+	EMBEMessageTranslator.cpp
+	EMBePopUpMenu.cpp
+	EMBePopUpMenuContainer.cpp
+	EMBeScrollbar.cpp
+	EMBeScrollbarContainer.cpp
+	EMBeTextControl.cpp
+	EMBeTextControlContainer.cpp
+	EMBeTextView.cpp
+	EMBeTextViewContainer.cpp
+	EMBeView.cpp
+	EMBeViewContainer.cpp
+	EMBeWindow.cpp
+	EMBeWindowContainer.cpp
+	EMBitmap.cpp
+	EMBrowseWindow.cpp
+	EMButton.cpp
+	EMCheckBox.cpp
+	EMComboBox.cpp
+	EMDragDrop.cpp
+	EMFileWindow.cpp
+	EMGroupBox.cpp
+	EMGUIComponent.cpp
+	EMKeyboard.cpp
+	EMLabel.cpp
+	EMListBox.cpp
+	EMListViewControl.cpp
+	EMMenu.cpp
+	EMMenuBar.cpp
+	EMMenuItEM.cpp
+	EMMessageBox.cpp
+	EMMouseCursor.cpp
+	EMPopUpMenu.cpp
+	EMProgressBar.cpp
+	EMRadioButton.cpp
+	EMResizeTab.cpp
+	EMScrollbar.cpp
+	EMTabControl.cpp
+	EMTextControl.cpp
+	EMTextView.cpp
+	EMToolTip.cpp
+	EMTrackbarControl.cpp
+	EMTreeViewControl.cpp
+	EMView.cpp
+	EMWindow.cpp
+;
+

@@ -1,6 +1,6 @@
 SubDir TOP Framework ;
 
-LOCATE_TARGET = "../output/Framework" ;
+LOCATE_TARGET = [ FDirName $(TOP) output Framework ] ;
 
 SubDirHdrs [ FDirName $(TOP) Framework Globals ] ;
 SubDirHdrs [ FDirName $(TOP) Framework Gui ] ;
@@ -11,7 +11,7 @@ SubDirHdrs [ FDirName $(TOP) Components Gui ] ;
 
 Library TitanFramework :
 	EMBeFactory.cpp
-	EMBeResourceRespository.cpp
+	EMBeResourceRepository.cpp
 	EMBeSemaphore.cpp
 	EMBeThread.cpp
 	EMCommand.cpp
@@ -23,3 +23,5 @@ Library TitanFramework :
 	EMThread.cpp
 	EMThreadListener.cpp
 ;
+
+SubInclude TOP Framework Gui ;

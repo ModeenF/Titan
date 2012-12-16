@@ -1,40 +1,39 @@
 #include "EMBeBitmapContainer.h"
 
-#ifdef PLATFORM_BEOS
 
 #include <Bitmap.h>
 #include <Rect.h>
 
-EMBeBitmapContainer::EMBeBitmapContainer(const EMBitmap* p_opBitmap) :
-m_opNativeBitmap(static_cast<BBitmap*>(p_opBitmap -> GetNativeBitmap()))
+EMBeBitmapContainer::EMBeBitmapContainer(const EMBitmap* bitmap) :
+fNativeBitmap(static_cast<BBitmap*>(bitmap -> GetNativeBitmap()))
 {
 }
 
-EMBeBitmapContainer::EMBeBitmapContainer(const void* p_opNativeBitmap) :
-m_opNativeBitmap(static_cast<BBitmap*>(p_opNativeBitmap))
+EMBeBitmapContainer::EMBeBitmapContainer(const void* nativeBitmap) :
+fNativeBitmap(static_cast<BBitmap*>(nativeBitmap))
 {
 }
 
 EMBeBitmapContainer::~EMBeBitmapContainer()
 {
-	delete m_opNativeBitmap;
+	delete fNativeBitmap;
 }
 
 EMRect EMBeBitmapContainer::Bounds() const
 {
-	BRect oRect = m_opNativeBitmap -> Bounds();
+	BRect oRect = fNativeBitmap -> Bounds();
 	return EMRect(oRect.left, oRect.top, oRect.right, oRect.bottom);
 }
 
-void* EMBeBitmapContainer::GetBits() const
+void* EMBeBitmapContainer::GetBits()
 {
-	return m_opNativeBitmap -> Bits();
+	return fNativeBitmap -> Bits();
 }
 
 // This method has no support for big-endian colorspaces (yet)
 EMColorSpace EMBeBitmapContainer::GetColorSpace() const
 {
-	color_space eSpace = m_opNativeBitmap -> ColorSpace();
+	color_space eSpace = fNativeBitmap -> ColorSpace();
 	switch(eSpace)
 	{
 	case B_GRAY1:
@@ -58,12 +57,11 @@ EMColorSpace EMBeBitmapContainer::GetColorSpace() const
 
 void* EMBeBitmapContainer::GetNativeBitmap() const
 {
-	return m_opNativeBitmap;
+	return fNativeBitmap;
 }
 
 int32 EMBeBitmapContainer::GetSize() const
 {
-	return m_opNativeBitmap -> BitsLength();
+	return fNativeBitmap -> BitsLength();
 }
 
-#endif

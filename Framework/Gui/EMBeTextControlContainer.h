@@ -44,7 +44,7 @@ public:
 			void			SetSelection(int32, int32);
 
 private:
-			EMBeTextControl*m_opTextControl;
+			EMBeTextControl*fTextControl;
 };
 
 #endif

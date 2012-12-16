@@ -15,60 +15,64 @@
 #include <Window.h>
 #include <Point.h>
 
-BBitmap* EMBeViewContainer::m_opBuffer = NULL;
-EMBeView* EMBeViewContainer::m_opBufferView = NULL;
-int EMBeViewContainer::m_vExistingDoubleBufferedViews = 0;
+BBitmap* EMBeViewContainer::fBuffer = NULL;
+EMBeView* EMBeViewContainer::fBufferView = NULL;
+int EMBeViewContainer::fExistingDoubleBufferedViews = 0;
 
-EMBeViewContainer::EMBeViewContainer(const EMRect p_oFrame, uint32 p_vResizingMode, bool p_vDoubleBuffered) :
-m_opPlainView(new EMBeView(this, BRect(p_oFrame.m_vLeft, p_oFrame.m_vTop, p_oFrame.m_vRight, p_oFrame.m_vBottom), 0, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE)),
-m_vBufferScrollOffsetX(0),
-m_vBufferScrollOffsetY(0),
-m_vIsDoubleBuffered(p_vDoubleBuffered)
+EMBeViewContainer::EMBeViewContainer(const EMRect frame, uint32 resizeMode,
+	bool doubleBuffered)
+	:
+	fPlainView(new EMBeView(this, BRect(frame.m_vLeft,
+			frame.m_vTop, frame.m_vRight, frame.m_vBottom),
+			0, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE)),
+	fBufferScrollOffsetX(0),
+	fBufferScrollOffsetY(0),
+	fDoubleBuffered(doubleBuffered)
 {
 	uint32 vResizingMode = 0;
-	
-	if((p_vResizingMode & EM_FOLLOW_LEFT) == EM_FOLLOW_LEFT)
+
+	if((resizeMode & EM_FOLLOW_LEFT) == EM_FOLLOW_LEFT)
 		vResizingMode = vResizingMode | B_FOLLOW_LEFT;
-	if((p_vResizingMode & EM_FOLLOW_RIGHT) == EM_FOLLOW_RIGHT)
+	if((resizeMode & EM_FOLLOW_RIGHT) == EM_FOLLOW_RIGHT)
 		vResizingMode = vResizingMode | B_FOLLOW_RIGHT;
-	if((p_vResizingMode & EM_FOLLOW_H_CENTER) == EM_FOLLOW_H_CENTER)
+	if((resizeMode & EM_FOLLOW_H_CENTER) == EM_FOLLOW_H_CENTER)
 		vResizingMode = vResizingMode | B_FOLLOW_H_CENTER;
-	if((p_vResizingMode & EM_FOLLOW_TOP) == EM_FOLLOW_TOP)
+	if((resizeMode & EM_FOLLOW_TOP) == EM_FOLLOW_TOP)
 		vResizingMode = vResizingMode | B_FOLLOW_TOP;
-	if((p_vResizingMode & EM_FOLLOW_BOTTOM) == EM_FOLLOW_BOTTOM)
+	if((resizeMode & EM_FOLLOW_BOTTOM) == EM_FOLLOW_BOTTOM)
 		vResizingMode = vResizingMode | B_FOLLOW_BOTTOM;
-	if((p_vResizingMode & EM_FOLLOW_V_CENTER) == EM_FOLLOW_V_CENTER)
+	if((resizeMode & EM_FOLLOW_V_CENTER) == EM_FOLLOW_V_CENTER)
 		vResizingMode = vResizingMode | B_FOLLOW_V_CENTER;
-	if((p_vResizingMode & EM_FOLLOW_LEFT_RIGHT) == EM_FOLLOW_LEFT_RIGHT)
+	if((resizeMode & EM_FOLLOW_LEFT_RIGHT) == EM_FOLLOW_LEFT_RIGHT)
 		vResizingMode = vResizingMode | B_FOLLOW_LEFT_RIGHT;
-	if((p_vResizingMode & EM_FOLLOW_TOP_BOTTOM) == EM_FOLLOW_TOP_BOTTOM)
+	if((resizeMode & EM_FOLLOW_TOP_BOTTOM) == EM_FOLLOW_TOP_BOTTOM)
 		vResizingMode = vResizingMode | B_FOLLOW_TOP_BOTTOM;
 
-	m_opPlainView -> SetResizingMode(vResizingMode);
+	fPlainView -> SetResizingMode(vResizingMode);
 
-	if(p_vDoubleBuffered && m_opBuffer == NULL) // The global double buffering buffer is now needed but not set yet
+	if(doubleBuffered && fBuffer == NULL) // The global double buffering buffer is now needed but not set yet
 	{
 		BRect oRect;
-		oRect.left = 0;//p_oFrame.m_vLeft;
-		oRect.top = 0;//p_oFrame.m_vTop;
-		oRect.right = 1600;//p_oFrame.m_vRight;
-		oRect.bottom = 1200;//p_oFrame.m_vBottom;
-		
-		m_opBuffer = new BBitmap(BRect(0, 0, /*oRect.Width()*/1600, /*oRect.Height()*/1200), B_RGB16, true);
-		m_opBufferView = new EMBeView(this, oRect, vResizingMode, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
-		m_opBufferView -> SetViewColor(B_TRANSPARENT_COLOR); // To avoid the background to be redrawn on every update = flicker
-		if(m_opBuffer -> Lock())
+		oRect.left = 0;//frame.m_vLeft;
+		oRect.top = 0;//frame.m_vTop;
+		oRect.right = 1600;//frame.m_vRight;
+		oRect.bottom = 1200;//frame.m_vBottom;
+
+		fBuffer = new BBitmap(BRect(0, 0, /*oRect.Width()*/1600, /*oRect.Height()*/1200), B_RGB16, true);
+		fBufferView = new EMBeView(this, oRect, vResizingMode, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
+		fBufferView -> SetViewColor(B_TRANSPARENT_COLOR); // To avoid the background to be redrawn on every update = flicker
+		if(fBuffer -> Lock())
 		{
-			m_opBuffer -> AddChild(m_opBufferView);
-			m_opBufferView -> ResizeTo(1600, 1200);
-			m_opBuffer -> Unlock();
+			fBuffer -> AddChild(fBufferView);
+			fBufferView -> ResizeTo(1600, 1200);
+			fBuffer -> Unlock();
 		}
 	}
-		
+
 //	auto_ptr<EMBeView> opPlainView(new EMBeView(this, oRect, vResizingMode, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE));
 //	EMBeView* opPlainView(new EMBeView(this, oRect, vResizingMode, B_WILL_DRAW | B_FRAME_EVENTS));
-	m_opPlainView -> SetViewColor(B_TRANSPARENT_COLOR); // To avoid the background to be redrawn on every update = flicker
-	if(p_vDoubleBuffered)
+	fPlainView -> SetViewColor(B_TRANSPARENT_COLOR); // To avoid the background to be redrawn on every update = flicker
+	if(doubleBuffered)
 	{
 /*
 		auto_ptr<BBitmap> opBuffer(new BBitmap(BRect(0, 0, 1600, 1200), B_RGB16, true));
@@ -80,266 +84,295 @@ m_vIsDoubleBuffered(p_vDoubleBuffered)
 			opBuffer -> Unlock();
 		}
 */
-//		m_opPlainView = opPlainView;
-//		m_opBufferView = opBufferView;
-//		m_opBuffer = opBuffer;
-		m_opDrawView = m_opBufferView;
-		m_vExistingDoubleBufferedViews++;
+//		fPlainView = opPlainView;
+//		fBufferView = opBufferView;
+//		fBuffer = opBuffer;
+		fDrawView = fBufferView;
+		fExistingDoubleBufferedViews++;
 	}
 	else
 	{
-//		m_opPlainView = opPlainView;
-		m_opDrawView = m_opPlainView;
-//		m_opDrawView = m_opPlainView;
+//		fPlainView = opPlainView;
+		fDrawView = fPlainView;
+//		fDrawView = fPlainView;
 	}
 }
+
 
 EMBeViewContainer::~EMBeViewContainer()
 {
 	;//cout_commented_out_4_release << "~EMBeViewContainer()" << endl;
 	// SInce BeOS deletes allt its windows and attached views itself, only
 	// the bitmap and its view are deleted here (done by the auto_ptr)
-//	m_opBufferView -> RemoveSelf();
+//	fBufferView -> RemoveSelf();
 /*
 	// The view must be removed from an eventual window since it will be
 	// deleted twice otherwise (by the window and by the auto_ptr destructor)
-	if(m_opPlainView -> Window() != NULL)
+	if(fPlainView -> Window() != NULL)
 	{
 		;//cout_commented_out_4_release << "~EMBeViewContainer(): removing view from window...";
-		m_opPlainView -> RemoveSelf();
+		fPlainView -> RemoveSelf();
 		;//cout_commented_out_4_release << "done" << endl;
 	}
-	else 
+	else
 		;//cout_commented_out_4_release <<"~EMBeViewContainer(): not attached" << endl;
 */
-	if(m_vIsDoubleBuffered)
+	if(fDoubleBuffered)
 	{
-		m_vExistingDoubleBufferedViews--;
-		if(m_vExistingDoubleBufferedViews == 0) // If double buffered stuff should be deleted
+		fExistingDoubleBufferedViews--;
+		if(fExistingDoubleBufferedViews == 0) // If double buffered stuff should be deleted
 		{
-			delete m_opBufferView;
-			m_opBufferView = NULL;
-			delete m_opBuffer;
-			m_opBuffer = NULL;
+			delete fBufferView;
+			fBufferView = NULL;
+			delete fBuffer;
+			fBuffer = NULL;
 		}
 	}
 }
 
-void EMBeViewContainer::AddChild(EMGUIComponent* p_opView)
+
+void EMBeViewContainer::AddChild(EMGUIComponent* view)
 {
 	// Sub-views in a double-buffered view is currently not allowed
-	if(m_vIsDoubleBuffered)
+	if(fDoubleBuffered)
 		EMDebugger("Adding views to a double-buffered view is not allowed");
-	m_opPlainView -> AddChild((BView*) p_opView -> GetNativeView());
-	p_opView -> InitComponent();
+	fPlainView -> AddChild((BView*) view -> GetNativeView());
+	view -> InitComponent();
 }
 
+
 // Enters debugger if window is unlocked
-void EMBeViewContainer::AssertWindowLocked()
+void EMBeViewContainer::AssertWindowLocked() const
 {
-	if(!(m_opPlainView -> Window() -> IsLocked()))
+	if(!(fPlainView -> Window() -> IsLocked()))
 		EMDebugger("Window must be locked before entering this method\n");
 }
 
+
 EMRect EMBeViewContainer::Bounds() const
 {
-//	BRect oRect = m_opDrawView -> Bounds();
+//	BRect oRect = fDrawView -> Bounds();
 	// Using the plain view so that the bitmap buffer does not have to be locked
 	// so often if the view is double-buffered
-	BRect oRect = m_opPlainView -> Bounds();
+	BRect oRect = fPlainView -> Bounds();
 	return EMRect(oRect.left, oRect.top, oRect.right, oRect.bottom);
 }
-	
-void EMBeViewContainer::CalculateStringHeight(const char* p_vpString, float &p_vAscent, float &p_vDescent)
+
+void EMBeViewContainer::CalculateStringHeight(const char* str,
+		int32 &ascent, int32 &descent)
 {
 	font_height oHeight;
-	m_opDrawView -> GetFontHeight(&oHeight);
-	p_vAscent = oHeight.ascent;
-	p_vDescent = oHeight.descent;
-	if(p_vAscent - static_cast<int>(p_vAscent) > 0)
-		p_vAscent = static_cast<int>(p_vAscent) + 1;
-	if(p_vDescent - static_cast<int>(p_vDescent) > 0)
-		p_vDescent = static_cast<int>(p_vDescent) + 1;
+	fDrawView -> GetFontHeight(&oHeight);
+	ascent = (int32)oHeight.ascent;
+	descent = (int32)oHeight.descent;
+	if(ascent - static_cast<int>(ascent) > 0)
+		ascent = static_cast<int>(ascent) + 1;
+	if(descent - static_cast<int>(descent) > 0)
+		descent = static_cast<int>(descent) + 1;
 }
 
-float EMBeViewContainer::CalculateStringWidth(const char* p_vpString)
+
+int32 EMBeViewContainer::CalculateStringWidth(const char* str)
 {
-	float vWidth = m_opDrawView -> StringWidth(p_vpString);
+	int32 vWidth = (int32)fDrawView -> StringWidth(str);
 	if(vWidth - static_cast<int>(vWidth) > 0)
 		vWidth = static_cast<int>(vWidth) + 1;
 	return vWidth;
 }
 
-void EMBeViewContainer::ConstrainClippingRect(const EMRect p_oRect)
+
+void EMBeViewContainer::ConstrainClippingRect(EMRect rect)
 {
-	if(!p_oRect.IsValid())
+	if(!rect.IsValid())
 	{
-		m_opPlainView -> ConstrainClippingRegion(NULL);
-		if(m_vIsDoubleBuffered)
-			m_opBufferView -> ConstrainClippingRegion(NULL);
+		fPlainView -> ConstrainClippingRegion(NULL);
+		if(fDoubleBuffered)
+			fBufferView -> ConstrainClippingRegion(NULL);
 		return;
 	}
-	
+
 //	BRegion* oRegion = new BRegion();
 	BRegion oRegion;
 	BRect oRect;
-	
-	oRect.left = p_oRect.m_vLeft;
-	oRect.top = p_oRect.m_vTop;
-	oRect.right = p_oRect.m_vRight;
-	oRect.bottom = p_oRect.m_vBottom;
+
+	oRect.left = rect.m_vLeft;
+	oRect.top = rect.m_vTop;
+	oRect.right = rect.m_vRight;
+	oRect.bottom = rect.m_vBottom;
 //	oRegion -> Set(oRect);
-//	m_opPlainView -> ConstrainClippingRegion(oRegion);
+//	fPlainView -> ConstrainClippingRegion(oRegion);
 	oRegion.Set(oRect);
-	m_opPlainView -> ConstrainClippingRegion(&oRegion);
-	if(m_vIsDoubleBuffered)
-		m_opBufferView -> ConstrainClippingRegion(&oRegion);
+	fPlainView -> ConstrainClippingRegion(&oRegion);
+	if(fDoubleBuffered)
+		fBufferView -> ConstrainClippingRegion(&oRegion);
 }
 
-void EMBeViewContainer::ConvertToScreenCoordinates(float &p_vX, float &p_vY)
+
+void EMBeViewContainer::ConvertToScreenCoordinates(int32 &x, int32 &y)
 {
-	BPoint oNewPoint = m_opPlainView -> ConvertToScreen(BPoint(p_vX, p_vY));
-	p_vX = oNewPoint.x;
-	p_vY = oNewPoint.y;
+	BPoint oNewPoint = fPlainView -> ConvertToScreen(BPoint(x, y));
+	x = (int32)oNewPoint.x;
+	y = (int32)oNewPoint.y;
 }
 
-void EMBeViewContainer::DrawAndUnlockBuffer(EMRect p_oUpdateRect)
+
+void EMBeViewContainer::DrawAndUnlockBuffer(EMRect rect)
 {
 //;//cout_commented_out_4_release << "EMBeViewContainer::DrawAndUnlockBuffer: ";
-//p_oUpdateRect.Print();
-	if(!m_vIsDoubleBuffered)
+//rect.Print();
+	if(!fDoubleBuffered)
 		EMDebugger("DrawAndUnlockBuffer() does not make sense in a non-double-buffered view");
 
-	if(!p_oUpdateRect.IsValid())
+	if(!rect.IsValid())
 	{
-		m_opBuffer -> Unlock();
+		fBuffer -> Unlock();
 		return;
 	}
 
-	BRect oSourceRect(p_oUpdateRect.m_vLeft, p_oUpdateRect.m_vTop, p_oUpdateRect.m_vRight, p_oUpdateRect.m_vBottom);
-	oSourceRect.OffsetBy(-1 * m_vBufferScrollOffsetX, -1 * m_vBufferScrollOffsetY);
-	BRect oDestinationRect(p_oUpdateRect.m_vLeft, p_oUpdateRect.m_vTop, p_oUpdateRect.m_vRight, p_oUpdateRect.m_vBottom);
-//	BRect oDrawRect(p_oUpdateRect.m_vLeft, p_oUpdateRect.m_vTop, p_oUpdateRect.m_vRight, p_oUpdateRect.m_vBottom);
-	m_opBufferView -> Sync();
-//	m_opPlainView -> DrawBitmap(m_opBuffer.get(), oDrawRect, oDrawRect);
-	m_opPlainView -> DrawBitmap(m_opBuffer, oSourceRect, oDestinationRect);
-	m_opBuffer -> Unlock();
+
+	BRect sourceRect(rect.m_vLeft, rect.m_vTop, rect.m_vRight, rect.m_vBottom);
+	sourceRect.OffsetBy(-1 * fBufferScrollOffsetX, -1 * fBufferScrollOffsetY);
+	BRect oDestinationRect(rect.m_vLeft, rect.m_vTop, rect.m_vRight, rect.m_vBottom);
+//	BRect oDrawRect(rect.m_vLeft, rect.m_vTop, rect.m_vRight, rect.m_vBottom);
+	fBufferView -> Sync();
+//	fPlainView -> DrawBitmap(fBuffer.get(), oDrawRect, oDrawRect);
+	fPlainView -> DrawBitmap(fBuffer, sourceRect, oDestinationRect);
+	fBuffer -> Unlock();
 }
 
-void EMBeViewContainer::DrawBitmap(const EMBitmap* p_opBitmap)
+
+void EMBeViewContainer::DrawBitmap(const EMBitmap* bitmap)
 {
-	m_opDrawView -> DrawBitmap((BBitmap*) p_opBitmap -> GetNativeBitmap());
+	fDrawView -> DrawBitmap((BBitmap*) bitmap -> GetNativeBitmap());
 }
 
-void EMBeViewContainer::DrawBitmap(const EMBitmap* p_opBitmap, float p_vX, float p_vY)
+
+
+void EMBeViewContainer::DrawBitmap(const EMBitmap* bitmap, int32 x, int32 y)
 {
-	m_opDrawView -> DrawBitmap((BBitmap*) p_opBitmap -> GetNativeBitmap(), BPoint(p_vX, p_vY));
+	fDrawView -> DrawBitmap((BBitmap*) bitmap -> GetNativeBitmap(),
+		BPoint(x, y));
 }
 
-void EMBeViewContainer::DrawBitmap(const EMBitmap* p_opBitmap, EMRect p_oSource, EMRect p_oDestination)
+
+void EMBeViewContainer::DrawBitmap(const EMBitmap* bitmap, EMRect source,
+	EMRect destination)
 {
-	if(!p_oSource.IsValid())
+	if(!source.IsValid())
 		return;
 
-	if(!p_oDestination.IsValid())
+	if(!destination.IsValid())
 		return;
 
-	BRect oSourceRect(p_oSource.m_vLeft, p_oSource.m_vTop, p_oSource.m_vRight, p_oSource.m_vBottom);
-	BRect oDestinationRect(p_oDestination.m_vLeft, p_oDestination.m_vTop, p_oDestination.m_vRight, p_oDestination.m_vBottom);
-	m_opDrawView -> DrawBitmap((BBitmap*) p_opBitmap -> GetNativeBitmap(), oSourceRect, oDestinationRect);
+	BRect sourceRect(source.m_vLeft, source.m_vTop, source.m_vRight,
+			source.m_vBottom);
+	BRect oDestinationRect(destination.m_vLeft, destination.m_vTop,
+		destination.m_vRight, destination.m_vBottom);
+
+	fDrawView -> DrawBitmap((BBitmap*) bitmap -> GetNativeBitmap(),
+		sourceRect, oDestinationRect);
 }
+
+
 /*
-void EMBeViewContainer::DrawBitmapOverlay(const EMBitmap* p_opBitmap, EMRect p_oSource, EMRect p_oDestination)
+void EMBeViewContainer::DrawBitmapOverlay(const EMBitmap* bitmap, EMRect source, EMRect destination)
 {
-	if(!p_oSource.IsValid())
+	if(!source.IsValid())
 		return;
 
-	if(!p_oDestination.IsValid())
+	if(!destination.IsValid())
 		return;
 
-	BRect oSourceRect(p_oSource.m_vLeft, p_oSource.m_vTop, p_oSource.m_vRight, p_oSource.m_vBottom);
-	BRect oDestinationRect(p_oDestination.m_vLeft, p_oDestination.m_vTop, p_oDestination.m_vRight, p_oDestination.m_vBottom);
+	BRect sourceRect(source.m_vLeft, source.m_vTop, source.m_vRight, source.m_vBottom);
+	BRect oDestinationRect(destination.m_vLeft, destination.m_vTop, destination.m_vRight, destination.m_vBottom);
 	rgb_color oColor;
-	m_opDrawView -> SetViewOverlay((BBitmap*) p_opBitmap -> GetNativeBitmap(), oSourceRect, oDestinationRect, &oColor, B_OVERLAY_FILTER_HORIZONTAL | B_OVERLAY_FILTER_VERTICAL);
+	fDrawView -> SetViewOverlay((BBitmap*) bitmap -> GetNativeBitmap(), sourceRect, oDestinationRect, &oColor, B_OVERLAY_FILTER_HORIZONTAL | B_OVERLAY_FILTER_VERTICAL);
 }
 */
-void EMBeViewContainer::DrawBuffer(EMRect p_oUpdateRect)
+
+
+void EMBeViewContainer::DrawBuffer(EMRect rect)
 {
-	if(!m_vIsDoubleBuffered)
+	if(!fDoubleBuffered)
 		EMDebugger("DrawBuffer() does not make sense in a non-double-buffered view");
 
-	if(!p_oUpdateRect.IsValid())
+	if(!rect.IsValid())
 		return;
 
-	BRect oSourceRect(p_oUpdateRect.m_vLeft, p_oUpdateRect.m_vTop, p_oUpdateRect.m_vRight, p_oUpdateRect.m_vBottom);
-	oSourceRect.OffsetBy(-1 * m_vBufferScrollOffsetX, -1 * m_vBufferScrollOffsetY);
-	BRect oDestinationRect(p_oUpdateRect.m_vLeft, p_oUpdateRect.m_vTop, p_oUpdateRect.m_vRight, p_oUpdateRect.m_vBottom);
-	m_opBufferView -> Sync();
-	m_opPlainView -> DrawBitmap(m_opBuffer, oSourceRect, oDestinationRect);
+	BRect sourceRect(rect.m_vLeft, rect.m_vTop, rect.m_vRight, rect.m_vBottom);
+	sourceRect.OffsetBy(-1 * fBufferScrollOffsetX, -1 * fBufferScrollOffsetY);
+	BRect destinationRect(rect.m_vLeft, rect.m_vTop, rect.m_vRight,
+		rect.m_vBottom);
+	fBufferView -> Sync();
+	fPlainView -> DrawBitmap(fBuffer, sourceRect, destinationRect);
 }
+
 
 /*
-void EMBeViewContainer::DrawBuffer(EMRect p_oUpdateRect)
+void EMBeViewContainer::DrawBuffer(EMRect rect)
 {
-	if(!p_oUpdateRect.IsValid())
+	if(!rect.IsValid())
 		return;
 
-	if(!m_vIsDoubleBuffered)
+	if(!fDoubleBuffered)
 		EMDebugger("DrawBuffer() does not make sense in a non-double-buffered view");
-	BRect oDrawRect(p_oUpdateRect.m_vLeft, p_oUpdateRect.m_vTop, p_oUpdateRect.m_vRight, p_oUpdateRect.m_vBottom);
-	m_opBufferView -> Sync();
-	m_opPlainView -> DrawBitmap(m_opBuffer.get(), oDrawRect, oDrawRect);
+	BRect oDrawRect(rect.m_vLeft, rect.m_vTop, rect.m_vRight, rect.m_vBottom);
+	fBufferView -> Sync();
+	fPlainView -> DrawBitmap(fBuffer.get(), oDrawRect, oDrawRect);
 }
 */
 
-void EMBeViewContainer::DrawString(float p_vX, float p_vY, const char* p_vpText)
+void EMBeViewContainer::DrawString(float x, float y, const char* text)
 {
-	m_opDrawView -> DrawString(p_vpText, BPoint(p_vX, p_vY));
+	fDrawView -> DrawString(text, BPoint(x, y));
 }
 
-void EMBeViewContainer::EnableDoubleBuffering(bool p_vEnabled)
+
+void EMBeViewContainer::EnableDoubleBuffering(bool enabled)
 {
-	if(!m_vIsDoubleBuffered)
+	if(!fDoubleBuffered)
 		EMDebugger("EnableDoubleBuffering can only be called on a view that has been created double buffered");
-	
-	if(!p_vEnabled)
-		m_opDrawView = m_opPlainView;
+
+	if(!enabled)
+		fDrawView = fPlainView;
 	else
-		m_opDrawView = m_opBufferView;
+		fDrawView = fBufferView;
 }
 
-void EMBeViewContainer::FillRect(const EMRect p_oRect)
+
+void EMBeViewContainer::FillRect(const EMRect rect)
 {
-	if(!p_oRect.IsValid())
+	if(!rect.IsValid())
 		return;
 
 	BRect oRect;
-	
-	oRect.left = p_oRect.m_vLeft;
-	oRect.top = p_oRect.m_vTop;
-	oRect.right = p_oRect.m_vRight;
-	oRect.bottom = p_oRect.m_vBottom;
 
-	m_opDrawView -> FillRect(oRect);
+	oRect.left = rect.m_vLeft;
+	oRect.top = rect.m_vTop;
+	oRect.right = rect.m_vRight;
+	oRect.bottom = rect.m_vBottom;
+
+	fDrawView -> FillRect(oRect);
 }
+
 
 EMRect EMBeViewContainer::Frame() const
 {
-//	BRect oRect = m_opDrawView -> Frame();
+//	BRect oRect = fDrawView -> Frame();
 	// Using the plain view so that the bitmap buffer does not have to be locked
 	// so often if the view is double-buffered
-	BRect oRect = m_opPlainView -> Frame();
+	BRect oRect = fPlainView -> Frame();
 	return EMRect(oRect.left, oRect.top, oRect.right, oRect.bottom);
 }
-	
+
 EMRect EMBeViewContainer::GetClippingRect() const
 {
 	BRegion oRegion;
 	BRect oRect;
 	EMRect oRect2;
-	
-//	m_opDrawView -> GetClippingRegion(&oRegion);
-	m_opPlainView -> GetClippingRegion(&oRegion);
+
+//	fDrawView -> GetClippingRegion(&oRegion);
+	fPlainView -> GetClippingRegion(&oRegion);
 /*
 ;//cout_commented_out_4_release << "Number of clipping rects: " << oRegion.CountRects() << endl;
 for(int vIndex = 0; vIndex < oRegion.CountRects(); vIndex++)
@@ -361,82 +394,92 @@ for(int vIndex = 0; vIndex < oRegion.CountRects(); vIndex++)
 	return oRect2;
 }
 
+
 EMView* EMBeViewContainer::GetLastMouseDownView()
 {
-	return m_opPlainView -> GetLastMouseDownView();
+	return fPlainView -> GetLastMouseDownView();
 }
 
-void EMBeViewContainer::GetMouse(float &p_vX, float &p_vY, bool &p_vButtonOne, bool &p_vButtonTwo, bool &p_vButtonThree) const
+
+void EMBeViewContainer::GetMouse(float &x, float &y, bool &buttonOne,
+	bool &buttonTwo, bool &buttonThree) const
 {
 	BPoint oPoint;
 	uint32 vButtons;
-	
-	m_opPlainView -> GetMouse(&oPoint, &vButtons, false);
 
-	p_vX = oPoint.x;
-	p_vY = oPoint.y;
-	
+	fPlainView -> GetMouse(&oPoint, &vButtons, false);
+
+	x = oPoint.x;
+	y = oPoint.y;
+
 	if((vButtons & B_PRIMARY_MOUSE_BUTTON) == B_PRIMARY_MOUSE_BUTTON)
-		p_vButtonOne = true;
+		buttonOne = true;
 	else
-		p_vButtonOne = false;
+		buttonOne = false;
 	if((vButtons & B_SECONDARY_MOUSE_BUTTON) == B_SECONDARY_MOUSE_BUTTON)
-		p_vButtonTwo = true;
+		buttonTwo = true;
 	else
-		p_vButtonTwo = false;
+		buttonTwo = false;
 	if((vButtons & B_TERTIARY_MOUSE_BUTTON) == B_TERTIARY_MOUSE_BUTTON)
-		p_vButtonThree = true;
+		buttonThree = true;
 	else
-		p_vButtonThree = false;
+		buttonThree = false;
 }
+
 
 void* EMBeViewContainer::GetNativeView() const
 {
-	return (void*) m_opPlainView;
-//	return m_opPlainView;
+	return (void*) fPlainView;
+//	return fPlainView;
 }
+
 
 void EMBeViewContainer::Hide()
 {
-	m_opPlainView -> Hide();
+	fPlainView -> Hide();
 }
 
-void EMBeViewContainer::Invalidate(const EMRect p_oRect)
+
+void EMBeViewContainer::Invalidate(const EMRect rect)
 {
-	if(!p_oRect.IsValid())
+	if(!rect.IsValid())
 		return;
 
 	BRect oRect;
-	
-	oRect.left = p_oRect.m_vLeft;
-	oRect.top = p_oRect.m_vTop;
-	oRect.right = p_oRect.m_vRight;
-	oRect.bottom = p_oRect.m_vBottom;
 
-	m_opPlainView -> Invalidate(oRect);
+	oRect.left = rect.m_vLeft;
+	oRect.top = rect.m_vTop;
+	oRect.right = rect.m_vRight;
+	oRect.bottom = rect.m_vBottom;
+
+	fPlainView -> Invalidate(oRect);
 }
+
 
 bool EMBeViewContainer::IsDoubleBuffered()
 {
-	return m_vIsDoubleBuffered;
+	return fDoubleBuffered;
 }
+
 
 bool EMBeViewContainer::IsHidden()
 {
-	return m_opPlainView -> IsHidden();
+	return fPlainView -> IsHidden();
 }
+
 
 bool EMBeViewContainer::LockBuffer()
 {
-	if(!m_vIsDoubleBuffered)
+	if(!fDoubleBuffered)
 		EMDebugger("LockBuffer() does not make sense in a non-double-buffered view");
-	return m_opBuffer -> Lock();
+	return fBuffer -> Lock();
 }
+
 
 bool EMBeViewContainer::LockWindow()
 {
 /*
-thread_id vThreadID = m_opPlainView -> Window() -> LockingThread();
+thread_id vThreadID = fPlainView -> Window() -> LockingThread();
 thread_id vThisThreadID = find_thread(NULL);
 thread_info oThreadInfo;
 thread_info oThisThreadInfo;
@@ -451,229 +494,247 @@ else
 }
 else
 ;//cout_commented_out_4_release << "Before locking window (from view). This thread: " << oThisThreadInfo.name << endl;
-bool vResult =  m_opPlainView -> Window() -> Lock();
+bool vResult =  fPlainView -> Window() -> Lock();
 ;//cout_commented_out_4_release << " ------------------------  Window Locked (from view) (" << vResult << ") " << oThisThreadInfo.name << " -------------------" << endl;
 //EMDebugger("Window locked by view");
 	return vResult;
 */
-	return m_opPlainView -> Window() -> Lock();
+	return fPlainView -> Window() -> Lock();
 }
+
 
 void EMBeViewContainer::ReceiveAllMouseEvents(bool vReceiveAll)
 {
 	if(vReceiveAll)
-		m_opPlainView -> SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
+		fPlainView -> SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 	else
-		m_opPlainView -> SetEventMask(0, B_NO_POINTER_HISTORY);
+		fPlainView -> SetEventMask(0, B_NO_POINTER_HISTORY);
 }
 
-bool EMBeViewContainer::RemoveChild(EMGUIComponent* p_opView)
+
+bool EMBeViewContainer::RemoveChild(EMGUIComponent* view)
 {
 	// Sub-views in a double-buffered view is currently not allowed
-	if(m_vIsDoubleBuffered)
+	if(fDoubleBuffered)
 		EMDebugger("Removing views from a double-buffered view is not allowed");
-	return m_opPlainView -> RemoveChild((BView*) p_opView -> GetNativeView());
+	return fPlainView -> RemoveChild((BView*) view -> GetNativeView());
 }
 
-void EMBeViewContainer::ScrollBy(float p_vX, float p_vY)
+
+void EMBeViewContainer::ScrollBy(float x, float y)
 {
-	m_opPlainView -> ScrollBy(p_vX, p_vY);
-	if(m_vIsDoubleBuffered)
-		m_opBufferView -> ScrollBy(p_vX, p_vY);
+	fPlainView -> ScrollBy(x, y);
+	if(fDoubleBuffered)
+		fBufferView -> ScrollBy(x, y);
 }
 
-void EMBeViewContainer::ScrollTo(float p_vX, float p_vY)
+
+void EMBeViewContainer::ScrollTo(float x, float y)
 {
-	m_opPlainView -> ScrollTo(p_vX, p_vY);
-	if(m_vIsDoubleBuffered)
+	fPlainView -> ScrollTo(x, y);
+	if(fDoubleBuffered)
 	{
-		m_opBufferView -> SetOrigin(-1 * p_vX, -1 * p_vY);
-		m_vBufferScrollOffsetX = p_vX;
-		m_vBufferScrollOffsetY = p_vY;
-//		m_opBufferView -> ScrollTo(p_vX, p_vY);
+		fBufferView -> SetOrigin(-1 * x, -1 * y);
+		fBufferScrollOffsetX = x;
+		fBufferScrollOffsetY = y;
+//		fBufferView -> ScrollTo(x, y);
 	}
 }
 
-void EMBeViewContainer::SetBitmap(EMBitmap* p_opBitmap)
+
+void EMBeViewContainer::SetBitmap(EMBitmap* bitmap)
 {
 	// Setting a bitmap in a double-buffered view is currently not allowed
-	if(m_vIsDoubleBuffered)
+	if(fDoubleBuffered)
 		EMDebugger("Setting a bitmap in a double-buffered view is not allowed");
-	m_opPlainView -> SetViewBitmap(static_cast<BBitmap*>(p_opBitmap -> GetNativeBitmap()));
+	fPlainView -> SetViewBitmap(static_cast<BBitmap*>(bitmap -> GetNativeBitmap()));
 }
 
-void EMBeViewContainer::SetDrawingMode(EMDrawingMode p_vMode)
+
+void EMBeViewContainer::SetDrawingMode(EMDrawingMode mode)
 {
-	switch(p_vMode)
+	switch(mode)
 	{
 	case EM_OP_COPY:
-		m_opDrawView -> SetDrawingMode(B_OP_COPY);
+		fDrawView -> SetDrawingMode(B_OP_COPY);
 		break;
 	case EM_OP_ALPHA:
-		m_opDrawView -> SetDrawingMode(B_OP_ALPHA);
-		m_opDrawView -> SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
+		fDrawView -> SetDrawingMode(B_OP_ALPHA);
+		fDrawView -> SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
 		break;
 	case EM_OP_INVERT:
-		m_opDrawView -> SetDrawingMode(B_OP_INVERT);
+		fDrawView -> SetDrawingMode(B_OP_INVERT);
 		break;
 	default:
-		m_opDrawView -> SetDrawingMode(B_OP_COPY);
+		fDrawView -> SetDrawingMode(B_OP_COPY);
 	}
 }
 
-void EMBeViewContainer::SetFont(EMFont p_vFont)
+
+void EMBeViewContainer::SetFont(EMFont font)
 {
-	switch(p_vFont)
+	switch(font)
 	{
 	case EM_PLAIN:
-		m_opDrawView -> SetFont(be_plain_font);
+		fDrawView -> SetFont(be_plain_font);
 		break;
 	case EM_BOLD:
-		m_opDrawView -> SetFont(be_bold_font);
+		fDrawView -> SetFont(be_bold_font);
 		break;
 	case EM_FIXED:
-		m_opDrawView -> SetFont(be_fixed_font);
+		fDrawView -> SetFont(be_fixed_font);
 		break;
 	}
 }
 
-void EMBeViewContainer::SetFrame(EMRect p_oFrame)
+
+void EMBeViewContainer::SetFrame(EMRect frame)
 {
-	if(Frame() == p_oFrame)
+	if(Frame() == frame)
 		return;
-		
-	if(Frame().m_vTop != p_oFrame.m_vTop || Frame().m_vLeft != p_oFrame.m_vLeft)
-		m_opPlainView -> MoveTo(p_oFrame.m_vLeft, p_oFrame.m_vTop);
-	if(Frame().GetWidth() != p_oFrame.GetWidth() || Frame().GetHeight() != p_oFrame.GetHeight())
+
+	if(Frame().m_vTop != frame.m_vTop || Frame().m_vLeft != frame.m_vLeft)
+		fPlainView -> MoveTo(frame.m_vLeft, frame.m_vTop);
+	if(Frame().GetWidth() != frame.GetWidth() || Frame().GetHeight() != frame.GetHeight())
 	{
-		m_opPlainView -> ResizeTo(p_oFrame.GetWidth(), p_oFrame.GetHeight());
+		fPlainView -> ResizeTo(frame.GetWidth(), frame.GetHeight());
 /*
-		if(m_vIsDoubleBuffered)
+		if(fDoubleBuffered)
 		{
-if(m_opBuffer == NULL)
+if(fBuffer == NULL)
 ;//cout_commented_out_4_release << "Hmm, the buffer is NULL" << endl;
-			if(m_opBuffer -> Lock())
+			if(fBuffer -> Lock())
 			{
-				m_opBufferView -> ResizeTo(p_oFrame.GetWidth(), p_oFrame.GetHeight());
-				m_opBuffer -> Unlock();
+				fBufferView -> ResizeTo(frame.GetWidth(), frame.GetHeight());
+				fBuffer -> Unlock();
 			}
 		}
 */
 	}
 /*
-	if(m_vIsDoubleBuffered)
+	if(fDoubleBuffered)
 	{
-		m_opBuffer -> RemoveChild(m_opBufferView.get());
-		delete m_opBuffer.get();
-		auto_ptr<BBitmap> opBuffer(new BBitmap(BRect(0, 0, p_oFrame.GetWidth(), p_oFrame.GetHeight()), B_RGB16, true));
+		fBuffer -> RemoveChild(fBufferView.get());
+		delete fBuffer.get();
+		auto_ptr<BBitmap> opBuffer(new BBitmap(BRect(0, 0, frame.GetWidth(), frame.GetHeight()), B_RGB16, true));
 		if(opBuffer -> Lock())
 		{
-			opBuffer -> AddChild(m_opBufferView.get());
+			opBuffer -> AddChild(fBufferView.get());
 
-			m_opBufferView -> ResizeTo(p_oFrame.GetWidth(), p_oFrame.GetHeight());
-//			m_opBufferView -> MoveTo(p_oFrame.m_vLeft, p_oFrame.m_vTop);
+			fBufferView -> ResizeTo(frame.GetWidth(), frame.GetHeight());
+//			fBufferView -> MoveTo(frame.m_vLeft, frame.m_vTop);
 
 			opBuffer -> Unlock();
 		}
-		m_opBuffer = opBuffer;
+		fBuffer = opBuffer;
 	}
 */
 }
 
-void EMBeViewContainer::SetHighColor(const EMColor p_vColor)
+
+void EMBeViewContainer::SetHighColor(const EMColor color)
 {
 	rgb_color sColor;
-	sColor.red = p_vColor.m_vRed;
-	sColor.blue = p_vColor.m_vBlue;
-	sColor.green = p_vColor.m_vGreen;
-	sColor.alpha = p_vColor.m_vAlpha;
+	sColor.red = color.m_vRed;
+	sColor.blue = color.m_vBlue;
+	sColor.green = color.m_vGreen;
+	sColor.alpha = color.m_vAlpha;
 
-	m_opDrawView -> SetHighColor(sColor);
+	fDrawView -> SetHighColor(sColor);
 }
 
-void EMBeViewContainer::SetLowColor(const EMColor p_vColor)
+
+void EMBeViewContainer::SetLowColor(const EMColor color)
 {
 	rgb_color sColor;
-	sColor.red = p_vColor.m_vRed;
-	sColor.blue = p_vColor.m_vBlue;
-	sColor.green = p_vColor.m_vGreen;
-	sColor.alpha = p_vColor.m_vAlpha;
+	sColor.red = color.m_vRed;
+	sColor.blue = color.m_vBlue;
+	sColor.green = color.m_vGreen;
+	sColor.alpha = color.m_vAlpha;
 
-	m_opDrawView -> SetLowColor(sColor);
+	fDrawView -> SetLowColor(sColor);
 }
 /*
 // This method is from the game kit
-void EMBeViewContainer::SetMousePosition(float p_vX, float p_vY)
+void EMBeViewContainer::SetMousePosition(float x, float y)
 {
-	set_mouse_position(static_cast<int32>(p_vX), static_cast<int32>(p_vY));
+	set_mouse_position(static_cast<int32>(x), static_cast<int32>(y));
 }
 */
-void EMBeViewContainer::SetViewColor(const EMColor p_vColor)
+void EMBeViewContainer::SetViewColor(const EMColor color)
 {
 	rgb_color sColor;
-	sColor.red = p_vColor.m_vRed;
-	sColor.blue = p_vColor.m_vBlue;
-	sColor.green = p_vColor.m_vGreen;
-	sColor.alpha = p_vColor.m_vAlpha;
+	sColor.red = color.m_vRed;
+	sColor.blue = color.m_vBlue;
+	sColor.green = color.m_vGreen;
+	sColor.alpha = color.m_vAlpha;
 
-	m_opPlainView -> SetViewColor(sColor);
-	if(m_vIsDoubleBuffered)
-		m_opBufferView -> SetViewColor(sColor);
+	fPlainView -> SetViewColor(sColor);
+	if(fDoubleBuffered)
+		fBufferView -> SetViewColor(sColor);
 }
+
 
 void EMBeViewContainer::Show()
 {
-	m_opPlainView -> Show();
+	fPlainView -> Show();
 }
 
-void EMBeViewContainer::StrokeLine(float p_vX1, float p_vY1, float p_vX2, float p_vY2)
+
+void EMBeViewContainer::StrokeLine(float x1, float y1, float x2, float y2)
 {
-	m_opDrawView -> StrokeLine(BPoint(p_vX1, p_vY1), BPoint(p_vX2, p_vY2));
+	fDrawView -> StrokeLine(BPoint(x1, y1), BPoint(x2, y2));
 }
 
-void EMBeViewContainer::StrokeRect(EMRect p_oRect)
+
+void EMBeViewContainer::StrokeRect(EMRect rect)
 {
-	if(!p_oRect.IsValid())
+	if(!rect.IsValid())
 		return;
 
-	m_opDrawView -> StrokeRect(BRect(p_oRect.m_vLeft, p_oRect.m_vTop, p_oRect.m_vRight, p_oRect.m_vBottom));
+	fDrawView -> StrokeRect(BRect(rect.m_vLeft, rect.m_vTop, rect.m_vRight,
+		rect.m_vBottom));
 }
+
 
 void EMBeViewContainer::Sync()
 {
-	m_opDrawView -> Sync();
+	fDrawView -> Sync();
 }
+
 
 void EMBeViewContainer::UpdateBufferFrame()
 {
 /*
-	if(m_opBuffer -> Lock())
+	if(fBuffer -> Lock())
 	{
-		m_opBufferView -> ResizeTo((m_opPlainView -> Bounds()).Width(), (m_opPlainView -> Bounds()).Height());
-;//cout_commented_out_4_release << "EMBeViewContainer::UpdateBufferFrame: m_opBufferView: ";
-;//cout_commented_out_4_release << (m_opPlainView -> Bounds()).Width() << ", " << (m_opPlainView -> Bounds()).Height() << endl;
-		m_opBuffer -> Unlock();
+		fBufferView -> ResizeTo((fPlainView -> Bounds()).Width(), (fPlainView -> Bounds()).Height());
+;//cout_commented_out_4_release << "EMBeViewContainer::UpdateBufferFrame: fBufferView: ";
+;//cout_commented_out_4_release << (fPlainView -> Bounds()).Width() << ", " << (fPlainView -> Bounds()).Height() << endl;
+		fBuffer -> Unlock();
 	}
 */
 }
 
+
 bool EMBeViewContainer::WindowIsLocked()
 {
-	return m_opPlainView -> Window() -> IsLocked();
+	return fPlainView -> Window() -> IsLocked();
 }
+
 
 void EMBeViewContainer::UnlockBuffer()
 {
-	if(!m_vIsDoubleBuffered)
+	if(!fDoubleBuffered)
 		EMDebugger("UnlockBuffer() does not make sense in a non-double-buffered view");
-	m_opBuffer -> Unlock();
+	fBuffer -> Unlock();
 }
+
 
 void EMBeViewContainer::UnlockWindow()
 {
-//;//cout_commented_out_4_release << " ------------------------  Window Unlocked (from view) -------------------" << endl;
-//;//cout_commented_out_4_release << " ------------------------  Window Unlocked (from view) -------------------" << endl;
-	m_opPlainView -> Window() -> Unlock();
+	fPlainView -> Window() -> Unlock();
 }
+
 
 #endif

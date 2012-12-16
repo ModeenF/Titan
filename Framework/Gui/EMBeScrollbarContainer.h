@@ -48,7 +48,7 @@ public:
 			void			Enable(bool);
 
 private:
-			EMBeScrollbar* 	m_opScrollbar;
+			EMBeScrollbar* 	fScrollbar;
 };
 
 #endif

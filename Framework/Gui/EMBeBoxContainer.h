@@ -17,6 +17,8 @@
 #include "EMGUIGlobals.h"
 #include "EMRect.h"
 
+#include "EMGUIComponent.h"
+
 #include <memory>
 
 class EMBeBox;
