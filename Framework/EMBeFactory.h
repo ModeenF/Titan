@@ -33,24 +33,43 @@ class EMWindow;
 class EMBeFactory : public EMFactory
 {
 public:
-	EMBitmap* CreateBitmap(const void* p_opNativeBitmap);
-	EMBorder* CreateBorder(EMRect p_oFrame, uint32 p_vResizingMode, EMBorderStyle p_vStyle, const char* p_vLabel);
-	EMButton* CreateButton(const EMRect p_oFrame, const char* p_vpLabel, uint32 p_vMessage, uint32 p_vResizingMode, uint32 p_vCommandID);
-	EMFileWindow* CreateFileWindow(EMFilePanelMode p_eFilePanelMode/*bool p_vIsLoadWindow*/,
-									const char* p_vpWindowTitle,
-									bool p_vMultipleSelection,
-									const char* p_vpSaveDefaultText,
-									vector<string>* p_vpVisibleExtensions,
-									const char* p_vpStartDirectory, uint32 p_vMessage);
-	EMMenu* CreateMenu(string* p_opName);
-	EMMenuBar* CreateMenuBar();
-	EMMenuItem* CreateMenuItem(string* p_opName, uint32 p_vCommand);
-	EMPopUpMenu* CreatePopUpMenu();
-	EMScrollbar* CreateScrollbar(EMRect p_oFrame, float p_vMinValue, float p_vMaxValue, EMOrientation p_vOrientation);
-	EMTextControl* CreateTextControl(EMRect p_oFrame, const char* p_vpText, uint32 p_vResizingMode);
-	EMTextView* CreateTextView(EMRect p_oFrame, const char* p_vpName, uint32 p_vResizingMode);
-	EMView* CreateView(const EMRect p_oFrame, uint32 p_vResizingMode, bool p_vDoubleBuffered);
-	EMWindow* CreateWindow(const EMRect p_oFrame, const char* p_vpName, const EMWindowType p_oType);
+			EMBitmap* 		CreateBitmap(const void* nativeBitmap);
+
+			EMBorder* 		CreateBorder(EMRect, uint32 resizingMode,
+									 EMBorderStyle, const char* label);
+
+			EMButton* 		CreateButton(EMRect, const char* label,
+									uint32 message, uint32 resizingMode,
+									uint32 commandID);
+
+			EMFileWindow* 	CreateFileWindow(EMFilePanelMode,
+									const char* title, bool multiSelect,
+									const char* saveDefaultText,
+									vector<string>* visibleExtensions,
+									const char* startDir, uint32 message);
+
+			EMMenu* 		CreateMenu(string* name);
+
+			EMMenuBar* 		CreateMenuBar();
+
+			EMMenuItem* 	CreateMenuItem(string* name, uint32 command);
+
+			EMPopUpMenu* 	CreatePopUpMenu();
+
+			EMScrollbar* 	CreateScrollbar(EMRect, float min, float max,
+									EMOrientation);
+
+			EMTextControl* 	CreateTextControl(EMRect, const char* text,
+									uint32 resizeMode);
+
+			EMTextView* 	CreateTextView(EMRect, const char* name,
+									uint32 resizeMode);
+
+			EMView* 		CreateView(EMRect, uint32 resizeMode,
+									bool doubleBuffer);
+
+			EMWindow* 		CreateWindow(EMRect, const char* name,
+									EMWindowType);
 };
 
 #endif

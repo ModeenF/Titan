@@ -19,28 +19,33 @@
 class EMBeScrollbarContainer : public EMScrollbar
 {
 public:
-							EMBeScrollbarContainer(EMRect p_oFrame,
-								float p_vMinValue, float p_vMaxValue,
-								EMOrientation p_vOrientation);
+							EMBeScrollbarContainer(EMRect, float min,
+									float max, EMOrientation);
 
 							~EMBeScrollbarContainer();
 
 	virtual EMRect 			Frame() const;
 	virtual void* 			GetNativeView() const;
+
 			void 			Hide();
+			void 			Show();
 
-
-			void			GetRange(float& p_vMin, float& p_vMax);
-			void 			GetSteps(float& p_vSmallStep, float& p_vBigStep);
+			void			GetRange(int32& min, int32& max);
+			void 			GetSteps(int32& small, int32& big);
 			int32			GetValue();
 
 			EMOrientation 	Orientation();
-			void 			SetFrame(EMRect p_oFrame);
-			void			SetProportion(float p_vProportion);
-			void			SetRange(float p_vMin, float p_vMax);
-			void			SetSteps(float p_vSmallStep, float p_vBigStep);
-			void			SetValue(float p_vValue);
-			void 			Show();
+			void 			SetFrame(EMRect);
+			void			SetProportion(float);
+			void			SetRange(float min, float max);
+			void			SetSteps(int32 small, int32 big);
+			void			SetValue(int32);
+
+			void			SetPageAndRange(uint32, uint32, uint32);
+
+
+			bool			IsEnabled();
+			void			Enable(bool);
 
 private:
 			EMBeScrollbar* 	m_opScrollbar;

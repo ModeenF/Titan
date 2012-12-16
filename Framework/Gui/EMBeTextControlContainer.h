@@ -7,8 +7,6 @@
 
 #include "EMGlobals.h"
 
-#ifdef PLATFORM_BEOS
-
 #ifndef __EM_BE_TEXT_CONTROL_CONTAINER
 #define __EM_BE_TEXT_CONTROL_CONTAINER
 
@@ -18,26 +16,36 @@
 class EMBeTextControlContainer : public EMTextControl
 {
 public:
-	EMBeTextControlContainer(EMRect p_oFrame, const char* p_vpText, uint32 p_vResizingMode);
-	~EMBeTextControlContainer();
-	EMRect Frame() const;
-	void* GetNativeView() const;
-	void Hide();
-	void InitComponent();
-	void Invalidate();
-	void SelectAll();
-	void SetFocus();
-	void SetFrame(EMRect p_oFrame);
-	void SetText(const char* p_vpText);
-	void Show();
-	void SetMaxBytes(int32 p_vMaxBytes);
-//	void SetWordWrap(bool p_vWrap);
-	const char* Text();
+							EMBeTextControlContainer(EMRect, const char* text,
+									uint32 resizeMode);
+							~EMBeTextControlContainer();
+
+			void 			InitComponent();
+
+			EMRect			Frame() const;
+			void 			SetFrame(EMRect);
+
+			void* 			GetNativeView() const;
+			void 			Hide();
+			void 			Show();
+
+			void 			Invalidate();
+
+			void 			SelectAll();
+			void 			SetFocus();
+			void 			SetText(const char*);
+			void 			SetMaxBytes(int32);
+
+			const char* 	Text();
+
+			bool			IsEnabled();
+			void			Enable(bool);
+			void			GetSelection(int32&, int32&);
+			void			SetSelection(int32, int32);
 
 private:
-	EMBeTextControl* m_opTextControl;
+			EMBeTextControl*m_opTextControl;
 };
 
 #endif
 
-#endif

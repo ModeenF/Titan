@@ -11,7 +11,7 @@
 EMBeThread::EMBeThread(const char* p_vpName, int32 p_vPriority, int32 p_vSleepTime) :
 EMThread(p_vpName)
 {
-	m_opSemaphore = EMSemaphore::CreateSemaphore();
+	m_opSemaphore = EMSemaphore::CreateEMSemaphore();
 	m_vSleepTime = p_vSleepTime;
 	m_sThreadID = spawn_thread(ThreadEntry, p_vpName, p_vPriority, this);
 
@@ -86,7 +86,7 @@ void EMBeThread::Start()
 	resume_thread(m_sThreadID);
 }
 
-void EMBeThread::Suspend()
+void EMBeThread::Suspend(bool calledFromThread)
 {
 	m_vShouldRun = false;
 	m_opSemaphore -> Acquire();

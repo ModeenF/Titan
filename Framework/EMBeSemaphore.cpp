@@ -17,7 +17,7 @@ EMBeSemaphore::~EMBeSemaphore()
 	delete_sem(m_vSemaphore);
 }
 
-void EMBeSemaphore::Acquire()
+bool EMBeSemaphore::Acquire()
 {
 	acquire_sem(m_vSemaphore);
 }

@@ -23,21 +23,29 @@
 class EMBePopUpMenuContainer : public EMPopUpMenu
 {
 public:
-	EMBePopUpMenuContainer();
-	virtual ~EMBePopUpMenuContainer();
-	bool AddItem(EMMenu* p_opMenu);
-	bool AddItem(EMMenuItem* p_opMenuItem);
-	bool AddSeparatorItem();
-	EMRect Frame() const { return EMRect(); };
-	void* GetNativeView() const;
-	void Hide() {};
-	void PopUp(float p_vX, float p_vY);
-	void Show() {};
+								EMBePopUpMenuContainer();
+	virtual 					~EMBePopUpMenuContainer();
+
+			bool 			AddItem(EMMenu* p_opMenu);
+			bool 			AddItem(EMMenuItem* p_opMenuItem);
+			bool 			AddSeparatorItem();
+
+			EMRect 			Frame() const { return EMRect(); };
+
+			void* 			GetNativeView() const;
+
+			void 			Hide() {};
+			void 			PopUp(float p_vX, float p_vY);
+			void 			Show() {};
+
+			void			SetFrame(EMRect);
+
+			void			PopUp(int32 x, int32 y, EMView*);
 
 private:
-	EMBePopUpMenu* m_opNativeMenu;
-	list<EMMenu*> m_oMenus;
-	list<EMMenuItem*> m_oMenuItems;
+			EMBePopUpMenu* m_opNativeMenu;
+			list<EMMenu*> m_oMenus;
+			list<EMMenuItem*> m_oMenuItems;
 };
 
 #endif

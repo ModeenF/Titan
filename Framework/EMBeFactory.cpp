@@ -17,76 +17,105 @@
 #include <string>
 #include <vector>
 
-EMBitmap* EMBeFactory::CreateBitmap(const void* p_opNativeBitmap)
+
+EMBitmap*
+EMBeFactory	::	CreateBitmap(const void* nativeBitmap)
 {
-	return new EMBeBitmapContainer(p_opNativeBitmap);
+	return new EMBeBitmapContainer(nativeBitmap);
 }
 
-EMBorder* EMBeFactory::CreateBorder(EMRect p_oFrame, uint32 p_vResizingMode, EMBorderStyle p_vStyle, const char* p_vLabel)
+
+EMBorder*
+EMBeFactory	::	CreateBorder(EMRect frame, uint32 resizeMode,
+							EMBorderStyle style, const char* label)
 {
-	return new EMBeBoxContainer(p_oFrame, p_vResizingMode, p_vStyle, p_vLabel);
+	return new EMBeBoxContainer(frame, resizeMode, style, label);
 }
 
-EMButton* EMBeFactory::CreateButton(const EMRect p_oFrame, const char* p_vpLabel, uint32 p_vMessage, uint32 p_vResizingMode, uint32 p_vCommandID)
+
+EMButton*
+EMBeFactory	::	CreateButton(const EMRect frame,	const char* label,
+							uint32 message, uint32 resizeMode,
+							uint32 commandID)
 {
-	return new EMBeButtonContainer(p_oFrame, p_vpLabel, p_vMessage, p_vResizingMode, p_vCommandID);
+	return new EMBeButtonContainer(frame, label, message,
+		resizeMode, commandID);
 }
 
-EMFileWindow* EMBeFactory::CreateFileWindow(EMFilePanelMode p_eFilePanelMode/*bool p_vIsLoadWindow*/,
-											const char* p_vpWindowTitle,
-											bool p_vMultipleSelection,
-											const char* p_vpSaveDefaultText,
-											vector<string>* p_vpVisibleExtensions,
-											const char* p_vpStartDirectory, uint32 p_vMessage)
+
+EMFileWindow*
+EMBeFactory	::	CreateFileWindow(EMFilePanelMode mode, const char* title,
+						bool multiSelect, const char* saveDefaultText,
+						vector<string>* visibleExtensions,
+						const char* startDirectory, uint32 message)
 {
-	return new EMBeFilePanelContainer(p_eFilePanelMode, p_vpWindowTitle,
-										p_vMultipleSelection, p_vpSaveDefaultText,
-										p_vpVisibleExtensions, p_vpStartDirectory, p_vMessage);
+	return new EMBeFilePanelContainer(mode, title, multiSelect, saveDefaultText,
+								visibleExtensions, startDirectory, message);
 }
 
-EMMenu* EMBeFactory::CreateMenu(string* p_opName)
+
+EMMenu*
+EMBeFactory	::	CreateMenu(string* name)
 {
-	return new EMBeMenuContainer(p_opName);
+	return new EMBeMenuContainer(name);
 }
 
-EMMenuBar* EMBeFactory::CreateMenuBar()
+
+EMMenuBar*
+EMBeFactory	::	CreateMenuBar()
 {
 //	return NULL;
 	return new EMBeMenuBarContainer();
 }
 
-EMMenuItem* EMBeFactory::CreateMenuItem(string* p_opName, uint32 p_vCommand)
+
+EMMenuItem*
+EMBeFactory	::	CreateMenuItem(string* name, uint32 command)
 {
-	return new EMBeMenuItemContainer(p_opName, p_vCommand);
+	return new EMBeMenuItemContainer(name, command);
 }
 
-EMPopUpMenu* EMBeFactory::CreatePopUpMenu()
+
+EMPopUpMenu*
+EMBeFactory	::	CreatePopUpMenu()
 {
 	return new EMBePopUpMenuContainer();
 }
 
-EMScrollbar* EMBeFactory::CreateScrollbar(EMRect p_oFrame, float p_vMinValue, float p_vMaxValue, EMOrientation p_vOrientation)
+
+EMScrollbar*
+EMBeFactory	::	CreateScrollbar(EMRect frame, float min, float max,
+						EMOrientation orientation)
 {
-	return new EMBeScrollbarContainer(p_oFrame, p_vMinValue, p_vMaxValue, p_vOrientation);
+	return new EMBeScrollbarContainer(frame, min, max, orientation);
 }
 
-EMTextControl* EMBeFactory::CreateTextControl(EMRect p_oFrame, const char* p_vpText, uint32 p_vResizingMode)
+
+EMTextControl*
+EMBeFactory	::	CreateTextControl(EMRect frame, const char* text, uint32 resizeMode)
 {
-	return new EMBeTextControlContainer(p_oFrame, p_vpText, p_vResizingMode);
+	return new EMBeTextControlContainer(frame, text, resizeMode);
 }
 
-EMTextView* EMBeFactory::CreateTextView(EMRect p_oFrame, const char* p_vpName, uint32 p_vResizingMode)
+
+EMTextView*
+EMBeFactory	::	CreateTextView(EMRect frame, const char* name, uint32 resizeMode)
 {
-	return new EMBeTextViewContainer(p_oFrame, p_vpName, p_vResizingMode);
+	return new EMBeTextViewContainer(frame, name, resizeMode);
 }
 
-EMView* EMBeFactory::CreateView(const EMRect p_oFrame, uint32 p_vResizingMode, bool p_vDoubleBuffered)
+
+EMView*
+EMBeFactory	::	CreateView(const EMRect frame, uint32 resizeMode, bool dblBuf)
 {
-	return new EMBeViewContainer(p_oFrame, p_vResizingMode, p_vDoubleBuffered);
+	return new EMBeViewContainer(frame, resizeMode, dblBuf);
 }
 
-EMWindow* EMBeFactory::CreateWindow(const EMRect p_oFrame, const char* p_vpName, const EMWindowType p_oType)
+
+EMWindow*
+EMBeFactory	::	CreateWindow(const EMRect frame, const char* name,
+						const EMWindowType type)
 {
-	return new EMBeWindowContainer(p_oFrame, p_vpName, p_oType);
+	return new EMBeWindowContainer(frame, name, type);
 }
 

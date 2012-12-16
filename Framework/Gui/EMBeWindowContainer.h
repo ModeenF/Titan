@@ -7,8 +7,6 @@
 
 #include "EMGlobals.h"
 
-#ifdef PLATFORM_BEOS
-
 #ifndef __EM_BE_WINDOW_CONTAINER
 #define __EM_BE_WINDOW_CONTAINER
 
@@ -23,27 +21,42 @@ class EMView;
 class EMBeWindowContainer : public EMWindow
 {
 public:
-	EMBeWindowContainer(const EMRect p_oRect, const char* p_vpName, const EMWindowType p_oType);
-	virtual ~EMBeWindowContainer();
-	void AddChild(EMGUIComponent* p_opView);
-	EMRect Bounds() const;
-	EMRect Frame() const;
-	void* GetNativeView() const;
-	void Hide();
-	bool IsHidden();
-	bool Lock();
-	void MoveTo(float p_vX, float p_vY);
-	void SetBounds(EMRect p_oBounds);
-	void SetFrame(EMRect p_oFrame);
-	void SetSizeLimits(float p_vMinimumWidth, float p_vMaximumWidth, float p_vMinimumHeight, float p_vMaximumHeght);
-	void SetTitle(const char* p_vpTitle);
-	void Show();
-	void Unlock();
+							EMBeWindowContainer(EMRect, const char* name,
+									EMWindowType);
+	virtual 				~EMBeWindowContainer();
+
+			void			ConvertFromWorkAreaToWindow(EMRect &);
+
+			void 			AddChild(EMGUIComponent*);
+
+			EMRect 			Bounds() const;
+			EMRect 			Frame() const;
+			void* 			GetNativeView() const;
+
+			void 			Hide();
+			void 			Show();
+			bool 			IsHidden();
+
+			bool 			Lock();
+			void 			Unlock();
+
+			bool			IsMaximized();
+			void			SetMaximized(bool);
+
+			void			MoveTo(int32, int32);
+			void			SetCurrentFocus();
+
+			void 			SetBounds(EMRect);
+			void 			SetFrame(EMRect);
+			void 			SetFrame(EMRect, bool);
+
+			void 			SetSizeLimits(int32 minW, int32 maxW, int32 minH,
+									int32 maxH);
+
+			void 			SetTitle(const char*);
 
 private:
-	EMBeWindow* m_opWindow; // This class retains retains ownership of its native window
+			EMBeWindow* 	m_opWindow;
 };
-
-#endif
 
 #endif

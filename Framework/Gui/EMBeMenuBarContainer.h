@@ -9,67 +9,63 @@
 
 #ifdef PLATFORM_BEOS
 
-#ifndef __EM_BE_MENU_CONTAINER
-#define __EM_BE_MENU_CONTAINER
+#ifndef __EM_BE_MENU_BAR_CONTAINER
+#define __EM_BE_MENU_BAR_CONTAINER
 
-#include "EMBeMenu.h"
-#include "EMMenu.h"
+#include "EMMenuBar.h"
+#include "EMBeMenuBar.h"
 
 #include <list>
 #include <string>
 
-class EMMenuItem;
+class BMenu;
+class EMBeMenuBar;
+class EMCommand;
+class EMListener;
 
-class EMBeMenuContainer : public EMMenu
+class EMBeMenuBarContainer : public EMMenuBar
 {
 public:
-							EMBeMenuContainer(string* p_opName);
-							~EMBeMenuContainer();
+							EMBeMenuBarContainer();
+							~EMBeMenuBarContainer();
 
-			bool 			AddItem(EMMenu* p_opMenu);
-			bool 			AddItem(EMMenuItem* p_opMenuItem);
-			bool 			AddItem(EMMenu* p_opMenu, int32 p_vIndex);
-			bool 			AddItem(EMMenuItem* p_opMenuItem, int32 p_vIndex);
-			bool 			AddSeparatorItem();
+			bool			AddItem(EMMenu*);
+			bool 			AddItem(EMMenu*, int32 index);
+
+			void			SetFrame(EMRect);
 			EMRect 			Frame() const;
 
-			EMMenu* 		GetMenu(string* p_opName);
-			EMMenuItem* 	GetMenuItem(string* p_opName);
-			const char* 	GetName();
+			EMMenu* 		GetMenu(string* name);
 			void* 			GetNativeView() const;
 
+			void 			Show();
 			void 			Hide();
 
-			bool 			RemoveItem(EMMenu* p_opMenu);
-			bool 			RemoveItem(EMMenuItem* p_opMenuItem);
+			void 			InitComponent();
 
-			void 			Show();
-			void			SetFrame(EMRect);
+			bool			Notify(uint32 message);
+			bool 			Notify(list<EMListener*>*, uint32 message);
 
-			bool			GetEnabled();
-			void			SetEnabled(bool);
-
-			EMMenuItem*		GetMenuItem(uint32);
-			EMMenuItem*		GetLastTriggeredMenuItem();
+			bool 			RemoveItem(EMMenu*);
 
 			bool			SetMarked(uint32 menuID, uint32 menuItemID, bool);
 			bool			SetEnabled(uint32 menuID, bool);
 			bool			SetEnabled(uint32 menuID, uint32 menuItemID, bool);
 
+			EMMenuItem*		GetLastTriggeredMenuItem();
 
+
+//			void SetApplicationMessageTarget(EMListener* p_opMessageTarget);
+//			bool 			MessageReceived(EMListenerRepository* sender,
+//									 uint32 message);
 
 private:
-			void			SetMessageTarget(void* p_opMessageTarget);
-
-private:
-		//	EMListener* 	m_opApplicationMessageTarget;
-			EMBeMenu* 		m_opNativeMenu;
 			list<EMMenu*> 	m_oMenus;
-			list<EMMenuItem*> m_oMenuItems;
+//			EMListener* 	m_opApplicationMessageTarget;
+			EMBeMenuBar* 	m_opNativeMenuBar;
 };
 
 #endif
 
 #endif
-
 
