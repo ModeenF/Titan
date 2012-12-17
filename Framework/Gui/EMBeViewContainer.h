@@ -119,8 +119,8 @@ public:
 private:
 			EMBeView* 		fDrawView;
 			EMBeView* 		fPlainView;
-			float 			fBufferScrollOffsetX;
-			float 			fBufferScrollOffsetY;
+			int32 			fBufferScrollOffsetX;
+			int32 			fBufferScrollOffsetY;
 	static	BBitmap* 		fBuffer;
 	static	EMBeView* 		fBufferView;
 

@@ -21,7 +21,7 @@ class EMResizeTab
 public:
 	~EMResizeTab();
 	virtual EMView* GetView() = 0;
-	static EMResizeTab* Create(void* p_opParentNativeView, EMRect p_oParentRect);
+	static EMResizeTab* Create(void* nativeView, EMRect);
 
 protected:
 	EMResizeTab();

@@ -19,13 +19,13 @@ Library TitanFrameworkGUI :
 	EMBeButtonContainer.cpp
 	EMBeFilePanelContainer.cpp
 	EMBeKeyboard.cpp
-	EMBEMenu.cpp
-	EMBEMenuBar.cpp
-	EMBEMenuBarContainer.cpp
-	EMBEMenuContainer.cpp
-	EMBEMenuItem.cpp
-	EMBEMenuItEMContainer.cpp
-	EMBEMessageTranslator.cpp
+	EMBeMenu.cpp
+	EMBeMenuBar.cpp
+	EMBeMenuBarContainer.cpp
+	EMBeMenuContainer.cpp
+	EMBeMenuItem.cpp
+	EMBeMenuItEMContainer.cpp
+	EMBeMessageTranslator.cpp
 	EMBePopUpMenu.cpp
 	EMBePopUpMenuContainer.cpp
 	EMBeScrollbar.cpp
@@ -53,7 +53,7 @@ Library TitanFrameworkGUI :
 	EMListViewControl.cpp
 	EMMenu.cpp
 	EMMenuBar.cpp
-	EMMenuItEM.cpp
+	EMMenuItem.cpp
 	EMMessageBox.cpp
 	EMMouseCursor.cpp
 	EMPopUpMenu.cpp

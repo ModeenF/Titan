@@ -1,7 +1,5 @@
 #include "EMResizeTab.h"
 
-#include "EMWinResizeTab.h"
-
 EMResizeTab::EMResizeTab()
 {
 }

@@ -322,7 +322,7 @@ void EMBeViewContainer::DrawBuffer(EMRect rect)
 }
 */
 
-void EMBeViewContainer::DrawString(float x, float y, const char* text)
+void EMBeViewContainer::DrawString(int32 x, int32 y, const char* text)
 {
 	fDrawView -> DrawString(text, BPoint(x, y));
 }
@@ -387,10 +387,10 @@ for(int vIndex = 0; vIndex < oRegion.CountRects(); vIndex++)
 }
 */
 	oRect = oRegion.Frame();
-	oRect2.m_vLeft = oRect.left;
-	oRect2.m_vTop = oRect.top;
-	oRect2.m_vRight = oRect.right;
-	oRect2.m_vBottom = oRect.bottom;
+	oRect2.m_vLeft = (int32)oRect.left;
+	oRect2.m_vTop = (int32)oRect.top;
+	oRect2.m_vRight = (int32)oRect.right;
+	oRect2.m_vBottom = (int32)oRect.bottom;
 	return oRect2;
 }
 
@@ -401,7 +401,7 @@ EMView* EMBeViewContainer::GetLastMouseDownView()
 }
 
 
-void EMBeViewContainer::GetMouse(float &x, float &y, bool &buttonOne,
+void EMBeViewContainer::GetMouse(int32 &x, int32 &y, bool &buttonOne,
 	bool &buttonTwo, bool &buttonThree) const
 {
 	BPoint oPoint;
@@ -409,8 +409,8 @@ void EMBeViewContainer::GetMouse(float &x, float &y, bool &buttonOne,
 
 	fPlainView -> GetMouse(&oPoint, &vButtons, false);
 
-	x = oPoint.x;
-	y = oPoint.y;
+	x = (int32)oPoint.x;
+	y = (int32)oPoint.y;
 
 	if((vButtons & B_PRIMARY_MOUSE_BUTTON) == B_PRIMARY_MOUSE_BUTTON)
 		buttonOne = true;
@@ -521,20 +521,20 @@ bool EMBeViewContainer::RemoveChild(EMGUIComponent* view)
 }
 
 
-void EMBeViewContainer::ScrollBy(float x, float y)
+void EMBeViewContainer::ScrollBy(int32 x, int32 y)
 {
-	fPlainView -> ScrollBy(x, y);
+	fPlainView -> ScrollBy((float)x, (float)y);
 	if(fDoubleBuffered)
-		fBufferView -> ScrollBy(x, y);
+		fBufferView -> ScrollBy((float)x, (float)y);
 }
 
 
-void EMBeViewContainer::ScrollTo(float x, float y)
+void EMBeViewContainer::ScrollTo(int32 x, int32 y)
 {
-	fPlainView -> ScrollTo(x, y);
+	fPlainView -> ScrollTo((float)x, (float)y);
 	if(fDoubleBuffered)
 	{
-		fBufferView -> SetOrigin(-1 * x, -1 * y);
+		fBufferView -> SetOrigin((float)-1 * x, (float)-1 * y);
 		fBufferScrollOffsetX = x;
 		fBufferScrollOffsetY = y;
 //		fBufferView -> ScrollTo(x, y);
@@ -681,7 +681,7 @@ void EMBeViewContainer::Show()
 }
 
 
-void EMBeViewContainer::StrokeLine(float x1, float y1, float x2, float y2)
+void EMBeViewContainer::StrokeLine(int32 x1, int32 y1, int32 x2, int32 y2)
 {
 	fDrawView -> StrokeLine(BPoint(x1, y1), BPoint(x2, y2));
 }

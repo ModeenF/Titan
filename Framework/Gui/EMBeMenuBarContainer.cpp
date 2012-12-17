@@ -138,10 +138,11 @@ bool EMBeMenuBarContainer::Notify(uint32 p_vMessage)
 	// First, check to see if it really is a command ID
 //	if(!(p_vMessage & COMMAND_BASE_OFFSET) && !(p_vMessage & MEDIA_COMMAND_BASE_OFFSET))
 //		return EMListenerRepository::Notify(p_vMessage);
-		
+
 //;//cout_commented_out_4_release << "EMBeMenuBarContainer::Notify: " << p_vMessage << endl;
 	if(p_vMessage != 0)
-		EMCommandRepository::Instance() -> ExecuteCommand(p_vMessage, true);
+		EMCommandRepository::Instance() -> ExecuteCommand(p_vMessage);
+
 	return EMListenerRepository::Notify(p_vMessage);
 }
 

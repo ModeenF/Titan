@@ -2,12 +2,13 @@
 #include "EMCommand.h"
 #include "EMCommandRepository.h"
 
-EMCommandRepository* EMCommandRepository::m_opInstance = NULL; // Static variable instantiation
+EMCommandRepository* EMCommandRepository::m_opInstance = NULL;
 
-EMCommandRepository::EMCommandRepository() :
-//m_opCommands(NULL),
-//m_opRedoCommand(NULL),
-m_vKeyReleased(false)
+EMCommandRepository::EMCommandRepository()
+	:
+//	m_opCommands(NULL),
+//	m_opRedoCommand(NULL),
+	m_vKeyReleased(false)
 {
 	//m_opCommands = new map<uint32, EMCommand*>();
 	for(uint32 vIndex = 0; vIndex < MAX_NR_COMMANDS; vIndex++)
@@ -40,17 +41,17 @@ EMCommandRepository::~EMCommandRepository()
 
 }
 
-bool EMCommandRepository::AddCommand(EMCommand* p_opCommand, uint32 p_vID)
+bool EMCommandRepository::AddCommand(EMCommand* p_opCommand, uint32 id)
 {
 /*
-	if(m_opCommands -> find(p_vID) != m_opCommands -> end())
+	if(m_opCommands -> find(id) != m_opCommands -> end())
 		return false; // The ID already exists
-	(*m_opCommands)[p_vID] = p_opCommand;
+	(*m_opCommands)[id] = p_opCommand;
 */
-	if(m_opCommands[p_vID] != NULL)
+	if(m_opCommands[id] != NULL)
 		return false;
 
-	m_opCommands[p_vID] = p_opCommand;
+	m_opCommands[id] = p_opCommand;
 
 	return true;
 }
@@ -58,14 +59,17 @@ bool EMCommandRepository::AddCommand(EMCommand* p_opCommand, uint32 p_vID)
 void EMCommandRepository::ClearUndoStack()
 {
 	EMCommand* opCommand;
-	list<EMCommand*>::iterator oIterator = m_oUndoStack.begin();
-	while(oIterator != m_oUndoStack.end())
+
+	list<EMCommand*>::iterator oIterator = fUndoStack.begin();
+
+	while(oIterator != fUndoStack.end())
 	{
 		opCommand = *oIterator;
 		oIterator++;
 		delete opCommand;
 	}
-	m_oUndoStack.clear();
+
+	fUndoStack.clear();
 }
 
 bool EMCommandRepository::CommandExists(uint32 p_vCommandID)
@@ -78,29 +82,29 @@ bool EMCommandRepository::CommandExists(uint32 p_vCommandID)
 */
 }
 
-bool EMCommandRepository::ExecuteCommand(uint32 p_vID)
+bool EMCommandRepository::ExecuteCommand(uint32 id)
 {
-	ExecuteCommandBody(p_vID, NULL, NULL, NULL, false, false);
+	ExecuteCommandBody(id, NULL, NULL, NULL, false, false);
 	return true;
 }
 
-void* EMCommandRepository::ExecuteCommand(uint32 p_vID, void* p_opParameterOne, void* p_opParameterTwo, void* p_opParameterThree)
+void* EMCommandRepository::ExecuteCommand(uint32 id, void* one, void* two, void* three)
 {
-	return ExecuteCommandBody(p_vID, p_opParameterOne, p_opParameterTwo, p_opParameterThree, false, false);
+	return ExecuteCommandBody(id, one, two, three, false, false);
 }
 
-void* EMCommandRepository::ExecuteCommandBody(uint32 p_vID, void* p_opParameterOne, void* p_opParameterTwo, void* p_opParameterThree, bool p_vPreventUndo, bool p_vTriggeredByBinding)
+void* EMCommandRepository::ExecuteCommandBody(uint32 id, void* one, void* two, void* three, bool p_vPreventUndo, bool p_vTriggeredByBinding)
 {
-	//if(m_opCommands -> find(p_vID) == m_opCommands -> end())
-	if(m_opCommands[p_vID] == NULL)
+	//if(m_opCommands -> find(id) == m_opCommands -> end())
+	if(m_opCommands[id] == NULL)
 	{
 		char vOutput[256];
-		sprintf(vOutput, "The command with ID %d does not exist", p_vID);
+		sprintf(vOutput, "The command with ID %d does not exist", id);
 		EMDebugger(vOutput); // FIXME: Temporary
 		return NULL; // The ID does not exist
 	}
 
-	EMCommand* opCommand = m_opCommands[p_vID];//(*m_opCommands)[p_vID];
+	EMCommand* opCommand = m_opCommands[id];//(*m_opCommands)[id];
 	m_vKeyReleased = false;
 	m_vTriggeredByBinding = p_vTriggeredByBinding;
 
@@ -109,13 +113,13 @@ void* EMCommandRepository::ExecuteCommandBody(uint32 p_vID, void* p_opParameterO
 	{
 		try
 		{
-			upResult = opCommand -> ExecuteE(p_opParameterOne, p_opParameterTwo, p_opParameterThree);
+			upResult = opCommand -> ExecuteE(one, two, three);
 		}
 		catch(...)
 		{
 			// Send exception to EMExceptionHandler
 			char vOutput[256];
-			sprintf(vOutput, "A command with ID %d \"%s\" threw an exception", p_vID, opCommand -> GetShortDescription());
+			sprintf(vOutput, "A command with ID %d \"%s\" threw an exception", id, opCommand -> GetShortDescription());
 			EMDebugger(vOutput); // FIXME: Temporary
 		}
 	}
@@ -129,24 +133,24 @@ void* EMCommandRepository::ExecuteCommandBody(uint32 p_vID, void* p_opParameterO
 		{
 			// Send exception to EMExceptionHandler
 			char vOutput[256];
-			sprintf(vOutput, "A command with ID %d \"%s\" threw an exception", p_vID, opCommand -> GetShortDescription());
+			sprintf(vOutput, "A command with ID %d \"%s\" threw an exception", id, opCommand -> GetShortDescription());
 			EMDebugger(vOutput); // FIXME: Temporary
 		}
 	}
 
-	if(opCommand/*(*m_opCommands)[p_vID]*/ -> TriggerOnKeyRelease())
+	if(opCommand/*(*m_opCommands)[id]*/ -> TriggerOnKeyRelease())
 	{
-		m_oReleaseKeyCommands.push_back(opCommand/*(*m_opCommands)[p_vID]*/);
+		m_oReleaseKeyCommands.push_back(opCommand/*(*m_opCommands)[id]*/);
 		m_oReleaseKeyCommands.unique();
 	}
 
 	if(opCommand -> IsUndoable() && !p_vPreventUndo)
 	{
 		if(opCommand -> GetShortDescription() != NULL)
-			eo << "Command with ID " << p_vID << " \"" << (const char*) opCommand -> GetShortDescription() << "\" is pushed onto the undo stack" << ef;
-		EMCommand* opCommandClone = opCommand/*(*m_opCommands)[p_vID]*/ -> CloneAndClear();
+			eo << "Command with ID " << id << " \"" << (const char*) opCommand -> GetShortDescription() << "\" is pushed onto the undo stack" << ef;
+		EMCommand* opCommandClone = opCommand/*(*m_opCommands)[id]*/ -> CloneAndClear();
 		ExecuteCommand(COMMAND_SET_UNDO_TEXTS, opCommandClone, NULL);
-		m_oUndoStack.push_back(opCommandClone);
+		fUndoStack.push_back(opCommandClone);
 	}
 
 	if(opCommand -> RequiresParameters())
@@ -155,33 +159,40 @@ void* EMCommandRepository::ExecuteCommandBody(uint32 p_vID, void* p_opParameterO
 		return NULL;
 }
 
-void* EMCommandRepository::ExecuteCommandNoUndo(uint32 p_vID, void* p_opParameterOne, void* p_opParameterTwo, void* p_opParameterThree)
+void* EMCommandRepository::ExecuteCommandNoUndo(uint32 id, void* one,
+			void* two, void* three)
 {
-	return ExecuteCommandBody(p_vID, p_opParameterOne, p_opParameterTwo, p_opParameterThree, true, false);
+	return ExecuteCommandBody(id, one, two, three, true, false);
 }
 
-bool EMCommandRepository::ExecuteTriggeredCommand(uint32 p_vID)
+
+bool EMCommandRepository::ExecuteTriggeredCommand(uint32 id)
 {
-	ExecuteCommandBody(p_vID, NULL, NULL, NULL, false, true);
+	ExecuteCommandBody(id, NULL, NULL, NULL, false, true);
+
 	return true;
 }
 
-EMCommand* EMCommandRepository::GetUndoClone(uint32 p_vID)
+
+EMCommand* EMCommandRepository::GetUndoClone(uint32 id)
 {
-	//if(m_opCommands -> find(p_vID) == m_opCommands -> end())
-	if(m_opCommands[p_vID] == NULL)
+	//if(m_opCommands -> find(id) == m_opCommands -> end())
+	if(m_opCommands[id] == NULL)
 	{
-//		emerr << "Failed to execute command with ID: " << p_vID << endl;
+//		emerr << "Failed to execute command with ID: " << id << endl;
 		EMDebugger("The command does not exist");
 		return NULL; // The ID does not exist
 	}
-	return m_opCommands[p_vID] -> CloneAndClear();
+	return m_opCommands[id] -> CloneAndClear();
 }
+
 
 list<EMCommand*>* EMCommandRepository::GetUndoStack()
 {
-	return &m_oUndoStack;
+	return &fUndoStack;
 }
+
+
 
 EMCommandRepository* EMCommandRepository::Instance()
 {
@@ -216,9 +227,9 @@ void EMCommandRepository::Redo()
 */
 }
 
-bool EMCommandRepository::RequiresParameters(uint32 p_vID)
+bool EMCommandRepository::RequiresParameters(uint32 id)
 {
-	return m_opCommands[p_vID] -> RequiresParameters();
+	return m_opCommands[id] -> RequiresParameters();
 }
 
 void EMCommandRepository::SetKeyReleased()
@@ -242,6 +253,7 @@ void EMCommandRepository::SetKeyReleased()
 	m_oReleaseKeyCommands.clear();
 }
 
+
 // Returns true if the last executed command (or currently executing
 // command was/is triggered by a key or a MIDI message
 bool EMCommandRepository::TriggeredByBinding()
@@ -249,10 +261,11 @@ bool EMCommandRepository::TriggeredByBinding()
 	return m_vTriggeredByBinding;
 }
 
+
 void EMCommandRepository::Undo()
 {
-	EMCommand* opCommand = m_oUndoStack.back();
-	m_oUndoStack.pop_back();
+	EMCommand* opCommand = fUndoStack.back();
+	fUndoStack.pop_back();
 	try
 	{
 		opCommand -> UndoE();
@@ -265,8 +278,8 @@ void EMCommandRepository::Undo()
 		EMDebugger(vOutput); // FIXME: Temporary
 	}
 
-	if(m_oUndoStack.size() > 0)
-		ExecuteCommand(COMMAND_SET_UNDO_TEXTS, m_oUndoStack.back(), opCommand);
+	if(fUndoStack.size() > 0)
+		ExecuteCommand(COMMAND_SET_UNDO_TEXTS, fUndoStack.back(), opCommand);
 	else
 		ExecuteCommand(COMMAND_SET_UNDO_TEXTS, NULL, opCommand);
 /*
@@ -276,6 +289,5 @@ void EMCommandRepository::Undo()
 */
 	delete opCommand;
 }
-
 
 

@@ -7,8 +7,6 @@
 
 #include "EMGlobals.h"
 
-#ifdef PLATFORM_BEOS
-
 #ifndef __EM_BE_WINDOW
 #define __EM_BE_WINDOW
 
@@ -22,16 +20,22 @@ class BMessage;
 class EMBeWindow : public BWindow
 {
 public:
-	EMBeWindow(EMBeWindowContainer* p_opContainer, const BRect p_oRect, const char* p_vpName, const window_type p_vType, uint32 p_vFlags);
-	EMBeWindow(EMBeWindowContainer* p_opContainer, const BRect p_oRect, const char* p_vpName, const window_look p_vLook, const window_feel p_vFeel, uint32 p_vFlags);
-	~EMBeWindow();
-	void MessageReceived(BMessage* p_opMessage); // Needed to catch native messages
-	bool QuitRequested();
+							EMBeWindow(EMBeWindowContainer*, BRect,
+								 const char*, window_type, uint32 flags);
+
+							EMBeWindow(EMBeWindowContainer*, BRect,
+								const char*, window_look, window_feel,
+								uint32 flags);
+
+							~EMBeWindow();
+
+			void			MessageReceived(BMessage*);
+
+			bool			QuitRequested();
 
 private:
-	EMBeWindowContainer* m_opContainer;
+			EMBeWindowContainer* m_opContainer;
 };
 
 #endif
 
-#endif
