@@ -48,11 +48,14 @@
 
 #define EM_FILE_SEPARATOR "/"
 
+#define emerr	cout << "ERROR: "
+
+
 #define EM_DEBUG // If debug code should be used
 
 #ifdef EM_DEBUG
 #	include <Debug.h>
-#	define EM_new new // No special new here as of this moment
+#	define EM_new new
 #else
 #	define EM_new new
 #endif

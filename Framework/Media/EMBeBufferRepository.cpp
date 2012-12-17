@@ -11,9 +11,7 @@
 #include <OS.h>
 
 EMBeBufferRepository::EMBeBufferRepository()
-	:	m_vAudioIsInitialized(false),
-		m_vVideoIsInitialized(false),
-		m_opAudioBuffers(NULL),
+	:	m_opAudioBuffers(NULL),
 		m_opVideoBuffers(NULL),
 		m_opVideoBuffersRclm(NULL),
 		m_vVideoBufferSize(0),
@@ -28,7 +26,7 @@ EMBeBufferRepository::EMBeBufferRepository()
 //	EMDebugger("EMBeBufferRepository::EMBeBufferRepository()");
 	m_vID = EMMediaIDManager::MakeID();
 	EMBeMediaUtility::push(this, "EMBeBufferRepository");
-	vVideoSemaphore = create_sem(1, "Video buffer array protection sem");		
+	vVideoSemaphore = create_sem(1, "Video buffer array protection sem");
 
 	//FOR VIDEO
 
@@ -49,31 +47,35 @@ EMBeBufferRepository::~EMBeBufferRepository()
 		for(int32 vIndex = 0; vIndex < vCount; vIndex++)
 		{
 			BBuffer* opDummy = m_opVideoBuffersRclm -> RequestBuffer(1, -1);
+
 			if(opDummy == NULL)
 			{
 				vIndex--;
 				snooze(5000);
-				emerr << "ERROR! Couldn't get video buffer... Waiting!" << endl;
+				emerr << "Couldn't get video buffer... Waiting!" << endl;
 			}
 			else
 				oDummyBuffersRclm.push_back(opDummy);
 		}
-				
+
 		while(oDummyBuffersRclm.size() > 0)
 		{
 			BBuffer* opBuffer = oDummyBuffersRclm.front();
 			oDummyBuffersRclm.pop_front();
 			opBuffer -> Recycle();
 		}
+
 		if(m_opBitmapArray != NULL)
 			for(int32 vIndex = 0; vIndex < m_vNumVideoBitmaps; vIndex++)
 				delete m_opBitmapArray[vIndex];
 
 		m_opBitmapArray = NULL;
+
 		if(m_opVideoBuffersRclm != NULL)
 		{
 			delete m_opVideoBuffers;
 		}
+
 		m_opVideoBuffersRclm = NULL;
 	}
 
@@ -96,7 +98,7 @@ EMBeBufferRepository::~EMBeBufferRepository()
 			else
 				oDummyBuffers.push_back(opDummy);
 		}
-				
+
 		while(oDummyBuffers.size() > 0)
 		{
 			BBuffer* opBuffer = oDummyBuffers.front();
@@ -114,10 +116,10 @@ EMBeBufferRepository::~EMBeBufferRepository()
 		}
 		m_opVideoBuffers = NULL;
 	}
-	
+
 	delete m_opMediaFormat;
 
-/*	Notify(EM_MESSAGE_BUFFER_DELETION);	
+/*	Notify(EM_MESSAGE_BUFFER_DELETION);
 	if(m_opBitmapArrayRclm != NULL)
 	{
 		for(int32 vIndex = 0; vIndex < m_vNumVideoBitmaps; vIndex++)
@@ -134,7 +136,7 @@ EMBeBufferRepository::~EMBeBufferRepository()
 
 	delete m_opMediaFormat;
 */
-	
+
 //	for(int32 vIndex = 0; vIndex < m_vNumVideoBitmaps; vIndex++)
 //		delete m_opBitmapArray[vIndex];
 	m_opInstance = NULL;
@@ -170,12 +172,12 @@ bool EMBeBufferRepository::InitializeAudioE(uint64 p_vBufferSize, int32 p_vNumBu
 			return false;
 		m_vAudioIsInitialized = true;
 	}
-	return true;		
+	return true;
 }
 
 bool EMBeBufferRepository::ResetVideoE(media_format* p_format)
 {
-	Notify(EM_MESSAGE_BUFFER_DELETION);	
+	Notify(EM_MESSAGE_BUFFER_DELETION);
 	if(m_opBitmapArrayRclm != NULL)
 	{
 		for(int32 vIndex = 0; vIndex < m_vNumVideoBitmaps; vIndex++)
@@ -197,21 +199,21 @@ bool EMBeBufferRepository::ResetVideoE(media_format* p_format)
 
 	if(m_opMediaFormat == NULL)
 		m_opMediaFormat = new EMMediaFormat(EM_TYPE_ANY_VIDEO);
-			
+
 	m_opMediaFormat -> CreateFormat(p_format);
 //	m_vVideoBufferSize = m_vVideoBufferSizeRclm;
-	
+
 	return true;
 }
 
 void EMBeBufferRepository::NotifyVideoFormatChange()
 {
-	Notify(EM_MESSAGE_BUFFER_SIZE_CHANGED);	
+	Notify(EM_MESSAGE_BUFFER_SIZE_CHANGED);
 }
 
 void EMBeBufferRepository::NotifyHistoryBufferDelete()
 {
-	Notify(EM_MESSAGE_BUFFER_DELETION);	
+	Notify(EM_MESSAGE_BUFFER_DELETION);
 }
 
 
@@ -231,34 +233,34 @@ EMMediaFormat* EMBeBufferRepository::GetCurrentVideoFormat()
 bool EMBeBufferRepository::InitializeVideoE(uint64 p_vBufferSize, int32 p_vNumBuffers, media_format* p_format, bool p_vDeleteFlag = false)
 {
 //	EMDebugger("EMBeBufferRepository::InitializeVideoE()");
-	status_t vAcquireResult = acquire_sem(vVideoSemaphore);	
+	status_t vAcquireResult = acquire_sem(vVideoSemaphore);
 	if(vAcquireResult != B_NO_ERROR)
 		EMDebugger("ERROR! EMBeBufferRepository could not acquire semaphore for video buffer protection!");
 	if(! m_vVideoIsInitialized || p_vDeleteFlag)
 	{
 //		EMDebugger("EMBeBufferRepository::Actually initializing buffers()");
-		
+
 		//On the fourth day, God created a BBufferGroup for video-BBuffers, and there
 		//was much joy amongst the system
 
 		if(m_opVideoBuffers != NULL)
 			m_opVideoBuffersRclm = m_opVideoBuffers;
-		
+
 //(		EMDebugger("Buffer reposutory initialize creating new buffer group");
 		m_opVideoBuffers = new BBufferGroup();
 
 		if(m_opVideoBuffers -> InitCheck() != B_OK)
 		{
 			EMDebugger("SOMETHING WONDERFULL HAS HAPPENED... Couldn't create BBufferGroup in EMBeBufferRepository");
-		}	
+		}
 
 		if(m_opBitmapArray != NULL)
 			m_opBitmapArrayRclm = m_opBitmapArray;
-	
+
 		m_opBitmapArray = new BBitmap*[p_vNumBuffers];
 
 		for(int32 vIndex = 0; vIndex < p_vNumBuffers; vIndex++)
-			m_opBitmapArray[vIndex] = NULL;	
+			m_opBitmapArray[vIndex] = NULL;
 
 		uint32 mXSize = p_format -> Width();//720; //with_format.u.raw_video.display.line_width;
 		uint32 mYSize = p_format -> Height();//576; //with_format.u.raw_video.display.line_count;
@@ -269,12 +271,12 @@ bool EMBeBufferRepository::InitializeVideoE(uint64 p_vBufferSize, int32 p_vNumBu
 			m_opBitmapArray[vIndex] = new BBitmap(BRect(0, 0, (mXSize-1), (mYSize - 1)), mColorspace, false, true);
 			if(m_opBitmapArray[vIndex] -> IsValid())
 			{
-				sInfo = new buffer_clone_info;						
+				sInfo = new buffer_clone_info;
 				if((sInfo -> area = area_for(m_opBitmapArray[vIndex] -> Bits())) == B_ERROR)
 				{
 					EMDebugger("ERROR! Could not calculate the address space of the memory area of the bitmap!");
 				}
-			
+
 				sInfo -> offset = 0; 	//The offset into the memory space
 				sInfo -> size = (size_t) m_opBitmapArray[vIndex] -> BitsLength();
 				sInfo -> flags = vIndex;	//Which bitmap in the array does this buffer correspond to?
@@ -284,8 +286,8 @@ bool EMBeBufferRepository::InitializeVideoE(uint64 p_vBufferSize, int32 p_vNumBu
 				else
 				{
 					m_vVideoBufferSizeRclm = sInfo -> size;
-					m_vVideoBufferSize = sInfo -> size;	
-				}	
+					m_vVideoBufferSize = sInfo -> size;
+				}
 				if(m_opVideoBuffers -> AddBuffer(*sInfo) != B_OK)
 				{
 					//Error
@@ -294,16 +296,16 @@ bool EMBeBufferRepository::InitializeVideoE(uint64 p_vBufferSize, int32 p_vNumBu
 				}
 				delete sInfo;
 			}
-			else 
+			else
 			{
 				//Error
 				emerr << "ERROR! The bitmap created is not valid: Size is 0,0 - " << mXSize-1 << "," << mYSize - 1 << endl;
 				EMDebugger("ERROR! Bitmap not valid!");
 				return false;
-			}	
+			}
 		}
 		m_vNumVideoBitmaps = p_vNumBuffers;
-			
+
 		m_vVideoIsInitialized = true;
 	}
 
@@ -311,7 +313,7 @@ bool EMBeBufferRepository::InitializeVideoE(uint64 p_vBufferSize, int32 p_vNumBu
 	m_opVideoBuffers -> CountBuffers(&c);
 	release_sem(vVideoSemaphore);
 
-	return true;		
+	return true;
 }
 
 BBuffer* EMBeBufferRepository::GetVideoBuffer()
@@ -330,7 +332,7 @@ BBuffer* EMBeBufferRepository::GetVideoBuffer()
 		release_sem(vVideoSemaphore);
 		snooze(2000);
 	}
-		
+
 	status_t vAcquireResult = acquire_sem(vVideoSemaphore);
 	if(vAcquireResult != B_NO_ERROR)
 		EMDebugger("ERROR! EMBeBufferRepository could not acquire semaphore for video buffer protection!");
@@ -340,7 +342,7 @@ BBuffer* EMBeBufferRepository::GetVideoBuffer()
 	vNextVideoBuffer++;
 	if(vNextVideoBuffer == m_vNumVideoBitmaps)
 		vNextVideoBuffer = 0;
-	
+
 	release_sem(vVideoSemaphore);
 	return opBuffer;
 }
@@ -353,7 +355,7 @@ void EMBeBufferRepository::RecycleVideoBuffer(BBuffer* p_opBuffer)
 
 	if(m_opBBufferArray[p_opBuffer -> Flags()] != NULL)
 		EMDebugger("ERROR! Video BBuffer slots confused!");
-	
+
 	m_opBBufferArray[p_opBuffer -> Flags()] = p_opBuffer;
 	release_sem(vVideoSemaphore);
 	return;

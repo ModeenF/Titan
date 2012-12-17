@@ -7,11 +7,10 @@
 
 #include "EMGlobals.h"
 
-#ifdef PLATFORM_BEOS
-
 #ifndef __EM_BE_MEDIA_UTILITY
 #define __EM_BE_MEDIA_UTILITY
 
+#include "EMMediaUtility.h"
 #include "EMMediaGlobals.h"
 #include "EMMediaFormat.h"
 
@@ -59,8 +58,8 @@ public:
 	list<char*>* classes;
 	list<int64>* num;
 	list<map<int64, string> >* instances;
-	void push(const void* ptr, char* name);
-	void pop(char* name);
+	static	void			push(const void* ptr, char* name);
+	static	void 			pop(char* name);
 	void show();
 
 	EMBeMediaUtility();
@@ -71,5 +70,4 @@ protected:
 	EMMediaFormat* m_opSystemVideoFormat;
 };
 
-#endif
 #endif

@@ -2,7 +2,7 @@
 * Creator: Richard Kronfalt
 * Portability: Native
 *-------------------------------------------------------
-* 
+*
 *******************************************************/
 
 #include "EMGlobals.h"
@@ -17,8 +17,9 @@
 #include "EMBeRealtimeAudioInputDescriptor.h"
 #include "EMBeRealtimeVideoInputDescriptor.h"
 #include "EMRealtimeOutputDescriptor.h"
-#include "EMBeRealtimeAudioOutputDescriptor.h"
-#include "EMBeRealtimeVideoOutputDescriptor.h"
+
+//#include "EMBeRealtimeAudioOutputDescriptor.h"
+//#include "EMBeRealtimeVideoOutputDescriptor.h"
 
 #include <list>
 
@@ -45,7 +46,7 @@ public:
 	list<EMRealtimeOutputDescriptor*>* GetRealtimeAudioOutputs();
 	list<EMRealtimeOutputDescriptor*>* GetRealtimeVideoOutputs();
 	void InspectCodecs();
-	
+
 protected:
 	EMBeMediaSystemInspector();
 	friend EMMediaSystemInspector;

@@ -2,7 +2,7 @@
 * Creator: Richard Kronfalt
 * Portability: Non-Native
 *-------------------------------------------------------
-* 
+*
 *******************************************************/
 
 #include "EMGlobals.h"
@@ -17,36 +17,40 @@ class EMMediaFile;
 class EMWaveFile;
 class EMSemaphore;
 
-#include "EMWinQuicktimeVideoSuper.h"
-
-class EMMediaFileManager 
+class EMMediaFileManager
 {
 public:
-	virtual ~EMMediaFileManager();
-	static EMMediaFileManager* Instance();
-	static void Delete();
-	int32 GetID() const;
-	virtual int32 GetFileTypeForE(const string* p_opFileName) = 0; 
-//	virtual bool IsWave(const string* p_opFileName) = 0;
-//	virtual bool HasVideo(const string* p_opFileName) = 0;
-//	virtual bool HasAudio(const string* p_opFileName) = 0;
-	virtual string CreatePeaksFileE(const string* p_opFileName) = 0;
-	virtual string ExtractAudioE(const string* p_oFileName) = 0;
-	virtual bool CheckFileForVideoFormat(const string* p_opFileName) = 0;
-	virtual bool FormatsMatch(const string* p_opFileName, const EMMediaFormat* p_oFormat) = 0;
-	virtual string ConvertAudio(const string* p_oSourceFileName, const EMMediaFormat* p_opTargetFormat) = 0;
-	virtual string CopyTo(const string* p_opSourceFile, const string* p_opTargetDirectory) = 0;
+	virtual 				~EMMediaFileManager();
 
-	static void Lock();
-	static void Unlock();
+	static	EMMediaFileManager* Instance();
+
+	static	void 			Delete();
+
+			int32		 	GetID() const;
+	virtual int32 			GetFileTypeForE(const string* fileName) = 0;
+
+	virtual string			CreatePeaksFileE(const string* fileName) = 0;
+	virtual string 			ExtractAudioE(const string* fileName) = 0;
+	virtual bool 			CheckFileForVideoFormat(const string* fileName) = 0;
+	virtual bool 			FormatsMatch(const string* fileName,
+								const EMMediaFormat*) = 0;
+
+	virtual string 			ConvertAudio(const string* sourceFileName,
+								const EMMediaFormat* targetFormat) = 0;
+
+	virtual string 			CopyTo(const string* sourceFile,
+								const string* targetDirectory) = 0;
+
+	static	void			Lock();
+	static	void 			Unlock();
 
 protected:
-	EMMediaFileManager();
+							EMMediaFileManager();
 
 private:
-	static EMMediaFileManager* m_opInstance;
-	int32 m_vID;
-	static EMSemaphore* m_opSemaphore;
+	static	EMMediaFileManager* m_opInstance;
+			int32			m_vID;
+	static 	EMSemaphore* 	m_opSemaphore;
 
 };
 

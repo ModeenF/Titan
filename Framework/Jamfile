@@ -25,3 +25,4 @@ Library TitanFramework :
 ;
 
 SubInclude TOP Framework Gui ;
+SubInclude TOP Framework Media ;

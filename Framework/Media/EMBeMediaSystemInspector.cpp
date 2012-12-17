@@ -4,10 +4,10 @@
 
 #include "EMBeMediaSystemInspector.h"
 
-#include "EMBeRealtimeInputDescriptor.h"
+//#include "EMBeRealtimeInputDescriptor.h"
 #include "EMBeRealtimeAudioInputDescriptor.h"
 #include "EMBeRealtimeVideoInputDescriptor.h"
-#include "EMBeRealtimeOutputDescriptor.h"
+//#include "EMBeRealtimeOutputDescriptor.h"
 #include "EMBeRealtimeAudioOutputDescriptor.h"
 #include "EMBeRealtimeVideoOutputDescriptor.h"
 #include "EMBeAnalogRealtimeVideoInputDescriptor.h"
@@ -163,7 +163,7 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 							EMDebugger("ERROR! roster->InstantiateDormantNode");
 							return NULL;
 						}
-	
+
 						// find free output from video source
 						int32 cnt = 0;
 						spOutput = new media_output;
@@ -224,7 +224,7 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 				opList -> push_back(opDescriptor);
 			}
 		}
-		
+
 		dormant_node_info dniAnalogue[5];
 		// get dormant node info for DV Input Node
 		int32 inOutNumNodesAnalogue = 5;
@@ -298,7 +298,7 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 		else
 		{
 				try
-				{	
+				{
 					// find free producer output
 					int32 cnt = 0;
 					spOutput = new media_output;
@@ -309,7 +309,7 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 						status = B_RESOURCE_UNAVAILABLE;
 						;//cout_commented_out_4_release<< "Can't find an available video stream:" << status << endl;
 						EMDebugger("Can't find an available video stream!");
-						return NULL;		
+						return NULL;
 					}
 					opDescriptor = new EMBeAnalogRealtimeVideoInputDescriptor(spOutput);
 					string oName = string(spOutput -> name);
@@ -317,14 +317,14 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 						oName = "Unknown analog video input";
 					opDescriptor -> SetName(oName);
 					opList -> push_back(opDescriptor);
-					
+
 				}
 				catch(...)
 				{
 					EMDebugger("Something went very wrong when trying to allocate analog video inputs!?");
 				}
 		}
-		///Finished checking for analog video inputs	
+		///Finished checking for analog video inputs
 	}
 */
 	} else if((p_eType & EM_TYPE_ANY_AUDIO) > 0)
@@ -353,8 +353,8 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 						else
 						{
 							EMDebugger("ERROR! In EMBeMediaSystemInspector::GetInputs() - Unknown media type!");
-						}		
-		
+						}
+
 						if(opDescriptor -> InitCheckE())
 						{
 							opDescriptor -> SetName(string(spOutput -> name));
@@ -362,7 +362,7 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 						}
 						else
 							emerr << "WARNING! Found an audio input that could not be initialized, so we're skipping it!" << endl;
-					} 
+					}
 					catch(...)
 					{
 						emerr << "EXCEPTION! Error! Got an exception while getting outchannels from the physical input!" << endl;
@@ -410,8 +410,8 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 							else
 							{
 								EMDebugger("ERROR! In EMBeMediaSystemInspector::GetInputs() - Unknown media type!");
-							}		
-							
+							}
+
 							if(opDescriptor -> InitCheckE())
 							{
 								opDescriptor -> SetName(string(spNodeInfo[vIndex1].name));
@@ -422,7 +422,7 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 								delete opDescriptor;
 								break;
 							}
-//						} 
+//						}
 //						catch(...)
 //						{
 //							emerr << "EXCEPTION! Error! Got an exception while getting outchannels from the physical input!" << endl;
@@ -436,12 +436,12 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 			}
 			else
 				EMDebugger("ERROR! Could not instantiate dormant node!");
-		
+
 //			EMBeMediaUtility::GetRosterE() -> ReleaseNode(sNode);
 			break; //TODO: Remove this statement!!!!!
 		}
 	}
-	
+
 	return opList;
 }
 
@@ -474,9 +474,9 @@ list<EMBeRealtimeOutputDescriptor*>* EMBeMediaSystemInspector::GetOutputs(EMMedi
 
 	if((p_eType & EM_TYPE_RAW_VIDEO) > 0)
 	{
-		if(m_opConsumer == NULL) 
+		if(m_opConsumer == NULL)
 			m_opConsumer = EMBeVideoConsumerNode::Instance();
-			
+
 		if(m_opConsumer == NULL)
 		{
 			emerr << "ERROR! Could not instantiate video consumer!" << endl;
@@ -487,7 +487,7 @@ list<EMBeRealtimeOutputDescriptor*>* EMBeMediaSystemInspector::GetOutputs(EMMedi
 		media_output sMediaFileNodeOutput;
 		int32 vVideoInputCount;
 		media_input sVideoInput;
-	
+
 		sVideoNode = m_opConsumer -> Node();
 
 		vErrorCode = B_OK;
@@ -497,10 +497,10 @@ list<EMBeRealtimeOutputDescriptor*>* EMBeMediaSystemInspector::GetOutputs(EMMedi
 			emerr << "ERROR! Could not find any free inputs for video consumer!" << endl;
 			return NULL;
 		}
-		
+
 //		char vpName[64] = "Titan video preview window";
 //		memcpy(sVideoInput.name, vpName, 26);
-				
+
 		EMBeRealtimeOutputDescriptor* opDescriptor = NULL;
 		opDescriptor = new EMBeRealtimeVideoOutputDescriptor(&sVideoInput);
 		if(! opDescriptor -> InitCheckE())
@@ -557,7 +557,7 @@ list<EMBeRealtimeOutputDescriptor*>* EMBeMediaSystemInspector::GetOutputs(EMMedi
 		//{
 		//	sNode = spLiveNodeInfo[vIndex1].node;
 		//	vErrorCode = m_opRoster -> GetFreeInputsFor(spLiveNodeInfo[vIndex1].node, spInputs, 20, &vNumInputs);
-		
+
 			media_node am;
 			EMBeMediaUtility::GetRosterE() -> GetAudioMixer(&am);
 			vErrorCode = EMBeMediaUtility::GetRosterE() -> GetFreeInputsFor(am, spInputs, 1, &vNumInputs);
@@ -591,7 +591,7 @@ list<EMBeRealtimeOutputDescriptor*>* EMBeMediaSystemInspector::GetOutputs(EMMedi
 							opDescriptor -> SetName(string("System audio mixer" /*spInput -> name*/ ));
 							opList -> push_back(opDescriptor);
 						}
-					} 
+					}
 					catch(...)
 					{
 						emerr << "EXCEPTION! Error! Got an exception while getting outchannels from the physical input!" << endl;
@@ -630,7 +630,7 @@ list<EMBeRealtimeOutputDescriptor*>* EMBeMediaSystemInspector::GetOutputs(EMMedi
 						{
 							EMDebugger("ERROR! In EMBeMediaSystemInspector::GetOutputs() - Unknown media type!");
 						}
-				
+
 						if(! opDescriptor -> InitCheckE())
 						{
 							emerr << "ERROR! Could not initialize audio output connected to the rendering node!" << endl;
@@ -643,7 +643,7 @@ list<EMBeRealtimeOutputDescriptor*>* EMBeMediaSystemInspector::GetOutputs(EMMedi
 							;//cout_commented_out_4_release << "Audio Render output has ID = " << opDescriptor -> GetID() << endl;
 							opList -> push_back(opDescriptor);
 						}
-					} 
+					}
 					catch(...)
 					{
 						emerr << "EXCEPTION! Error! Got an exception while getting outchannels from the physical input!" << endl;
@@ -657,7 +657,7 @@ list<EMBeRealtimeOutputDescriptor*>* EMBeMediaSystemInspector::GetOutputs(EMMedi
 				else
 					emerr << "ERROR! The input found doesn't match the format needed!" << endl;
 			}
-			
+
 	}
 	return opList;
 }
@@ -675,10 +675,10 @@ void EMBeMediaSystemInspector::InspectCodecs()
 	{
 		;//cout_commented_out_4_release<< "FAMILY:" << sFileFormat.short_name << endl;
 		EMCodecFormat* opNewFormat = new EMCodecFormat();
-		
+
 		opNewFormat -> m_oFormatShortName = sFileFormat.short_name;
 		opNewFormat -> m_oFormatLongName = sFileFormat.pretty_name;
-		
+
 		if(((sFileFormat.capabilities & media_file_format::B_KNOWS_RAW_AUDIO) >0) || ((sFileFormat.capabilities & media_file_format::B_KNOWS_ENCODED_AUDIO) >0))
 			opNewFormat -> m_vRawAudio = sFileFormat.capabilities;
 		if(((sFileFormat.capabilities & media_file_format::B_KNOWS_RAW_VIDEO) >0) || ((sFileFormat.capabilities & media_file_format::B_KNOWS_ENCODED_VIDEO) >0))
@@ -699,8 +699,8 @@ void EMBeMediaSystemInspector::InspectCodecs()
 			while(get_next_encoder(&vCookie2, &sFileFormat, &sFormat, &sOutFormat, &sCodec) == B_OK)
 			{
 				opNewFormat -> m_oRawAudioCodecShortNames.push_back(EMCodecInfo(string(sCodec.pretty_name), string(sCodec.short_name)));
-				
-				
+
+
 				memset(&sFormat, 0, sizeof(media_format));
 				sFormat.type = B_MEDIA_RAW_AUDIO;
 				sFormat.u.raw_audio = media_raw_audio_format::wildcard;
@@ -722,7 +722,7 @@ void EMBeMediaSystemInspector::InspectCodecs()
 			}
 		}
 
-		if(opNewFormat -> m_vRawAudio || 
+		if(opNewFormat -> m_vRawAudio ||
 			opNewFormat -> m_vRawVideo)
 			m_oFormats.push_back(opNewFormat);
 		else

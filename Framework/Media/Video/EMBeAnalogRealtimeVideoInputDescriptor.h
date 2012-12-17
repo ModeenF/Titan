@@ -2,7 +2,7 @@
 * Creator: Richard Kronfalt
 * Portability: Native
 *-------------------------------------------------------
-* 
+*
 *******************************************************/
 
 #include "EMGlobals.h"
@@ -12,7 +12,7 @@
 #ifndef __EM_BE_ANALOG_REALTIME_VIDEO_INPUT_DESCRIPTOR
 #define __EM_BE_ANALOG_REALTIME_VIDEO_INPUT_DESCRIPTOR
 
-#include "EMBeRealtimeInputDescriptor.h"
+//#include "EMBeRealtimeInputDescriptor.h"
 #include "EMBeAnalogConsumerNode.h"
 
 class EMMediaDataBuffer;

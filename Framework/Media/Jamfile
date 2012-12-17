@@ -1,0 +1,67 @@
+SubDir TOP Framework Media ;
+
+LOCATE_TARGET = [ FDirName $(TOP) output Framework Media ] ;
+
+SubDirHdrs [ FDirName $(TOP) Application ] ;
+SubDirHdrs [ FDirName $(TOP) Application Commands ] ;
+
+SubDirHdrs [ FDirName $(TOP) Framework ] ;
+SubDirHdrs [ FDirName $(TOP) Framework Globals ] ;
+SubDirHdrs [ FDirName $(TOP) Framework Media Audio ] ;
+SubDirHdrs [ FDirName $(TOP) Framework Media Video ] ;
+
+SubDirHdrs [ FDirName $(TOP) Components ] ;
+SubDirHdrs [ FDirName $(TOP) Components Media ] ;
+
+Library TitanFrameworkMedia :
+	EMBeBufferRepository.cpp
+	EMBeMediaFile.cpp
+	EMBeMediaFileManager.cpp
+	EMBeMediaRenderingNode.cpp
+	EMBeMediaSystemInspector.cpp
+	EMBeMediaTimer.cpp
+	EMBeMediaUtility.cpp
+	EMBeOutputNode.cpp
+	EMBitmapBuffer.cpp
+	EMBufferDestination.cpp
+	EMBufferRepository.cpp
+	EMDescriptor.cpp
+	EMDestructivePlugin.cpp
+	EMEncoderDescriptor.cpp
+	EMEncoderRepository.cpp
+	EMFileInputDescriptor.cpp
+	EMInputDescriptor.cpp
+	EMInputRepository.cpp
+	EMMediaAudioSignalMeter.cpp
+	EMMediaBufferSource.cpp
+	EMMediaClipRepository.cpp
+	EMMediaDataBuffer.cpp
+	EMMediaDestinationRepository.cpp
+	EMMediaEffectTrack.cpp
+	EMMediaEffectTrackRepository.cpp
+	EMMediaFile.cpp
+	EMMediaFileRepository.cpp
+	EMMediaFormat.cpp
+	EMMediaInputAudioSignalMeter.cpp
+	EMMediaItemContainer.cpp
+	EMMediaMatrix.cpp
+	EMMediaPool.cpp
+	EMMediaPoolEntry.cpp
+	EMMediaProject.cpp
+	EMMediaSignalMeter.cpp
+	EMMediaSignalMeterRepository.cpp
+	EMMediaSystemInspector.cpp
+	EMMediaTrackRepository.cpp
+	EMOutputDescriptor.cpp
+	EMOutputRepository.cpp
+	EMPlugin.cpp
+	EMPluginChain.cpp
+	EMPluginEntry.cpp
+	EMPluginRepository.cpp
+	EMRealtimeEncoderDescriptor.cpp
+	EMRealtimeInputDescriptor.cpp
+	EMRealtimeOutputDescriptor.cpp
+	EMRecording.cpp
+	EMVideoBitmapScaler.cpp
+;
+
