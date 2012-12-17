@@ -120,10 +120,10 @@ EMMediaDataBuffer* EMSilentVideoSource::GetBufferAt(int64 p_vTime, bool p_vSeeki
 		opBuffer = GetBuffer();
 	}
 
-	opBuffer -> SetFrame(EMMediaUtility::Instance() -> FramesToTime(p_vTime + 0*vAudioFrames, EMMediaUtility::Instance() -> GetSystemAudioFormat()));
-	opBuffer -> SetRelativeTimeToStart(EMMediaUtility::Instance() -> FramesToTime(p_vTime + 0*vAudioFrames, EMMediaUtility::Instance() -> GetSystemAudioFormat()));
-	
-	//memset(opBuffer -> Data(), 255, opBuffer -> m_vSizeAvailable); //Currently white, should be changed 
+	opBuffer -> SetFrame(gMediaUtility -> FramesToTime(p_vTime + 0*vAudioFrames, gMediaUtility -> GetSystemAudioFormat()));
+	opBuffer -> SetRelativeTimeToStart(gMediaUtility -> FramesToTime(p_vTime + 0*vAudioFrames, gMediaUtility -> GetSystemAudioFormat()));
+
+	//memset(opBuffer -> Data(), 255, opBuffer -> m_vSizeAvailable); //Currently white, should be changed
 
 	vLen = opBuffer -> m_vSizeAvailable;
 	unsigned char* opData = static_cast<unsigned char*>(opBuffer -> Data());
@@ -147,7 +147,7 @@ EMMediaDataBuffer* EMSilentVideoSource::GetBufferAt(int64 p_vTime, bool p_vSeeki
 
 	opBuffer -> m_vBelongsToUniqueID = this -> GetID();
 
-//	EMVideoSynchronizer::Instance() -> SetRelativeOffsetTime(EMMediaUtility::Instance() -> FramesToTime(p_vTime, EMMediaUtility::Instance() -> GetSystemAudioFormat()));
+//	EMVideoSynchronizer::Instance() -> SetRelativeOffsetTime(gMediaUtility -> FramesToTime(p_vTime, gMediaUtility -> GetSystemAudioFormat()));
 	//EMVideoSynchronizer::Instance() -> ZeroRealTimeClock();
 /*	if(p_vSeeking || EMVideoSynchronizer::Instance() -> NeedsToSynch())
 	{
@@ -208,10 +208,10 @@ bool EMSilentVideoSource::MessageReceived(EMListenerRepository* p_opSender, uint
 					oMediaFormat.m_vWidth = *(static_cast<int*>(EMMediaEngine::Instance() -> GetSettingsRepository() -> GetSetting(SETTING_VIDEO_RENDER_FORMAT_WIDTH)));//(m_opVideoPreview -> Bounds()).GetHeight();
 					oMediaFormat.m_vHeight  = *(static_cast<int*>(EMMediaEngine::Instance() -> GetSettingsRepository() -> GetSetting(SETTING_VIDEO_RENDER_FORMAT_HEIGHT)));//(m_opVideoPreview -> Bounds()).GetWidth();
 					oMediaFormat.m_vBytesPerSample = 3;
-					
+
 					while(((oMediaFormat.m_vHeight * oMediaFormat.m_vBytesPerSample) % 4) != 0)
 						oMediaFormat.m_vHeight--;
-					
+
 					if(m_vOldWidth != oMediaFormat.m_vWidth || m_vOldheight != oMediaFormat.m_vHeight)
 					{
 						oMediaFormat.m_vBytesPerRow  = oMediaFormat.m_vWidth*3;
@@ -238,11 +238,11 @@ bool EMSilentVideoSource::MessageReceived(EMListenerRepository* p_opSender, uint
 				}
 				m_vOldWidth = oMediaFormat.m_vWidth;
 				m_vOldheight = oMediaFormat.m_vHeight;
-			}			 
+			}
 			break;
 		default:
 			break;
 	};
-	
+
 	return true;
 }

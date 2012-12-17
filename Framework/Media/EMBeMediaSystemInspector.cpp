@@ -4,13 +4,18 @@
 
 #include "EMBeMediaSystemInspector.h"
 
-//#include "EMBeRealtimeInputDescriptor.h"
+#include "EMBeRealtimeInputDescriptor.h"
+#include "EMBeRealtimeOutputDescriptor.h"
+
 #include "EMBeRealtimeAudioInputDescriptor.h"
 #include "EMBeRealtimeVideoInputDescriptor.h"
-//#include "EMBeRealtimeOutputDescriptor.h"
+
 #include "EMBeRealtimeAudioOutputDescriptor.h"
+
 #include "EMBeRealtimeVideoOutputDescriptor.h"
+
 #include "EMBeAnalogRealtimeVideoInputDescriptor.h"
+
 #include "EMMediaIDManager.h"
 #include "EMDescriptor.h"
 #include "EMBeMediaUtility.h"
@@ -24,11 +29,11 @@
 #include <string>
 
 EMBeMediaSystemInspector::EMBeMediaSystemInspector()
-	:	EMMediaSystemInsepctor(),
+	:	EMMediaSystemInspector(),
 		m_opConsumer(NULL),
 		m_opRenderNode(NULL)
 {
-	EMBeMediaUtility::GetRosterE();
+	gBeMediaUtility->GetRosterE();
 	m_vID = EMMediaIDManager::MakeID();
 	m_opRenderNode = EMBeMediaRenderingNode::Instance();
 	m_opRenderNode -> Initialize();
@@ -40,39 +45,39 @@ EMBeMediaSystemInspector::~EMBeMediaSystemInspector()
 //	EMDebugger("Now in SystemInspector's destructor!");
 	if(m_opConsumer != NULL)
 	{
-		EMBeMediaUtility::GetRosterE() -> ReleaseNode(m_opConsumer -> Node());
-		EMBeMediaUtility::pop("EMBeMediaSystemInspector");
-		EMBeMediaUtility::GetRosterE() -> ReleaseNode(m_opRenderNode -> Node());;
+		gBeMediaUtility->GetRosterE() -> ReleaseNode(m_opConsumer -> Node());
+		gBeMediaUtility->pop("EMBeMediaSystemInspector");
+		gBeMediaUtility->GetRosterE() -> ReleaseNode(m_opRenderNode -> Node());;
 	}
 }
 
-list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetRealtimeAudioInputs()
+EMRIDList* EMBeMediaSystemInspector::GetRealtimeAudioInputs()
 {
-	list<EMBeRealtimeInputDescriptor*>* opList1 = GetInputs(EM_TYPE_RAW_AUDIO);
+	EMRIDList* opList1 = GetInputs(EM_TYPE_RAW_AUDIO);
 	return opList1;
 }
 
-list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetRealtimeVideoInputs()
+EMRIDList* EMBeMediaSystemInspector::GetRealtimeVideoInputs()
 {
-	list<EMBeRealtimeInputDescriptor*>* opList2 = GetInputs(EM_TYPE_ANY_VIDEO);
+	EMRIDList* opList2 = GetInputs(EM_TYPE_ANY_VIDEO);
 	return opList2;
 }
 
-list<EMBeRealtimeOutputDescriptor*>* EMBeMediaSystemInspector::GetRealtimeAudioOutputs()
+EMRODList* EMBeMediaSystemInspector::GetRealtimeAudioOutputs()
 {
-//	list<EMBeRealtimeOutputDescriptor*>* opList1 = new list<EMBeRealtimeOutputDescriptor*>();
-	list<EMBeRealtimeOutputDescriptor*>* opList1 = GetOutputs(EM_TYPE_RAW_AUDIO);
+//	EMRODList* opList1 = new EMRODList();
+	EMRODList* opList1 = GetOutputs(EM_TYPE_RAW_AUDIO);
 	return opList1;
 }
 
-list<EMBeRealtimeOutputDescriptor*>* EMBeMediaSystemInspector::GetRealtimeVideoOutputs()
+EMRODList* EMBeMediaSystemInspector::GetRealtimeVideoOutputs()
 {
-//	list<EMBeRealtimeOutputDescriptor*>* opList1 = new list<EMBeRealtimeOutputDescriptor*>();
-	list<EMBeRealtimeOutputDescriptor*>* opList1 = GetOutputs(EM_TYPE_RAW_VIDEO);
+//	EMRODList* opList1 = new EMRODList();
+	EMRODList* opList1 = GetOutputs(EM_TYPE_RAW_VIDEO);
 	return opList1;
 }
 
-list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaType p_eType)
+EMRIDList* EMBeMediaSystemInspector::GetInputs(EMMediaType p_eType)
 {
 	status_t vErrorCode;
 	dormant_node_info spNodeInfo[20];
@@ -82,9 +87,9 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 	media_output spOutputs[20];
 
 	media_node sNode;
-	list<EMBeRealtimeInputDescriptor*>* opList = NULL;
+	EMRIDList* opList = NULL;
 
-	opList = new list<EMBeRealtimeInputDescriptor*>();
+	opList = new EMRIDList();
 
 	if(p_eType == EM_TYPE_RAW_AUDIO)
 		sFormat.type = B_MEDIA_RAW_AUDIO;
@@ -98,7 +103,7 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 		sFormat.type = B_MEDIA_MULTISTREAM;
 
 
-	EMBeRealtimeInputDescriptor* opDescriptor = NULL;
+	EMRealtimeInputDescriptor* opDescriptor = NULL;
 
 	if((p_eType & EM_TYPE_ANY_VIDEO) > 0)
 	{
@@ -118,14 +123,14 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 		tryFormat.type = B_MEDIA_ENCODED_VIDEO;
 		tryFormat.u.encoded_video = media_encoded_video_format::wildcard;
 
-		vErrorCode = EMBeMediaUtility::GetRosterE() ->GetLiveNodes(lni, &linOutNumNodes, NULL, &tryFormat, NULL, B_PHYSICAL_INPUT);
+		vErrorCode = gBeMediaUtility->GetRosterE() ->GetLiveNodes(lni, &linOutNumNodes, NULL, &tryFormat, NULL, B_PHYSICAL_INPUT);
 		for(int32 vIndex = 0; vIndex < linOutNumNodes; vIndex++)
 		{
 			// find free output from video source
 			int32 cnt = 0;
 			spOutput = new media_output;
 
-			vErrorCode = EMBeMediaUtility::GetRosterE() -> GetFreeOutputsFor(lni[vIndex].node, spOutput, 1, &cnt, B_MEDIA_ENCODED_VIDEO);
+			vErrorCode = gBeMediaUtility->GetRosterE() -> GetFreeOutputsFor(lni[vIndex].node, spOutput, 1, &cnt, B_MEDIA_ENCODED_VIDEO);
 			if (vErrorCode < B_OK || cnt < 1) {
 				cout<<"ERROR! Video stream 1 is busy!"<<endl;
 			}
@@ -138,7 +143,7 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 		}
 
 
-		vErrorCode = EMBeMediaUtility::GetRosterE() -> GetDormantNodes(dni, &inOutNumNodes, NULL, &tryFormat, NULL, B_PHYSICAL_INPUT);
+		vErrorCode = gBeMediaUtility->GetRosterE() -> GetDormantNodes(dni, &inOutNumNodes, NULL, &tryFormat, NULL, B_PHYSICAL_INPUT);
 
 		if (vErrorCode < B_OK)
 			;
@@ -157,7 +162,7 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 				{
 					try
 					{
-						status_t err = EMBeMediaUtility::GetRosterE()->InstantiateDormantNode(dni[vIndex], &mConnection.producer, B_FLAVOR_IS_LOCAL);
+						status_t err = gBeMediaUtility->GetRosterE()->InstantiateDormantNode(dni[vIndex], &mConnection.producer, B_FLAVOR_IS_LOCAL);
 						if (err < B_OK) {
 						;//cout_commented_out_4_release<< "ERROR INSTANSIATING DORMANTNODE:" << strerror(err) << endl;
 							EMDebugger("ERROR! roster->InstantiateDormantNode");
@@ -168,7 +173,7 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 						int32 cnt = 0;
 						spOutput = new media_output;
 
-						err = EMBeMediaUtility::GetRosterE() -> GetFreeOutputsFor(mConnection.producer, spOutput, 1, &cnt, B_MEDIA_ENCODED_VIDEO);
+						err = gBeMediaUtility->GetRosterE() -> GetFreeOutputsFor(mConnection.producer, spOutput, 1, &cnt, B_MEDIA_ENCODED_VIDEO);
 						if (err < B_OK || cnt < 1) {
 							cout<<"ERROR! Video stream 1 is busy!"<<endl;
 						}
@@ -206,13 +211,13 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 		tryFormatAnalogue.type = B_MEDIA_RAW_VIDEO;
 		tryFormatAnalogue.u.raw_video = media_raw_video_format::wildcard;
 
-		vErrorCode = EMBeMediaUtility::GetRosterE() ->GetLiveNodes(lniAnalogue, &linOutNumNodesAnalogue, NULL, &tryFormatAnalogue, NULL, B_PHYSICAL_INPUT);
+		vErrorCode = gBeMediaUtility->GetRosterE() ->GetLiveNodes(lniAnalogue, &linOutNumNodesAnalogue, NULL, &tryFormatAnalogue, NULL, B_PHYSICAL_INPUT);
 		for(int32 vIndex = 0; vIndex < linOutNumNodesAnalogue; vIndex++)
 		{
 			// find free output from video source
 			int32 cnt = 0;
 			spOutputAnalogue = new media_output;
-			vErrorCode = EMBeMediaUtility::GetRosterE() -> GetFreeOutputsFor(lniAnalogue[vIndex].node, spOutputAnalogue, 1, &cnt, B_MEDIA_RAW_VIDEO);
+			vErrorCode = gBeMediaUtility->GetRosterE() -> GetFreeOutputsFor(lniAnalogue[vIndex].node, spOutputAnalogue, 1, &cnt, B_MEDIA_RAW_VIDEO);
 			if (vErrorCode < B_OK || cnt < 1) {
 				cout<<"ERROR! Video stream is busy!"<<endl;
 				//return NULL;
@@ -231,7 +236,7 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 		isNotInAliveList = true;
 		tryFormatAnalogue.type = B_MEDIA_RAW_VIDEO;
 		tryFormatAnalogue.u.raw_video = media_raw_video_format::wildcard;
-		vErrorCode = EMBeMediaUtility::GetRosterE() -> GetDormantNodes(dniAnalogue, &inOutNumNodesAnalogue, NULL, &tryFormatAnalogue, NULL, B_PHYSICAL_INPUT);
+		vErrorCode = gBeMediaUtility->GetRosterE() -> GetDormantNodes(dniAnalogue, &inOutNumNodesAnalogue, NULL, &tryFormatAnalogue, NULL, B_PHYSICAL_INPUT);
 
 		if (vErrorCode < B_OK)
 			;
@@ -250,7 +255,7 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 				{
 					try
 					{
-						status_t err = EMBeMediaUtility::GetRosterE()->InstantiateDormantNode(dniAnalogue[vIndex], &mConnection.producer, B_FLAVOR_IS_LOCAL);
+						status_t err = gBeMediaUtility->GetRosterE()->InstantiateDormantNode(dniAnalogue[vIndex], &mConnection.producer, B_FLAVOR_IS_LOCAL);
 						if (err < B_OK) {
 						;//cout_commented_out_4_release<< "ERROR INSTANSIATING DORMANTNODE:" << strerror(err) << endl;
 							cout<< "ERROR_CODE:" << strerror(err) << endl;
@@ -262,7 +267,7 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 						int32 cnt = 0;
 						spOutputAnalogue = new media_output;
 
-						err = EMBeMediaUtility::GetRosterE() -> GetFreeOutputsFor(mConnection.producer, spOutputAnalogue, 1, &cnt, B_MEDIA_RAW_VIDEO);
+						err = gBeMediaUtility->GetRosterE() -> GetFreeOutputsFor(mConnection.producer, spOutputAnalogue, 1, &cnt, B_MEDIA_RAW_VIDEO);
 						if (err < B_OK || cnt < 1) {
 							cout<<"ERROR! Video stream is busy!"<<endl;
 							//return NULL;
@@ -290,7 +295,7 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 		//END Checking for analogue video inputs
 
 
-/*		status_t status = EMBeMediaUtility::GetRosterE() -> GetVideoInput(&mConnection.producer);
+/*		status_t status = gBeMediaUtility->GetRosterE() -> GetVideoInput(&mConnection.producer);
 		if (status != B_OK)
 		{
 			;//cout_commented_out_4_release<<"Can't find an analog video input:" << status << endl;
@@ -303,7 +308,7 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 					int32 cnt = 0;
 					spOutput = new media_output;
 
-					status = EMBeMediaUtility::GetRosterE() -> GetFreeOutputsFor(mConnection.producer, spOutput, 1,  &cnt, B_MEDIA_RAW_VIDEO);
+					status = gBeMediaUtility->GetRosterE() -> GetFreeOutputsFor(mConnection.producer, spOutput, 1,  &cnt, B_MEDIA_RAW_VIDEO);
 					if (status != B_OK || cnt < 1)
 					{
 						status = B_RESOURCE_UNAVAILABLE;
@@ -332,11 +337,11 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 		//*****************************************
 		//This is where the LIVE NODES are fetched
 		//*****************************************
-		/*vErrorCode = EMBeMediaUtility::GetRosterE() -> GetLiveNodes(spLiveNodeInfo, &vNumNodes, NULL, NULL, NULL, B_PHYSICAL_INPUT);
+		/*vErrorCode = gBeMediaUtility->GetRosterE() -> GetLiveNodes(spLiveNodeInfo, &vNumNodes, NULL, NULL, NULL, B_PHYSICAL_INPUT);
 		for(int32 vIndex1 = 0; vIndex1 < vNumNodes; vIndex1++)
 		{
 			sNode = spLiveNodeInfo[vIndex1].node;
-			vErrorCode = EMBeMediaUtility::GetRosterE() -> GetAllOutputsFor(sNode, spOutputs, 20, &vNumOutputs);
+			vErrorCode = gBeMediaUtility->GetRosterE() -> GetAllOutputsFor(sNode, spOutputs, 20, &vNumOutputs);
 			for(int32 vIndex2 = 0; vIndex2 < vNumOutputs; vIndex2++)
 			{
 				if(spOutputs[vIndex2].format.type == sFormat.type)
@@ -384,15 +389,15 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 		sWantedFormat.type = B_MEDIA_RAW_AUDIO;
 		sWantedFormat.u.raw_audio = media_raw_audio_format::wildcard;
 
-		vErrorCode = EMBeMediaUtility::GetRosterE() -> GetDormantNodes(spNodeInfo, &vNumNodes, NULL, &sWantedFormat, NULL, B_PHYSICAL_INPUT, 0);
+		vErrorCode = gBeMediaUtility->GetRosterE() -> GetDormantNodes(spNodeInfo, &vNumNodes, NULL, &sWantedFormat, NULL, B_PHYSICAL_INPUT, 0);
 		for(int32 vIndex1 = 0; vIndex1 < vNumNodes; vIndex1++)
 		{
-			vErrorCode = EMBeMediaUtility::GetRosterE() -> InstantiateDormantNode(spNodeInfo[vIndex1], &sNode);
+			vErrorCode = gBeMediaUtility->GetRosterE() -> InstantiateDormantNode(spNodeInfo[vIndex1], &sNode);
 
-//			EMBeMediaUtility::GetRosterE() -> GetAudioInput(&sNode);
+//			gBeMediaUtility->GetRosterE() -> GetAudioInput(&sNode);
 			if(vErrorCode == B_OK)
 			{
-//				vErrorCode = EMBeMediaUtility::GetRosterE() -> GetAllOutputsFor(sNode, spOutputs, 20, &vNumOutputs);
+//				vErrorCode = gBeMediaUtility->GetRosterE() -> GetAllOutputsFor(sNode, spOutputs, 20, &vNumOutputs);
 //				for(int32 vIndex2 = 0; vIndex2 < vNumOutputs; vIndex2++)
 //				{
 //					if(spOutputs[vIndex2].format.type == sWantedFormat.type)
@@ -437,7 +442,7 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 			else
 				EMDebugger("ERROR! Could not instantiate dormant node!");
 
-//			EMBeMediaUtility::GetRosterE() -> ReleaseNode(sNode);
+//			gBeMediaUtility->GetRosterE() -> ReleaseNode(sNode);
 			break; //TODO: Remove this statement!!!!!
 		}
 	}
@@ -445,7 +450,7 @@ list<EMBeRealtimeInputDescriptor*>* EMBeMediaSystemInspector::GetInputs(EMMediaT
 	return opList;
 }
 
-list<EMBeRealtimeOutputDescriptor*>* EMBeMediaSystemInspector::GetOutputs(EMMediaType p_eType)
+EMRODList* EMBeMediaSystemInspector::GetOutputs(EMMediaType p_eType)
 {
 	status_t vErrorCode;
 	dormant_node_info spDormantNodeInfo[20];
@@ -457,9 +462,9 @@ list<EMBeRealtimeOutputDescriptor*>* EMBeMediaSystemInspector::GetOutputs(EMMedi
 	media_input spInputs[20];
 	int32 vNumInputs = 20;
 	media_node sNode;
-	list<EMBeRealtimeOutputDescriptor*>* opList = NULL;
+	EMRODList* opList = NULL;
 
-	opList = new list<EMBeRealtimeOutputDescriptor*>();
+	opList = new EMRODList();
 
 	if(p_eType == EM_TYPE_RAW_AUDIO)
 		sFormat.type = B_MEDIA_RAW_AUDIO;
@@ -491,7 +496,7 @@ list<EMBeRealtimeOutputDescriptor*>* EMBeMediaSystemInspector::GetOutputs(EMMedi
 		sVideoNode = m_opConsumer -> Node();
 
 		vErrorCode = B_OK;
-		vErrorCode = EMBeMediaUtility::GetRosterE() -> GetFreeInputsFor(sVideoNode, &sVideoInput, 1, &vVideoInputCount, B_MEDIA_RAW_VIDEO);
+		vErrorCode = gBeMediaUtility->GetRosterE() -> GetFreeInputsFor(sVideoNode, &sVideoInput, 1, &vVideoInputCount, B_MEDIA_RAW_VIDEO);
 		if(vErrorCode != B_OK)
 		{
 			emerr << "ERROR! Could not find any free inputs for video consumer!" << endl;
@@ -501,7 +506,7 @@ list<EMBeRealtimeOutputDescriptor*>* EMBeMediaSystemInspector::GetOutputs(EMMedi
 //		char vpName[64] = "Titan video preview window";
 //		memcpy(sVideoInput.name, vpName, 26);
 
-		EMBeRealtimeOutputDescriptor* opDescriptor = NULL;
+		EMRealtimeOutputDescriptor* opDescriptor = NULL;
 		opDescriptor = new EMBeRealtimeVideoOutputDescriptor(&sVideoInput);
 		if(! opDescriptor -> InitCheckE())
 		{
@@ -523,7 +528,7 @@ list<EMBeRealtimeOutputDescriptor*>* EMBeMediaSystemInspector::GetOutputs(EMMedi
 		int32 vCount = 1;
 		media_input sRenderInput;
 
-		vErrorCode = EMBeMediaUtility::GetRosterE() -> GetFreeInputsFor(m_opRenderNode -> Node(), &sRenderInput, 1, &vCount, B_MEDIA_RAW_VIDEO);
+		vErrorCode = gBeMediaUtility->GetRosterE() -> GetFreeInputsFor(m_opRenderNode -> Node(), &sRenderInput, 1, &vCount, B_MEDIA_RAW_VIDEO);
 		if(vErrorCode != B_OK)
 		{
 			EMDebugger("ERROR! Could not find any free video inputs for video render node!");
@@ -559,8 +564,8 @@ list<EMBeRealtimeOutputDescriptor*>* EMBeMediaSystemInspector::GetOutputs(EMMedi
 		//	vErrorCode = m_opRoster -> GetFreeInputsFor(spLiveNodeInfo[vIndex1].node, spInputs, 20, &vNumInputs);
 
 			media_node am;
-			EMBeMediaUtility::GetRosterE() -> GetAudioMixer(&am);
-			vErrorCode = EMBeMediaUtility::GetRosterE() -> GetFreeInputsFor(am, spInputs, 1, &vNumInputs);
+			gBeMediaUtility->GetRosterE() -> GetAudioMixer(&am);
+			vErrorCode = gBeMediaUtility->GetRosterE() -> GetFreeInputsFor(am, spInputs, 1, &vNumInputs);
 
 			for(int32 vIndex2 = 0; vIndex2 < vNumInputs; vIndex2++)
 			{
@@ -611,7 +616,7 @@ list<EMBeRealtimeOutputDescriptor*>* EMBeMediaSystemInspector::GetOutputs(EMMedi
 			//*
 			//***********************************
 			am = m_opRenderNode -> Node();
-			vErrorCode = EMBeMediaUtility::GetRosterE() -> GetFreeInputsFor(am, spInputs, 2, &vNumInputs, B_MEDIA_RAW_AUDIO);
+			vErrorCode = gBeMediaUtility->GetRosterE() -> GetFreeInputsFor(am, spInputs, 2, &vNumInputs, B_MEDIA_RAW_AUDIO);
 			for(int32 vIndex2 = 0; vIndex2 < vNumInputs; vIndex2++)
 			{
 				if(spInputs[vIndex2].format.type == sFormat.type)

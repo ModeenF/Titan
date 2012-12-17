@@ -7,6 +7,8 @@
 
 #include "EMGlobals.h"
 
+#include <TimedEventQueue.h>
+
 class EMMediaDataBuffer;
 
 const int64 EM_TICKS_PER_SECOND = 1000000L;
@@ -25,8 +27,8 @@ const int32 EM_PORT_MESSAGE_FLUSH_QUEUE			= 0x60000002L;
 const int32 EM_PORT_MESSAGE_BUFFER_FEED_SUSPENDING= 0x60000003L;
 const int32 EM_PORT_MESSAGE_BUFFER_FEED_RESUMING= 0x60000004L;
 const int32 EM_PORT_MESSAGE_RESET				= 0x60000005L;
-//const int32 EM_NODE_PAUSE						= 0x60000003L;
-//const int32 EM_NODE_RESUME					= 0x60000003L;
+const int32 EM_NODE_PAUSE						= 0x60000003L;
+const int32 EM_NODE_RESUME					= 0x60000003L;
 
 const int32 EM_AUDIO_FADER_MAX 					= 127;
 const int32 EM_AUDIO_FADER_MIN 					= 0;
@@ -38,7 +40,7 @@ const int32 EM_MIDI_BUFFER_SIZE					= 400;
 const int32 EM_AUDIO_NUM_CHANNELS				= 2;
 const int32 EM_AUDIO_SAMPLESIZE					= 2;
 const float EM_AUDIO_READAHEAD					= 0.75; //seconds
-//const float EM_VIDEO_FRAME_RATE					= 30;//12.0097;
+const float EM_VIDEO_FRAME_RATE					= 30;//12.0097;
 
 const int32 EM_OUTPUT_TYPE_ANY 					= 0xF;
 const int32 EM_OUTPUT_TYPE_PHYSICAL 			= 0x1;
@@ -49,20 +51,20 @@ const int32 EM_OUTPUT_TYPE_PREEFFECTS 			= 0x8;
 const int32 EM_TIMED_EVENT_SHUTDOWN 			= 0;//BTimedEventQueue::B_USER_EVENT + 1;
 const int32 EM_TIMED_EVENT_FLUSH_CASH			= 1;//BTimedEventQueue::B_USER_EVENT + 2;
 const int32 EM_TIMED_EVENT_RESET				= 2;//BTimedEventQueue::B_USER_EVENT + 3;
-//const int32 EM_EVENT_PAUSE					= BTimedEventQueue::B_USER_EVENT + 4;
-//const int32 EM_EVENT_RESUME					= BTimedEventQueue::B_USER_EVENT + 5;
+const int32 EM_EVENT_PAUSE					= BTimedEventQueue::B_USER_EVENT + 4;
+const int32 EM_EVENT_RESUME					= BTimedEventQueue::B_USER_EVENT + 5;
 
 const uint32 EM_MESSAGE_BEGIN_BUFFER_UP			= 665;
 const uint32 EM_MESSAGE_BEGIN_PLAYORRECORD		= 666;
 const uint32 EM_MESSAGE_STOP_PLAYORRECORD		= 667;
 const uint32 EM_MESSAGE_TIME_WAS_SEEKED			= 668;
 
-//const uint32 EM_MESSAGE_TIMER_STARTED			= 666;
-//const uint32 EM_MESSAGE_PAUSE					= 667;
-//const uint32 EM_MESSAGE_RESUME				= 668;
-//const uint32 EM_MESSAGE_TIMER_STOPPED			= 669;
-//const uint32 EM_MESSAGE_START					= 669;
-//const uint32 EM_MESSAGE_STOP					= 670;
+const uint32 EM_MESSAGE_TIMER_STARTED			= 666;
+const uint32 EM_MESSAGE_PAUSE					= 667;
+const uint32 EM_MESSAGE_RESUME				= 668;
+const uint32 EM_MESSAGE_TIMER_STOPPED			= 669;
+const uint32 EM_MESSAGE_START					= 669;
+const uint32 EM_MESSAGE_STOP					= 670;
 const uint32 EM_MESSAGE_BUFFER_SIZE_CHANGED		= 671;
 const uint32 EM_MESSAGE_AUDIO_TRACK_ACTIVATED	= 672;
 const uint32 EM_MESSAGE_VIDEO_TRACK_ACTIVATED	= 673;
@@ -73,6 +75,7 @@ const uint32 EM_MESSAGE_TRACK_DEST_CHANGE		= 677;
 const uint32 EM_MESSAGE_MIDI_RECORDING_STARTED	= 678;
 const uint32 EM_MESSAGE_MIDI_RECORDING_STOPPED	= 679;
 const uint32 EM_MESSAGE_MIDI_EVENT				= 680;
+const uint32 EM_MESSAGE_TIME_SEEKED				= 681;
 
 const int32 EM_WRITE							= 0x01;
 const int32 EM_READ								= 0x00;

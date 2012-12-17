@@ -12,14 +12,15 @@
 #ifndef __EM_BE_ANALOG_REALTIME_VIDEO_INPUT_DESCRIPTOR
 #define __EM_BE_ANALOG_REALTIME_VIDEO_INPUT_DESCRIPTOR
 
-//#include "EMBeRealtimeInputDescriptor.h"
+#include "EMBeRealtimeInputDescriptor.h"
 #include "EMBeAnalogConsumerNode.h"
 
 class EMMediaDataBuffer;
 class EMProjectDataSaver;
 class EMProjectDataLoader;
 
-class EMBeAnalogRealtimeVideoInputDescriptor : public EMBeRealtimeInputDescriptor
+class EMBeAnalogRealtimeVideoInputDescriptor
+	: public EMRealtimeInputDescriptor
 {
 public:
 	EMBeAnalogRealtimeVideoInputDescriptor(media_output* p_spMediaOutput);

@@ -34,7 +34,7 @@ EMEqualizerPlugin::EMEqualizerPlugin()
 		memset(m_opTempBuffers[i], 0, 2*m_BufferSize);
 	}
 
-	m_oFormat = *(EMMediaUtility::Instance() -> GetSystemAudioFormat());
+	m_oFormat = *(gMediaUtility -> GetSystemAudioFormat());
 
 	m_opSemaphore = EMSemaphore::CreateEMSemaphore(NULL, 1, 1);
 
@@ -152,7 +152,7 @@ void EMEqualizerPlugin::Equalize(EMMediaDataBuffer* p_opBuffer)
 		{
 			vLeft += static_cast<float>(*opSrc) * *opH;
 			vRight += static_cast<float>(*(opSrc + 1)) * *opH;
-			
+
 			++opH;
 			opSrc += 2;
 
@@ -271,7 +271,7 @@ void EMEqualizerPlugin::InitFreq(double* Hb, double hb, double hm, double ht, fl
 EMPlugin* EMEqualizerPlugin::Clone()
 {
 	EMEqualizerPlugin* opPlug = EM_new EMEqualizerPlugin();
-	
+
 	opPlug -> SetSettings(-m_vBase, -m_vMid, -m_vTreb);
 
 	return opPlug;
@@ -291,7 +291,7 @@ bool EMEqualizerPlugin::ActivatePreset(int32 p_vID)
 {
 	return false;
 }
-	
+
 
 bool EMEqualizerPlugin::LoadSetting(EMProjectDataLoader* p_opLoader)
 {
@@ -305,7 +305,7 @@ bool EMEqualizerPlugin::LoadSetting(EMProjectDataLoader* p_opLoader)
 
 	return true;
 }
-	
+
 
 bool EMEqualizerPlugin::SaveSetting(EMProjectDataSaver* p_opSaver)
 {

@@ -21,11 +21,11 @@ template<class tFromType, class tToType> EMAudioConverter<tFromType, tToType>::~
 {
 }
 
-template<class tFromType, class tToType> 
+template<class tFromType, class tToType>
 string EMAudioConverter<tFromType, tToType>::ConvertAudio(const string* p_oSourceFileName, const EMMediaFormat* p_opTargetFormat)
 {
 //	oNoPathFileName += ".converted.wav";
-	string oConvertedFileName(EMMediaUtility::Instance() -> MakeConvertFileName((*p_oSourceFileName).c_str())); //ParseFullPath(oNoPathFileName, DIRECTORY_ID_AUDIO_DATA_USED);
+	string oConvertedFileName(gMediaUtility -> MakeConvertFileName((*p_oSourceFileName).c_str())); //ParseFullPath(oNoPathFileName, DIRECTORY_ID_AUDIO_DATA_USED);
 
 //	string oConvertedFileName = *p_oSourceFileName + "_Converted.wav";
 
@@ -34,7 +34,7 @@ string EMAudioConverter<tFromType, tToType>::ConvertAudio(const string* p_oSourc
 
 	opSourceFile -> InitCheckE();
 	opTargetFile -> InitCheckE();
-	
+
 	EMMediaFormat* opSourceFormat = opSourceFile -> GetFormat();
 
 	int64 vTotalSize = opSourceFile -> NumberOfFramesInFile() * p_opTargetFormat -> m_vNumChannels * sizeof(tFromType);
@@ -56,7 +56,7 @@ string EMAudioConverter<tFromType, tToType>::ConvertAudio(const string* p_oSourc
 		vSourceFileBytePosition += vNumberOfBytesRead;
 		if(vNumberOfBytesRead != opSourceFormat -> m_vBufferSizeBytes) //TODO: Fix so we can have 4096 mod file sizes!
 			vShouldLoop = false;
-		if(vNumberOfBytesRead == 0) 
+		if(vNumberOfBytesRead == 0)
 			break;
 
 		upDataToWrite = vpSourceData;
@@ -85,7 +85,7 @@ string EMAudioConverter<tFromType, tToType>::ConvertAudio(const string* p_oSourc
 		}
 		else
 			vpPointer = (tToType*) vpSourceData;
-		
+
 		tToType* vpNewPointer = NULL;
 		int64 vNumBytesReturnedHere = 0;
 		if(opSourceFormat -> m_vFrameRate != p_opTargetFormat -> m_vFrameRate)
@@ -113,7 +113,7 @@ string EMAudioConverter<tFromType, tToType>::ConvertAudio(const string* p_oSourc
 	EMMediaFormat oFormat = *p_opTargetFormat;
 	oFormat.m_vBytesPerSample = sizeof(tToType);
 	opTargetFile -> WriteHeaderE(&oFormat);
-	
+
 	delete opSourceFile;
 	delete opTargetFile;
 	delete [] vpSourceData;
@@ -122,12 +122,12 @@ string EMAudioConverter<tFromType, tToType>::ConvertAudio(const string* p_oSourc
 	return oConvertedFileName;
 }
 
-template<class tFromType, class tToType> 
-void EMAudioConverter<tFromType, tToType>::ChannelConversion(tFromType* p_vpSourceArray, 
-													int64 p_vNumSourceFrames, 
+template<class tFromType, class tToType>
+void EMAudioConverter<tFromType, tToType>::ChannelConversion(tFromType* p_vpSourceArray,
+													int64 p_vNumSourceFrames,
 													const EMMediaFormat* p_opSourceFormat,
 
-													tFromType** p_vpTargetArrayPointer, 
+													tFromType** p_vpTargetArrayPointer,
 													int64* p_vOutNumTargetBytes,
 													const EMMediaFormat* p_opTargetFormat)
 {
@@ -136,7 +136,7 @@ void EMAudioConverter<tFromType, tToType>::ChannelConversion(tFromType* p_vpSour
 	float vFactor = static_cast<float>(vNumTargetChannels) / static_cast<float>(vNumSourceChannels);
 	int64 vNumSourceBytes = p_vNumSourceFrames * vNumSourceChannels * sizeof(tFromType);
 	int64 vNumTargetBytes = vNumSourceBytes * vFactor;
-	
+
 	int64 vNumTargetSamples = vNumTargetBytes / p_opTargetFormat -> m_vBytesPerSample;
 
 	*p_vpTargetArrayPointer = EM_new tFromType[vNumTargetSamples];
@@ -145,7 +145,7 @@ void EMAudioConverter<tFromType, tToType>::ChannelConversion(tFromType* p_vpSour
 		(*p_vpTargetArrayPointer)[i] = p_vpSourceArray[static_cast<int32>(floor(i / vFactor))];
 }
 
-template<class tFromType, class tToType> 
+template<class tFromType, class tToType>
 void EMAudioConverter<tFromType, tToType>::SampleTypeConversion(tFromType* p_upSourceArray, int64 p_vSourceNumBytes, tToType** p_upTargetArrayPointer, int64* p_vpOutNumBytes)
 {
 	tFromType* vpSourceArray = (tFromType*) p_upSourceArray;
@@ -154,17 +154,17 @@ void EMAudioConverter<tFromType, tToType>::SampleTypeConversion(tFromType* p_upS
 
 	bool vFromTypeIsSigned = false;
 	bool vToTypeIsSigned = false;
-	
-	//Find out if the types are signed or not... Subtract 1 from 0 and see 
+
+	//Find out if the types are signed or not... Subtract 1 from 0 and see
 	//what the result is (if it's less than 0 then it's signed - otherwise not).
-	if((tFromType) (((tFromType) 0) -1) > 0) 
+	if((tFromType) (((tFromType) 0) -1) > 0)
 		vFromTypeIsSigned = false;
-	else 
+	else
 		vFromTypeIsSigned = true;
 
-	if((tToType) (((tToType) 0) -1) > 0) 
+	if((tToType) (((tToType) 0) -1) > 0)
 		vToTypeIsSigned = false;
-	else 
+	else
 		vToTypeIsSigned = true;
 
 
@@ -173,7 +173,7 @@ void EMAudioConverter<tFromType, tToType>::SampleTypeConversion(tFromType* p_upS
 	float vSourceMinimum = (vFromTypeIsSigned ? -(vSourceRange / 2) : 0);
 	float vSourceMaximum = (vFromTypeIsSigned ? (vSourceRange / 2) -1 : vSourceRange -1);
 	float vSourceZeroLevel = (vFromTypeIsSigned ? 0 : (vSourceRange / 2));
-	
+
 	float vTargetRange = pow(2, 8 * sizeof(tToType));
 	float vTargetMinimum = (vToTypeIsSigned ? -(vTargetRange / 2) : 0);
 	float vTargetMaximum = (vToTypeIsSigned ? (vTargetRange / 2) -1 : vTargetRange -1);
@@ -186,7 +186,7 @@ void EMAudioConverter<tFromType, tToType>::SampleTypeConversion(tFromType* p_upS
 
 //	float vSourceSampleZeroLevel = (vFromTypeIsSigned ? vSourceMax / 2 : vSourceMax);
 //	float vTargetSampleZeroLevel = (vToTypeIsSigned ? vTargetMax / 2 : vTargetMax);
-		
+
 	*p_vpOutNumBytes = vNumSamples * sizeof(tToType);
 
 	if(*vpTargetArray != NULL)
@@ -201,7 +201,7 @@ void EMAudioConverter<tFromType, tToType>::SampleTypeConversion(tFromType* p_upS
 		float vR1 = (vSourceFloatValue >= vSourceZeroLevel ? (vSourceFloatValue + 1) / vSourceRange : vSourceFloatValue / vSourceRange);
 		float vR2 = vR1 + (vTargetMinimum / vTargetRange) + (vTargetZeroLevel / vTargetRange);
 		float vR3 = vR2 * vTargetRange;
-		
+
 		(*vpTargetArray)[vIndex] = (tToType) floor(vR3);
 */
 //		(*vpTargetArray)[vIndex] = (tToType) floor(vSourceFloatValue * (float) vTargetMax);
@@ -213,12 +213,12 @@ void EMAudioConverter<tFromType, tToType>::SampleTypeConversion(tFromType* p_upS
 	}
 }
 
-template<class tFromType, class tToType> 
-void EMAudioConverter<tFromType, tToType>::FrameRateConversion(tToType* p_vpSourceArray, 
-													int64 p_vNumSourceFrames, 
+template<class tFromType, class tToType>
+void EMAudioConverter<tFromType, tToType>::FrameRateConversion(tToType* p_vpSourceArray,
+													int64 p_vNumSourceFrames,
 													const EMMediaFormat* p_opSourceFormat,
 
-													tToType** p_vpTargetArrayPointer, 
+													tToType** p_vpTargetArrayPointer,
 													int64* p_vOutNumTargetBytes,
 													const EMMediaFormat* p_opTargetFormat)
 //Temporary assumption: The number of channels are always the same in the source and target formats
@@ -230,18 +230,18 @@ void EMAudioConverter<tFromType, tToType>::FrameRateConversion(tToType* p_vpSour
 	};
 
 	float vDivisability = p_opTargetFormat -> m_vFrameRate / p_opSourceFormat -> m_vFrameRate;
-	
+
 	const int32 EM_UPSAMPLE = 1;
 	const int32 EM_DOWNSAMPLE = 2;
-	
+
 	int32 vMode = 0;
 	if(vDivisability > 1)
 		vMode = EM_UPSAMPLE;
 	else
 		vMode = EM_DOWNSAMPLE;
-	
+
 	int64 vNumTargetFrames = static_cast<int64>(static_cast<float>(p_vNumSourceFrames) * vDivisability);
-	
+
 	if(*p_vpTargetArrayPointer != NULL)
 		delete [] *p_vpTargetArrayPointer;
 	tFrame* vpSourceFrames = (tFrame*) p_vpSourceArray;
@@ -291,7 +291,7 @@ do until source frame no >= number of source frames
 	target[target frame no] = source[source frame no]
 
 	target frame no ++
-	
+
 	if target frame no / target frame rate >= source frame no / source frame rate
 		source frame no ++
 
@@ -315,9 +315,9 @@ one source frame is 1/10th of a second long, that is 100 mS
 one target frame is 1/4th of a second long, that is 250 mS
 
 do until target frame no >= number of target frames
-	
+
 	target[target frame no] = source[source frame no]
-	
+
 	source frame no ++;
 
 	if(source frame no / source frame rate >= target frame no / target frame rate)

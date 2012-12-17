@@ -2,7 +2,7 @@
 * Creator: Richard Kronfalt
 * Portability: Native
 *-------------------------------------------------------
-* 
+*
 *******************************************************/
 
 #include "EMGlobals.h"
@@ -12,7 +12,7 @@
 #ifndef __EM_BE_REALTIME_VIDEO_OUTPUT_DESCRIPTOR
 #define __EM_BE_REALTIME_VIDEO_OUTPUT_DESCRIPTOR
 
-#include "EMRealtimeOutputDescriptor.h"
+#include "EMBeRealtimeOutputDescriptor.h"
 #include "EMMediaDataBuffer.h"
 #include "EMListener.h"
 
@@ -22,7 +22,8 @@ class EMListenerRepository;
 class EMProjectDataSaver;
 class EMProjectDataLoader;
 
-class EMBeRealtimeVideoOutputDescriptor : public EMRealtimeOutputDescriptor, public EMListener
+class EMBeRealtimeVideoOutputDescriptor : public EMBeRealtimeOutputDescriptor,
+			public EMListener
 {
 public:
 	EMBeRealtimeVideoOutputDescriptor(media_input* p_spMediaInput);
@@ -36,7 +37,7 @@ public:
 	bool ClearData();
 	bool SaveData(EMProjectDataSaver* p_opSaver);
 	bool LoadData(EMProjectDataLoader* p_opLoader);
-	
+
 private:
 	bool m_vAwaitingNewBufferFormat;
 	bool m_ReadyForFormatChange;

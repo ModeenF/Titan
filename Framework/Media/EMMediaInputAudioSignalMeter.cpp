@@ -12,7 +12,7 @@ EMMediaInputAudioSignalMeter::EMMediaInputAudioSignalMeter()
 	:	EMMediaSignalMeter(EM_TYPE_RAW_AUDIO),
 		m_opSignalValues(NULL)
 {
-	EMMediaFormat* opFormat = EMMediaUtility::Instance() -> GetSystemAudioFormat();
+	EMMediaFormat* opFormat = gMediaUtility -> GetSystemAudioFormat();
 	int64 vBufferSize = opFormat -> m_vBufferSizeBytes;
 
 	m_opSignalValues = EM_new EMMediaSignal;
@@ -63,7 +63,7 @@ EMMediaDataBuffer* EMMediaInputAudioSignalMeter::ProcessBufferE(list<EMMediaData
 	if(p_opBufferList -> size() != 1)
 		EMDebugger("SignalMeter received an unsupported number of buffers (not 1)");
 	EMMediaDataBuffer* opBuffer = p_opBufferList -> front();
-	
+
 	//We start by finding the peaks in the buffer. One peak for each channel!
 	signed short* vpAllSamples = static_cast<signed short*>(opBuffer -> Data());
 	float vpMaxSamples[5];
@@ -82,7 +82,7 @@ EMMediaDataBuffer* EMMediaInputAudioSignalMeter::ProcessBufferE(list<EMMediaData
 	}
 
 	Put(vpMaxSamples, vNumChannels);
-	
+
 	if(GetDestination() == NULL)
 	{
 		opBuffer -> Recycle();

@@ -58,8 +58,8 @@ public:
 	list<char*>* classes;
 	list<int64>* num;
 	list<map<int64, string> >* instances;
-	static	void			push(const void* ptr, char* name);
-	static	void 			pop(char* name);
+	void			push(const void* ptr, char* name);
+	void 			pop(char* name);
 	void show();
 
 	EMBeMediaUtility();
@@ -69,5 +69,7 @@ protected:
 	EMMediaFormat* m_opSystemAudioFormat;
 	EMMediaFormat* m_opSystemVideoFormat;
 };
+
+extern "C" EMBeMediaUtility* gBeMediaUtility;
 
 #endif

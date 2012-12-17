@@ -10,7 +10,7 @@ EMMediaPoolAudioEntry::EMMediaPoolAudioEntry(string p_oFileName)
 	:	EMMediaPoolEntry(p_oFileName, EM_TYPE_ANY_AUDIO)
 {
 	m_opHiResWaveFile = EM_new EMWaveFileReader(p_oFileName);
-	string oPeaksFileName(EMMediaUtility::Instance() -> MakePeaksFileName(p_oFileName.c_str()));
+	string oPeaksFileName(gMediaUtility -> MakePeaksFileName(p_oFileName.c_str()));
 	m_opLowResWaveFile = EM_new EMWaveFileReader(oPeaksFileName);
 }
 
@@ -18,7 +18,7 @@ EMMediaPoolAudioEntry::EMMediaPoolAudioEntry(EMProjectDataLoader* p_opLoader, ui
 	:	EMMediaPoolEntry(p_opLoader, vUndecidedType)
 {
 	m_opHiResWaveFile = EM_new EMWaveFileReader(GetFileName());
-	string oPeaksFileName(EMMediaUtility::Instance() -> MakePeaksFileName(GetFileName().c_str()));
+	string oPeaksFileName(gMediaUtility -> MakePeaksFileName(GetFileName().c_str()));
 	m_opLowResWaveFile = EM_new EMWaveFileReader(oPeaksFileName);
 }
 
@@ -42,7 +42,7 @@ int64 EMMediaPoolAudioEntry::GetLength() const
 	{
 //		if(! m_opHiResWaveFile -> HasFormat())
 //			m_opHiResWaveFile -> ReadFormatE();
-		vLength = EMMediaUtility::Instance() -> FramesToTime(m_opHiResWaveFile -> NumberOfFramesInFile(), m_opHiResWaveFile -> GetFormat());
+		vLength = gMediaUtility -> FramesToTime(m_opHiResWaveFile -> NumberOfFramesInFile(), m_opHiResWaveFile -> GetFormat());
 	}
 	catch(...)
 	{
@@ -139,7 +139,7 @@ void EMMediaPoolAudioEntry::GetHiResContent(void* p_upArray, int32& p_vArrayCapa
 //		if(! m_opHiResWaveFile -> HasFormat())
 //			m_opHiResWaveFile -> ReadFormatE();
 
-		int64 vBytePosition = EMMediaUtility::Instance() -> FramesToBytes(EMMediaUtility::Instance() -> TimeToFrames(p_vMediaTime, m_opHiResWaveFile -> GetFormat()), m_opHiResWaveFile -> GetFormat());
+		int64 vBytePosition = gMediaUtility -> FramesToBytes(gMediaUtility -> TimeToFrames(p_vMediaTime, m_opHiResWaveFile -> GetFormat()), m_opHiResWaveFile -> GetFormat());
 
 		int64 vSizeActuallyRead = (int64) p_vArrayCapacityBytes;
 		m_opHiResWaveFile -> ReadData(p_upArray, vSizeActuallyRead, vBytePosition, 0, EM_AUDIO_SAMPLESIZE);

@@ -32,8 +32,8 @@ media_file_format GetMediaFileFormat(string p_oExtension, media_format* p_spForm
 	media_file_format mfi;
 //	media_codec_info mci;
 	format = *p_spFormat;
-	
-	while(get_next_file_format(&cookie, &mfi) == B_OK) 
+
+	while(get_next_file_format(&cookie, &mfi) == B_OK)
 	{
 		if(strcmp(mfi.short_name, p_oExtension.c_str()) == 0)
 			return mfi;
@@ -48,11 +48,11 @@ media_codec_info GetCodecInfo(media_file_format p_sFileFormat, media_format* p_s
 	media_format format, outfmt;
 //	media_file_format mfi;
 	media_codec_info mci;
-	
+
 	while(get_next_encoder(&cookie, &p_sFileFormat, p_spFormat, &outfmt, &mci) == B_OK)
 	{
 	}
-	
+
 	return mci;
 }
 
@@ -65,8 +65,8 @@ EMBeMediaRenderingNode* EMBeMediaRenderingNode::Instance()
 	return m_opInstance;
 }
 
-EMBeMediaRenderingNode::EMBeMediaRenderingNode() 
-	:	BMediaNode("Titan consumer node"), 
+EMBeMediaRenderingNode::EMBeMediaRenderingNode()
+	:	BMediaNode("Titan consumer node"),
 		BBufferConsumer(B_MEDIA_MULTISTREAM),
 		m_vShouldRender(false),
 		m_opMediaFile(NULL),
@@ -101,9 +101,9 @@ EMBeMediaRenderingNode::EMBeMediaRenderingNode()
 	m_sAudioFormat.u.raw_audio = media_raw_audio_format::wildcard;
 	m_sVideoFormat.type = B_MEDIA_RAW_VIDEO;
 	m_sVideoFormat.u.raw_video = media_raw_video_format::wildcard;
-	
-	EMBeMediaUtility::GetRosterE() -> RegisterNode(this);
-	EMBeMediaUtility::push(this, "EMBeMediaRenderingNode");
+
+	gBeMediaUtility->GetRosterE() -> RegisterNode(this);
+	gBeMediaUtility->push(this, "EMBeMediaRenderingNode");
 }
 
 EMBeMediaRenderingNode::~EMBeMediaRenderingNode()
@@ -117,7 +117,7 @@ EMBeMediaRenderingNode::~EMBeMediaRenderingNode()
 		snooze(1000);
 	delete_port(m_sControlPortID);
 	delete m_opPreviewingImage;
-	EMBeMediaUtility::pop("EMBeMediaRenderingNode");
+	gBeMediaUtility->pop("EMBeMediaRenderingNode");
 }
 
 status_t EMBeMediaRenderingNode::AcceptFormat(const media_destination& p_destination, media_format* p_format)
@@ -128,13 +128,13 @@ status_t EMBeMediaRenderingNode::AcceptFormat(const media_destination& p_destina
 		return B_MEDIA_BAD_DESTINATION;
 	}
 
-	media_format sInputFormat;	
+	media_format sInputFormat;
 	if(p_destination == m_sInputs[EM_AUDIO_INPUT].destination)
 		sInputFormat = m_sPreferedInputFormat[EM_AUDIO_INPUT];
 	else if(p_destination == m_sInputs[EM_VIDEO_INPUT].destination)
 		sInputFormat = m_sPreferedInputFormat[EM_VIDEO_INPUT];
 
-	if(p_format -> type <= 0 && p_format -> type != sInputFormat.type) 
+	if(p_format -> type <= 0 && p_format -> type != sInputFormat.type)
 	{
 		p_format -> type = sInputFormat.type;
 		p_format -> u = sInputFormat.u;
@@ -149,7 +149,7 @@ status_t EMBeMediaRenderingNode::AcceptFormat(const media_destination& p_destina
 
 BMediaAddOn* EMBeMediaRenderingNode::AddOn(int32* p_outInternalID) const
 {
-	if (p_outInternalID) 
+	if (p_outInternalID)
 		*p_outInternalID = 0;
 	return NULL;
 }
@@ -162,8 +162,8 @@ void EMBeMediaRenderingNode::BufferReceived(BBuffer* p_opBuffer)
 		;//cout_commented_out_4_release << "AudioBuffer " << flush;
 	if(p_opBuffer -> Header() -> type == B_MEDIA_RAW_VIDEO)
 		;//cout_commented_out_4_release << "VideoBuffer " << flush;
-		
-	
+
+
 	acquire_sem(m_vSemaphore);
 	if(m_vShouldRender && m_vReadyForWriting)
 	{
@@ -171,7 +171,7 @@ void EMBeMediaRenderingNode::BufferReceived(BBuffer* p_opBuffer)
 		{
 			EMMediaFormat oAudioFormat(EM_TYPE_RAW_AUDIO);
 			oAudioFormat.CreateFormat(&(m_sInputs[EM_AUDIO_INPUT].format));
-			vFrames = EMBeMediaUtility::BytesToFrames(p_opBuffer -> SizeUsed(), &oAudioFormat);
+			vFrames = gBeMediaUtility->BytesToFrames(p_opBuffer -> SizeUsed(), &oAudioFormat);
 			status_t vResult = m_opAudioTrack -> WriteFrames((const void*) (p_opBuffer -> Data()), vFrames, B_MEDIA_KEY_FRAME);
 			//status_t vResult = m_opVideoTrack -> WriteFrames((const void*) (p_opBuffer -> Data()), vFrames, B_MEDIA_KEY_FRAME);
 			if(vResult != B_OK)
@@ -191,7 +191,7 @@ void EMBeMediaRenderingNode::BufferReceived(BBuffer* p_opBuffer)
 			;//cout_commented_out_4_release<<"Size of Data() available:"<<p_opBuffer -> SizeAvailable()<<endl;
 			;//cout_commented_out_4_release<<"Size of Data() used:"<<p_opBuffer -> SizeUsed()<<endl;
 			void* opData = m_opVideoScaler -> Scale(p_opBuffer -> Data(), &oCurrentBufferFormat, m_oDesiredFormat);
-				
+
 /*			if(m_opReceiver -> LockPreviewWindow())
 			{
 				if(m_vLocalHeight != m_oDesiredFormat -> m_vHeight || m_vLocalWidth != m_oDesiredFormat -> m_vWidth || m_opPreviewingImage == NULL)
@@ -210,21 +210,21 @@ void EMBeMediaRenderingNode::BufferReceived(BBuffer* p_opBuffer)
 				m_opReceiver -> HandleNativeBuffer(m_opPreviewingImage);
 			}
 			else
-				EMDebugger("ERROR! Vide rendering node failed to lock the window for previewing video!"); 
+				EMDebugger("ERROR! Vide rendering node failed to lock the window for previewing video!");
 */
-				
+
 			vFrames = 1;
 			if(opData != NULL)
 			{
-//				if(m_opVideoTrack -> WriteFrames(opData, vFrames, (((vVideoFrameCount++) % vVideoKeyFrameRate) == 0 ? B_MEDIA_KEY_FRAME : 0))) 
-				if(m_opVideoTrack -> WriteFrames(opData, vFrames, B_MEDIA_KEY_FRAME)) 
+//				if(m_opVideoTrack -> WriteFrames(opData, vFrames, (((vVideoFrameCount++) % vVideoKeyFrameRate) == 0 ? B_MEDIA_KEY_FRAME : 0)))
+				if(m_opVideoTrack -> WriteFrames(opData, vFrames, B_MEDIA_KEY_FRAME))
 					emerr << "ERROR! Couldn't write data to video track!" << endl;
-			} 
+			}
 			else
 			{
-//				if(m_opVideoTrack -> WriteFrames(p_opBuffer -> Data(), vFrames, (((vVideoFrameCount++) % vVideoKeyFrameRate) == 0 ? B_MEDIA_KEY_FRAME : 0))) 
+//				if(m_opVideoTrack -> WriteFrames(p_opBuffer -> Data(), vFrames, (((vVideoFrameCount++) % vVideoKeyFrameRate) == 0 ? B_MEDIA_KEY_FRAME : 0)))
 				if(m_opVideoTrack -> WriteFrames(p_opBuffer -> Data(), vFrames, B_MEDIA_KEY_FRAME))
-					emerr << "ERROR! Couldn't write data to video track!" << endl;			
+					emerr << "ERROR! Couldn't write data to video track!" << endl;
 			}
 
 		}
@@ -237,8 +237,8 @@ void EMBeMediaRenderingNode::BufferReceived(BBuffer* p_opBuffer)
 	snooze(5000);
 }
 
-status_t EMBeMediaRenderingNode::Connected(const media_source& p_source, 
-										  const media_destination& p_destination, 
+status_t EMBeMediaRenderingNode::Connected(const media_source& p_source,
+										  const media_destination& p_destination,
 										  const media_format& p_format,
 										  media_input* p_outInput)
 {
@@ -261,9 +261,9 @@ status_t EMBeMediaRenderingNode::Connected(const media_source& p_source,
 		memcpy(p_outInput, &m_sInputs[EM_VIDEO_INPUT], sizeof(media_input));
 		memcpy(&m_sVideoFormat, &p_format, sizeof(media_format));
 	}
-	else 
-		return B_MEDIA_BAD_DESTINATION; 
-	
+	else
+		return B_MEDIA_BAD_DESTINATION;
+
 	return B_OK;
 }
 
@@ -272,11 +272,11 @@ port_id EMBeMediaRenderingNode::ControlPort(void) const
 	return m_sControlPortID;
 }
 
-void EMBeMediaRenderingNode::Disconnected(const media_source& p_sSource, const media_destination& p_sDestination) 
+void EMBeMediaRenderingNode::Disconnected(const media_source& p_sSource, const media_destination& p_sDestination)
 {
-	if(p_sSource != m_sInputs[EM_AUDIO_INPUT].source && p_sSource != m_sInputs[EM_VIDEO_INPUT].source) 
+	if(p_sSource != m_sInputs[EM_AUDIO_INPUT].source && p_sSource != m_sInputs[EM_VIDEO_INPUT].source)
 		return;
-	if(p_sDestination != m_sInputs[EM_AUDIO_INPUT].destination && p_sDestination != m_sInputs[EM_VIDEO_INPUT].destination) 
+	if(p_sDestination != m_sInputs[EM_AUDIO_INPUT].destination && p_sDestination != m_sInputs[EM_VIDEO_INPUT].destination)
 		return;
 
 	if(p_sSource == m_sInputs[EM_AUDIO_INPUT].source)
@@ -293,16 +293,16 @@ void EMBeMediaRenderingNode::DisposeInputCookie(int32 p_cookie)
 {
 }
 
-status_t EMBeMediaRenderingNode::FormatChanged(const media_source& p_source, 
-											  const media_destination& p_destination, 
-											  int32 p_something, 
+status_t EMBeMediaRenderingNode::FormatChanged(const media_source& p_source,
+											  const media_destination& p_destination,
+											  int32 p_something,
 											  const media_format& p_format)
 {
 	return B_OK;
 }
 
-status_t EMBeMediaRenderingNode::GetLatencyFor(const media_destination& p_forWhom, 
-											  bigtime_t* p_outLatency, 
+status_t EMBeMediaRenderingNode::GetLatencyFor(const media_destination& p_forWhom,
+											  bigtime_t* p_outLatency,
 											  media_node_id* p_outTimeSource)
 {
 	return B_OK;
@@ -310,9 +310,9 @@ status_t EMBeMediaRenderingNode::GetLatencyFor(const media_destination& p_forWho
 
 status_t EMBeMediaRenderingNode::GetNextInput(int32* p_cookie, media_input* p_outInput)
 {
-	if(*p_cookie >= 0 && *p_cookie <= 1) 
+	if(*p_cookie >= 0 && *p_cookie <= 1)
 	{
-		if(m_sInputs[*p_cookie].source == media_source::null) 
+		if(m_sInputs[*p_cookie].source == media_source::null)
 		{
 			m_sInputs[*p_cookie].format = m_sPreferedInputFormat[*p_cookie]; //.type = B_MEDIA_RAW_AUDIO;
 			m_sInputs[*p_cookie].format.type = m_sPreferedInputFormat[*p_cookie].type;
@@ -329,7 +329,7 @@ status_t EMBeMediaRenderingNode::GetNextInput(int32* p_cookie, media_input* p_ou
 
 status_t EMBeMediaRenderingNode::HandleMessage(int32 message, const void * data, size_t size)
 {
-	if((BBufferConsumer::HandleMessage(message, data, size) < 0) && 
+	if((BBufferConsumer::HandleMessage(message, data, size) < 0) &&
 	   (BMediaNode::HandleMessage(message, data, size) < 0))
 	{
 		HandleBadMessage(message, data, size);
@@ -401,9 +401,9 @@ void EMBeMediaRenderingNode::Stop(bigtime_t performance_time, bool immediate)
 {
 }
 
-void EMBeMediaRenderingNode::ProducerDataStatus(const media_destination& p_destination, 
-											   int32 p_status, 
-											   bigtime_t p_atPerformanceTime) 
+void EMBeMediaRenderingNode::ProducerDataStatus(const media_destination& p_destination,
+											   int32 p_status,
+											   bigtime_t p_atPerformanceTime)
 {
 	if(p_status == B_DATA_AVAILABLE)
 		;
@@ -486,16 +486,16 @@ bool EMBeMediaRenderingNode::PrepareFile()
 	int vQuality = *(static_cast<int*>(EMMediaEngine::Instance() -> GetSettingsRepository() -> GetSetting(SETTING_RENDER_CODEC_QUALITY)));
 	m_vVideoFrameRate = *(static_cast<float*>(EMMediaEngine::Instance() -> GetSettingsRepository() -> GetSetting(SETTING_VIDEO_RENDER_FRAMERATE)));
 
-	string oRenderFileName = EMBeMediaUtility::MakeRenderFileName(m_vRenderFileSequenceNumber++);
+	string oRenderFileName = gBeMediaUtility->MakeRenderFileName(m_vRenderFileSequenceNumber++);
 
 	m_vpQuality = float(vQuality/100.0);
 
 	if( *m_opFamilyName == "unknown")
 		return true;
-		
+
 	int32 vCookie = 0;
 	media_format_family sFamily;
-	if(m_opMediaFile == NULL)	
+	if(m_opMediaFile == NULL)
 	{
 		entry_ref sRef;
 		if(get_ref_for_path(oRenderFileName.c_str(), &sRef) != B_OK)
@@ -507,11 +507,11 @@ bool EMBeMediaRenderingNode::PrepareFile()
 			if (strcmp(m_sFileFormat.pretty_name, m_opFamilyName -> c_str()) == 0)
 			{
 				sFamily = m_sFileFormat.family;
-								
+
 				break;
 			}
 		}
-		
+
 		//END GETTINg FAMILY
 		m_opMediaFile = new BMediaFile(&sRef, &m_sFileFormat);
 		if(m_opMediaFile -> InitCheck() != B_OK)
@@ -519,14 +519,14 @@ bool EMBeMediaRenderingNode::PrepareFile()
 	}
 
 	if(HaveAudioConnection() && HaveVideoConnection() && m_opVideoTrack == NULL && m_opMediaFile != NULL)
-	{	
+	{
 		media_format sFormat;
 		memcpy(&sFormat, &m_sVideoFormat, sizeof(media_format));
-		
+
 		media_codec_info mci;
 		vCookie = 0;
 		media_format outfmt;
-		
+
 		sFormat.u.raw_video.display.line_width =  m_oDesiredFormat -> m_vWidth;
 		sFormat.u.raw_video.display.line_count =  m_oDesiredFormat -> m_vHeight;
 
@@ -544,14 +544,14 @@ bool EMBeMediaRenderingNode::PrepareFile()
 		}
 
 		if(m_vRenderVideo)
-		{	
+		{
 
 			sFormat.u.raw_video.field_rate = m_vVideoFrameRate;
 			sFormat.u.raw_video.display.line_width =  m_oDesiredFormat -> m_vWidth;
 			sFormat.u.raw_video.display.line_count =  m_oDesiredFormat -> m_vHeight;
 			m_opVideoTrack = m_opMediaFile -> CreateTrack(&sFormat, &mci);
 			if(m_opVideoTrack == NULL)
-				EMDebugger("ERROR! Could not create video track in BMediaFile");	
+				EMDebugger("ERROR! Could not create video track in BMediaFile");
 
 			if(m_opVideoTrack -> InitCheck() != B_OK)
 				EMDebugger("ERROR! Could not initialize video track in BMediaFile!");
@@ -576,7 +576,7 @@ bool EMBeMediaRenderingNode::PrepareFile()
 	{
 		media_format sFormat;
 		memcpy(&sFormat, &m_sAudioFormat, sizeof(media_format));
-		
+
 		media_codec_info mci;
 		int32 vCookie = 0;
 		media_format outfmt;
@@ -598,7 +598,7 @@ bool EMBeMediaRenderingNode::PrepareFile()
 			m_opAudioTrack = m_opMediaFile -> CreateTrack(&sFormat, &mci);
 			if(m_opAudioTrack == NULL)
 			{
-				EMDebugger("ERROR! Could not create audio track in BMediaFile");	
+				EMDebugger("ERROR! Could not create audio track in BMediaFile");
 			}
 			if(m_opAudioTrack -> InitCheck() != B_OK)
 				EMDebugger("ERROR! Could not initialize audio track in BMediaFile!");
@@ -608,7 +608,7 @@ bool EMBeMediaRenderingNode::PrepareFile()
 
 			m_vRenderAudio = true;
 	if(HaveAudioConnection() && HaveVideoConnection() && (m_opAudioTrack != NULL || m_opVideoTrack != NULL) && ! m_vReadyForWriting)
-	{	
+	{
 		if(m_opMediaFile -> CommitHeader() != B_OK)
 		{
 			CloseFile();
@@ -618,7 +618,7 @@ bool EMBeMediaRenderingNode::PrepareFile()
 			m_vReadyForWriting = true;
 	}
 	;//cout_commented_out_4_release<<"At the moment " << m_opMediaFile -> CountTracks() << " Tracks have been created" << endl;
-	
+
 	return true;
 }
 
@@ -633,7 +633,7 @@ bool EMBeMediaRenderingNode::CloseFile()
 	{
 		if(m_opMediaFile -> CloseFile() != B_OK)
 			emerr << "ERROR! The media file could not be closed!" << endl;
-		
+
 		if(m_opVideoTrack != NULL)
 		{
 			m_opMediaFile -> ReleaseTrack(m_opVideoTrack);
@@ -648,12 +648,12 @@ bool EMBeMediaRenderingNode::CloseFile()
 
 		delete m_opMediaFile;
 		m_opMediaFile = NULL;
-	
+
 		m_vReadyForWriting = false;
 	}
 	else
 		;//emout_commented_out_4_release << "WARNING! No render-result media file to close!" << endl;
-	
+
 	return true;
 }
 

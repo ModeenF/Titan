@@ -12,10 +12,10 @@
 
 #include <MediaKit.h>
 
-EMBeMediaTimer::EMBeMediaTimer() 
+EMBeMediaTimer::EMBeMediaTimer()
 	:	EMMediaTimer()
 {
-	EMBeMediaUtility::push(this, "EMBeMediaTimer");
+	gBeMediaUtility->push(this, "EMBeMediaTimer");
 	m_vTimeProtectionSemaphore = create_sem(1, "Titan time protection sem");
 	m_vSem = create_sem(1, "Other time protection semaphore");
 	m_vID = EMMediaIDManager::MakeID();
@@ -24,7 +24,7 @@ EMBeMediaTimer::EMBeMediaTimer()
 
 EMBeMediaTimer::~EMBeMediaTimer()
 {
-	EMBeMediaUtility::pop("EMBeMediaTimer");
+	gBeMediaUtility->pop("EMBeMediaTimer");
 
 	delete_sem(m_vTimeProtectionSemaphore);
 }
@@ -34,7 +34,7 @@ bool EMBeMediaTimer::IncreaseNowFrame(int64 p_vWithFrames)
 //	status_t vAcquireResult = acquire_sem(m_vTimeProtectionSemaphore);
 //	if(vAcquireResult != B_NO_ERROR)
 //		EMDebugger("ERROR! EMBeMediaTimer could not acquire semaphore for timer protection!");
-	
+
 	if(! m_vIsStarted)
 		return false;
 
@@ -53,8 +53,8 @@ bool EMBeMediaTimer::IncreaseNowFrame(int64 p_vWithFrames)
 					SeekToFrame(m_vLoopStart);
 					return true;
 				}
- 				else if(EMMediaEngine::Instance() -> GetMediaProject() -> IsPlaying() && m_vNow >= m_vLoopEnd && 
-						(EMMediaEngine::Instance() -> GetMediaProject() -> IsRenderingAudio() || 
+ 				else if(EMMediaEngine::Instance() -> GetMediaProject() -> IsPlaying() && m_vNow >= m_vLoopEnd &&
+						(EMMediaEngine::Instance() -> GetMediaProject() -> IsRenderingAudio() ||
 						EMMediaEngine::Instance() -> GetMediaProject() -> IsRenderingVideo()))
 				{
 					EMMediaEngine::Instance() -> GetCommandRepository() -> ExecuteCommand(COMMAND_STOP);
@@ -86,7 +86,7 @@ int64 EMBeMediaTimer::NowTime()
 //	if(vAcquireResult != B_NO_ERROR)
 //		EMDebugger("ERROR! EMBeMediaTimer could not acquire semaphore for timer protection!");
 
-	int64 vTime = EMBeMediaUtility::FramesToTime(m_vNow, EMBeMediaUtility::GetSystemAudioFormat());
+	int64 vTime = gBeMediaUtility->FramesToTime(m_vNow, gBeMediaUtility->GetSystemAudioFormat());
 //	release_sem(m_vTimeProtectionSemaphore);
 	return vTime;
 }
@@ -142,7 +142,7 @@ int64 EMBeMediaTimer::AudioThenTime()
 //	if(vAcquireResult != B_NO_ERROR)
 //		EMDebugger("ERROR! EMBeMediaTimer could not acquire semaphore for timer protection!");
 
-	int64 vTime = EMBeMediaUtility::FramesToTime(m_vAudioThen, EMBeMediaUtility::GetSystemAudioFormat());
+	int64 vTime = gBeMediaUtility->FramesToTime(m_vAudioThen, gBeMediaUtility->GetSystemAudioFormat());
 //	release_sem(m_vTimeProtectionSemaphore);
 	return vTime;
 }
@@ -197,7 +197,7 @@ int64 EMBeMediaTimer::VideoThenTime()
 //	if(vAcquireResult != B_NO_ERROR)
 //		EMDebugger("ERROR! EMBeMediaTimer could not acquire semaphore for timer protection!");
 
-	int64 vTime = EMBeMediaUtility::FramesToTime(m_vVideoThen, EMBeMediaUtility::GetSystemAudioFormat());
+	int64 vTime = gBeMediaUtility->FramesToTime(m_vVideoThen, gBeMediaUtility->GetSystemAudioFormat());
 //	release_sem(m_vTimeProtectionSemaphore);
 	return vTime;
 }
@@ -205,17 +205,17 @@ int64 EMBeMediaTimer::VideoThenTime()
 void EMBeMediaTimer::SeekToFrame(int64 p_vNewFrame)
 {
 	Lock();
-	
+
 	if(m_vIsStarted)
 		Notify(EM_MESSAGE_PAUSE);
-		
+
 	status_t vAcquireResult = acquire_sem(m_vTimeProtectionSemaphore);
 	if(vAcquireResult != B_NO_ERROR)
 		EMDebugger("ERROR! EMBeMediaTimer could not acquire semaphore for timer protection!");
 
-	if(p_vNewFrame < 0) 
+	if(p_vNewFrame < 0)
 		p_vNewFrame = 0;
-	
+
 	m_vNow = p_vNewFrame;
 	m_vAudioThen = p_vNewFrame;
 	m_vVideoThen = p_vNewFrame;

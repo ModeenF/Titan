@@ -31,7 +31,7 @@ EMWaveFileReader::~EMWaveFileReader()
 //	delete m_opFile;
 	m_vIsInitialized = false;
 	delete m_opFormat;
-	
+
 	m_opSem -> Release();
 }
 
@@ -61,7 +61,7 @@ bool EMWaveFileReader::InitCheckE()
 	}
 
 	m_opFile -> Open(EM_READ);
-	
+
 	m_vIsInitialized = ReadFormatE() == NULL ? false : true;
 
 //	m_opSem -> Release();
@@ -120,7 +120,7 @@ EMMediaFormat* EMWaveFileReader::ReadFormatE()
 		else
 			EMDebugger("Unknown audio sample format in file!"); //TODO: Throw exception instead?
 		m_vSizeBytes = opChunk.size;
-	}		
+	}
 	else
 	{
 		//eo << "Audio file format is \"" << opChunk.id << "\"." << ef;
@@ -154,7 +154,7 @@ int64 EMWaveFileReader::CurrentBytePosition()
 		m_opSem -> Release();
 		return 0;
 	}
-	
+
 	int64 vCurrentPos = m_opFile -> GetPosition(); //(m_vIsReading ? m_opFile -> tellg() : m_opFile -> tellp());
 //	if(m_opFile -> eof())
 //		EMDebugger("ERROR! 22 File seems to be EOF!");
@@ -184,14 +184,14 @@ void EMWaveFileReader::ReadData(void* p_vpBuffer, int64& p_vInOutNumBytes, int64
 			memset(ptr, 0, p_vBufferOffset);
 
 		ptr += p_vBufferOffset;
-		
+
 		int64 vGCount = m_opFile -> Read(ptr, p_vInOutNumBytes - p_vBufferOffset, p_vBytePosition);
-		
+
 		p_vInOutNumBytes = vGCount;
 	}
 	else
 		EMDebugger("It's an error to try to Read a wave file when it's not opened and/or the format hasn't been read yet! Use InitCheckE and ReadFormatE first!"); //TODO: Throw exception instead?
-	
+
 	//m_opSem -> Release();
 }
 
@@ -205,7 +205,7 @@ void EMWaveFileReader::SeekToFrame(int64 p_vToFrame)
 //	if(m_vIsInitialized)
 //		m_opFile -> SeekFromStart(p_vToFrame * m_opFormat -> m_vNumChannels * m_opFormat -> m_vBytesPerSample); //, ios::beg);
 	m_vCurrentPosition = p_vToFrame * m_opFormat -> m_vNumChannels * m_opFormat -> m_vBytesPerSample;
-	
+
 	m_opSem -> Release();
 }
 
@@ -217,9 +217,9 @@ void EMWaveFileReader::SeekToTime(int64 p_vToTime)
 	m_opSem -> Acquire();
 
 	if(m_vIsInitialized)
-		SeekToFrame(EMMediaUtility::Instance() -> TimeToFrames(p_vToTime, m_opFormat));
-	m_vCurrentPosition = EMMediaUtility::Instance() -> TimeToFrames(p_vToTime, m_opFormat);
-	
+		SeekToFrame(gMediaUtility -> TimeToFrames(p_vToTime, m_opFormat));
+	m_vCurrentPosition = gMediaUtility -> TimeToFrames(p_vToTime, m_opFormat);
+
 	m_opSem -> Release();
 }
 

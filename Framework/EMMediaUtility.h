@@ -9,8 +9,6 @@ class EMMediaFormat;
 class __declspec(dllexport) EMMediaUtility
 {
 public:
-	static EMMediaUtility* Instance();
-	static void Delete();
 
 	virtual int64 BytesPerFrame(const EMMediaFormat* p_opFormat) = 0;
 	virtual int64 BytesToFrames(int64 p_vBytes, const EMMediaFormat* p_opFormat) = 0;
@@ -42,7 +40,9 @@ public:
 protected:
 	EMMediaUtility();
 	~EMMediaUtility();
-	static EMMediaUtility* m_opInstance;
+	EMMediaUtility* m_opInstance;
 };
+
+extern "C" EMMediaUtility*	gMediaUtility;
 
 #endif

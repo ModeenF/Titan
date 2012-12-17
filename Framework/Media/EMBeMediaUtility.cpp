@@ -1,7 +1,5 @@
 #include "EMGlobals.h"
 
-#ifdef PLATFORM_BEOS
-
 #include "EMBeMediaUtility.h"
 #include "EMMediaFormat.h"
 #include "EMCommandRepository.h"
@@ -19,13 +17,25 @@
 #include <string.h>
 #include <map>
 
-sem_id EMBeMediaUtility::vSem = create_sem(1, "debug sem");
-list<char*>* EMBeMediaUtility::classes = new list<char*>();
-list<int64>* EMBeMediaUtility::num = new list<int64>();
-list<map<int64, string> >* EMBeMediaUtility::instances = new list<map<int64, string> >();
+EMBeMediaUtility*	gBeMediaUtility = NULL;
 
-EMMediaFormat* EMBeMediaUtility::m_opSystemAudioFormat = NULL;
-EMMediaFormat* EMBeMediaUtility::m_opSystemVideoFormat = NULL;
+EMBeMediaUtility::EMBeMediaUtility()
+	:
+	classes(new list<char*>()),
+	num(new list<int64>()),
+	instances(new list<map<int64, string> >()),
+	vSem(create_sem(1, "debug sem")),
+	m_opSystemAudioFormat(NULL),
+	m_opSystemVideoFormat(NULL)
+{
+	gBeMediaUtility = this;
+}
+
+EMBeMediaUtility::~EMBeMediaUtility()
+{
+}
+
+
 
 void EMBeMediaUtility::push(const void* ptr, char* name)
 {
@@ -34,11 +44,6 @@ void EMBeMediaUtility::push(const void* ptr, char* name)
 	map<int64, string> oAddressNameMap;
 	oAddressNameMap[(int64) ptr] = string(name);
 	instances -> push_back(oAddressNameMap);
-//	push(name);
-//}
-//
-//void EMBeMediaUtility::push(char* name)
-//{
 
 	if(vAcquireResult != B_NO_ERROR)
 		EMDebugger("ERROR! EMBeMediaUtility could not acquire semaphore for push-protection!");
@@ -112,8 +117,8 @@ void EMBeMediaUtility::show()
 	}
 	;//cout_commented_out_4_release << "** Total number of instances left is " << sum << endl;
 	;//cout_commented_out_4_release << "** End of list" << endl;
-	
-	
+
+
 /*	;//cout_commented_out_4_release << endl << endl;
 	;//cout_commented_out_4_release << "** Classes and their object addresses:" << endl;
 
@@ -124,18 +129,11 @@ void EMBeMediaUtility::show()
 		mapIter = (*it).begin();
 		;//cout_commented_out_4_release << "** " << (*mapIter).first << " named \"" << (*mapIter).second << endl;
 	}
-	
+
 	;//cout_commented_out_4_release << "** End of list" << endl; */
 	release_sem(vSem);
 }
 
-EMBeMediaUtility::EMBeMediaUtility()
-{
-}
-
-EMBeMediaUtility::~EMBeMediaUtility()
-{
-}
 
 BMediaRoster* EMBeMediaUtility::GetRosterE()
 {
@@ -231,7 +229,7 @@ int64 EMBeMediaUtility::FramesInBuffer(BBuffer* p_opBuffer, const EMMediaFormat*
 		{
 			if(m_opSystemAudioFormat == NULL) m_opSystemAudioFormat = new EMMediaFormat(EM_TYPE_RAW_AUDIO);
 			if(m_opSystemVideoFormat == NULL) m_opSystemVideoFormat = new EMMediaFormat(EM_TYPE_RAW_VIDEO);
-			
+
 			vFrames = TimeToFrames(FramesToTime((static_cast<int64>((p_opBuffer -> SizeUsed()) / ((p_opFormat -> m_vBytesPerSample) * p_opFormat -> m_vNumChannels))), m_opSystemAudioFormat), m_opSystemVideoFormat);
 		}
 		return vFrames;
@@ -280,7 +278,7 @@ int64 EMBeMediaUtility::FindMaxNum(signed short* array, int64 length, int64 num)
 	signed short* max = new signed short[num];
 	for(register int i = 0; i < num; i++)
 		max[i] = 0;
-		
+
 	for(register int i = 0; i < length; i++)
 	{
 		for(register int j = num - 1; j >= 0; j--)
@@ -292,7 +290,7 @@ int64 EMBeMediaUtility::FindMaxNum(signed short* array, int64 length, int64 num)
 			}
 		}
 	}
-	
+
 	signed short val = max[0];
 	delete [] max;
 	return static_cast<int64>(val);
@@ -319,7 +317,7 @@ string EMBeMediaUtility::GetStringAfterLast(string p_oSourceString, char p_vDeli
 }
 
 string EMBeMediaUtility::GetFileName(string p_oFullPath)
-{	
+{
 	return GetStringAfterLast(p_oFullPath, '/');
 }
 
@@ -460,4 +458,3 @@ void EMBeMediaUtility::ClearData()
 	m_opSystemVideoFormat = NULL;
 }
 
-#endif

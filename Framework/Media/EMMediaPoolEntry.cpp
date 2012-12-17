@@ -20,7 +20,7 @@ EMMediaPoolEntry::EMMediaPoolEntry(EMProjectDataLoader* p_opLoader, uint32 vUnde
 	uint32 vID = static_cast<uint32>(p_opLoader -> LoadUInt32());
 	m_vID = (int32) vID;
 	m_vUsed = 0; //static_cast<int32>(p_opLoader -> LoadUInt32());
-	
+
 //	uint32 vType = p_opLoader -> LoadUInt32();
 
 	if((vUndecidedType & EM_TYPE_RAW_AUDIO) == EM_TYPE_RAW_AUDIO) m_eType = EM_TYPE_RAW_AUDIO;
@@ -36,11 +36,11 @@ EMMediaPoolEntry::EMMediaPoolEntry(EMProjectDataLoader* p_opLoader, uint32 vUnde
 	else if((vUndecidedType & EM_TYPE_GIF) == EM_TYPE_GIF) m_eType = EM_TYPE_GIF;
 	else if((vUndecidedType & EM_TYPE_JPG) == EM_TYPE_JPG) m_eType = EM_TYPE_JPG;
 	else if((vUndecidedType & EM_TYPE_TGA) == EM_TYPE_TGA) m_eType = EM_TYPE_TGA;
-	else 
+	else
 		EMDebugger("ERROR! Unknown type saved in project file!");
 
 	if((m_eType & EM_TYPE_ANY_AUDIO) > 0)
-		m_oFileName = EMMediaUtility::Instance() -> ParseFullPath(p_opLoader -> LoadString(), DIRECTORY_ID_AUDIO_DATA_USED);
+		m_oFileName = gMediaUtility -> ParseFullPath(p_opLoader -> LoadString(), DIRECTORY_ID_AUDIO_DATA_USED);
 	else
 		m_oFileName = string(p_opLoader -> LoadString());
 }
@@ -87,7 +87,7 @@ bool EMMediaPoolEntry::SaveData(EMProjectDataSaver* p_opSaver)
 //	p_opSaver -> SaveUInt32(static_cast<uint32>(0)); //m_vUsed));
 
 	if((m_eType & EM_TYPE_ANY_AUDIO) > 0) //If it's an audio file, we can use a project-relative path when loading the project back in
-		p_opSaver -> SaveString(EMMediaUtility::Instance() -> GetFileName(GetFileName().c_str()));
+		p_opSaver -> SaveString(gMediaUtility -> GetFileName(GetFileName().c_str()));
 	else //But if it's a video file, we can't (since those files aren't copied in to the project!)
 		p_opSaver -> SaveString(GetFileName().c_str());
 

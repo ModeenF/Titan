@@ -25,12 +25,12 @@ EMBeMediaFileManager::EMBeMediaFileManager()
 	:	EMMediaFileManager(),
 		m_opNewFile(NULL)
 {
-	EMBeMediaUtility::push(this, "EMBeMediaFileManager");
+	gBeMediaUtility->push(this, "EMBeMediaFileManager");
 }
 
 EMBeMediaFileManager::~EMBeMediaFileManager()
 {
-	EMBeMediaUtility::pop("EMBeMediaFileManager");
+	gBeMediaUtility->pop("EMBeMediaFileManager");
 }
 
 int32 EMBeMediaFileManager::GetFileTypeForE(const string* p_opFileName)
@@ -41,7 +41,7 @@ int32 EMBeMediaFileManager::GetFileTypeForE(const string* p_opFileName)
 	BMediaFile* opFile = new BMediaFile(&sRef, B_MEDIA_FILE_UNBUFFERED | B_MEDIA_FILE_NO_READ_AHEAD);
 	status_t vError = opFile -> InitCheck();
 	if(vError != B_OK)
-	{	
+	{
 		return EM_TYPE_UNKNOWN;
 		delete opFile;
 //		string oException("Unsupported file type! Cannot do anything with the file");
@@ -99,11 +99,11 @@ bool EMBeMediaFileManager::IsWave(const string* p_opFileName)
 
 	if((GetFileTypeFor(p_opFileName) & EM_TYPE_ANY_VIDEO) > 0)
 		return false;
-	
+
 	BEntry oEntry(p_opFileName -> c_str(), false);
 	oEntry.GetRef(&sRef);
 	BMediaFile* opFile = new BMediaFile(&sRef, B_MEDIA_FILE_UNBUFFERED);
-	
+
 	status_t vError = opFile -> InitCheck();
 	if(vError != B_OK)
 		EMDebugger("2 ERROR! Could not initialize media file!");
@@ -116,7 +116,7 @@ bool EMBeMediaFileManager::IsWave(const string* p_opFileName)
 	bool vIsWave = false;
 	if(strncmp(sFileFormat.short_name, "wave", 4) == 0)
 		vIsWave = true;
-			
+
 	delete opFile;
 	return vIsWave;
 }
@@ -157,16 +157,16 @@ bool EMBeMediaFileManager::FileExists(const string* p_opFileName)
 
 bool EMBeMediaFileManager::ConvertFileExistsFor(const string* p_opSourceFileName)
 {
-	string oConverttFileName = EMBeMediaUtility::MakeConvertFileName(*p_opSourceFileName);
+	string oConverttFileName = gBeMediaUtility->MakeConvertFileName(*p_opSourceFileName);
 
 	if(! FileExists(&oConverttFileName))
 		return false;
-		
+
 	//Find out what the expected numframes is...
 	EMWaveFileReader* opFile = new EMWaveFileReader(*p_opSourceFileName);
 	opFile -> InitCheckE();
 	int64 vOriginalNumFrames = opFile -> NumberOfFramesInFile();
-	
+
 	EMMediaFormat oSourceFormat = *(opFile -> GetFormat());
 	EMMediaFormat oTargetFormat(EM_TYPE_RAW_AUDIO);
 	delete opFile;
@@ -179,11 +179,11 @@ bool EMBeMediaFileManager::ConvertFileExistsFor(const string* p_opSourceFileName
 
 bool EMBeMediaFileManager::PeaksFileExistsFor(const string* p_opFileName)
 {
-	string oPeaksFileName = EMBeMediaUtility::MakePeaksFileName(*p_opFileName); //ParseFullPath(oNoPathFileName, DIRECTORY_ID_PROJECT_DATA);
+	string oPeaksFileName = gBeMediaUtility->MakePeaksFileName(*p_opFileName); //ParseFullPath(oNoPathFileName, DIRECTORY_ID_PROJECT_DATA);
 
 	if(! FileExists(&oPeaksFileName))
 		return false;
-		
+
 	//Find out what the expected numframes is...
 	EMWaveFileReader* opFile = new EMWaveFileReader(*p_opFileName);
 	opFile -> InitCheckE();
@@ -197,7 +197,7 @@ bool EMBeMediaFileManager::PeaksFileExistsFor(const string* p_opFileName)
 
 bool EMBeMediaFileManager::ExtractFileExistsFor(const string* p_opFileName)
 {
-	string oExtractFileName = EMBeMediaUtility::MakeExtractFileName(*p_opFileName); //ParseFullPath(oNoPathFileName, DIRECTORY_ID_AUDIO_DATA_USED);
+	string oExtractFileName = gBeMediaUtility->MakeExtractFileName(*p_opFileName); //ParseFullPath(oNoPathFileName, DIRECTORY_ID_AUDIO_DATA_USED);
 
 	if(! FileExists(&oExtractFileName))
 		return false;
@@ -208,11 +208,11 @@ bool EMBeMediaFileManager::ExtractFileExistsFor(const string* p_opFileName)
 
 	if(p_opFileName == NULL)
 		EMDebugger("ERROR! File name is NULL!");
-	
+
 	BEntry oEntry(p_opFileName -> c_str(), false);
 	oEntry.GetRef(&sRef);
 	BMediaFile* opFile = new BMediaFile(&sRef);
-	
+
 	status_t vError = opFile -> InitCheck();
 	if(vError != B_OK)
 		EMDebugger("ERROR! Could not initialize media file!");
@@ -231,33 +231,33 @@ bool EMBeMediaFileManager::ExtractFileExistsFor(const string* p_opFileName)
 			EMDebugger("ERROR! Could not initialize BMediaTrack!");
 		if(opTrack -> EncodedFormat(&sFormat) != B_OK)
 			EMDebugger("ERROR! Could not get format of BMediaTrack!");
-		
+
 		if(sFormat.type == B_MEDIA_RAW_AUDIO || sFormat.type == B_MEDIA_ENCODED_AUDIO)
 		{
 			vOriginalNumFrames = opTrack -> CountFrames();
 			opFile -> ReleaseTrack(opTrack);
 			if(vIndex == vCount-1)
-				break;	
+				break;
 		}
 		opFile -> ReleaseTrack(opTrack);
-	}	
+	}
 	delete opFile;
-	
+
 	if(vOriginalNumFrames <= 0)
 		EMDebugger("0 frames in media track!?");
-	
+
 	//Compare the expected number of frames now...
 	return CompareNumFramesInFile(&oExtractFileName, vOriginalNumFrames);
 }
 
 string EMBeMediaFileManager::CreatePeaksFileE(const string* p_opFileName)
 {
-	string oPeaksFileName = EMBeMediaUtility::MakePeaksFileName(*p_opFileName);
+	string oPeaksFileName = gBeMediaUtility->MakePeaksFileName(*p_opFileName);
 
 	if(PeaksFileExistsFor(p_opFileName))
 		return oPeaksFileName;
 
-	register bool vShouldLeaveLoop = false; 
+	register bool vShouldLeaveLoop = false;
 	EMWaveFileReader* opHiResFile = new EMWaveFileReader(*p_opFileName);
 	EMWaveFileWriter* opLoResFile = new EMWaveFileWriter(oPeaksFileName);
 
@@ -266,7 +266,7 @@ string EMBeMediaFileManager::CreatePeaksFileE(const string* p_opFileName)
 
 	int64 vTotalLength = opHiResFile -> GetSize();
 	int64 vFinishedLength = static_cast<int64>(floor(floor(vTotalLength / (EM_LOW_RES_AUDIO_SKIP_RATE * 4)) * 2));
-	
+
 	int vNumHiResSamplesToRead = 1000;
 	typedef int8 LORES_SAMPLE_TYPE;
 	int32 vHiResSampleSize = sizeof(signed short);
@@ -305,7 +305,7 @@ string EMBeMediaFileManager::CreatePeaksFileE(const string* p_opFileName)
 
 		opLoResFile -> WriteData(vpLoResArray, vSize);
 		vWriteCount += vSize;
-		
+
 		if((vCount % 10) == 0)
 		{
 			char vpPercentage[10];
@@ -338,10 +338,10 @@ bool EMBeMediaFileManager::CheckFileForVideoFormat(const string* p_opFileName)
 	int32 tracks = opFile->CountTracks();
 	media_format sFormat;
 	BMediaTrack* opTrackOut = NULL;
-	for (int32 i = 0; i < tracks; i++) 
+	for (int32 i = 0; i < tracks; i++)
 	{
 		opTrackOut = opFile -> TrackAt(i);
-				
+
 		//m_opTrackOut->EncodedFormat(&outfmt);
 		//We wannt RAW Video.. nothing else can be handled :)
 		//So we will have to negotiate for RAW_VIDEO through DecodeFormat(..)
@@ -363,7 +363,7 @@ bool EMBeMediaFileManager::CheckFileForVideoFormat(const string* p_opFileName)
 			delete opFile;
 			return true;
 		}
-		
+
 	}
 	if(opTrackOut != NULL)
 		opFile -> ReleaseTrack(opTrackOut);
@@ -376,9 +376,9 @@ string EMBeMediaFileManager::ExtractAudioE(const string* p_opFileName)
 {
 	if(ExtractFileExistsFor(p_opFileName))
 	{
-//		string oNoPathFileName = EMBeMediaUtility::GetFileName(*p_opFileName);
+//		string oNoPathFileName = gBeMediaUtility->GetFileName(*p_opFileName);
 //		oNoPathFileName += ".extract.wav";
-		string oExtractFileName = EMBeMediaUtility::MakeExtractFileName(*p_opFileName); //ParseFullPath(oNoPathFileName, DIRECTORY_ID_AUDIO_DATA_USED);
+		string oExtractFileName = gBeMediaUtility->MakeExtractFileName(*p_opFileName); //ParseFullPath(oNoPathFileName, DIRECTORY_ID_AUDIO_DATA_USED);
 		return oExtractFileName;
 	}
 
@@ -387,7 +387,7 @@ string EMBeMediaFileManager::ExtractAudioE(const string* p_opFileName)
 
 	if(p_opFileName == NULL)
 		EMDebugger("ERROR! File name is NULL!");
-	
+
 	BEntry oEntry(p_opFileName -> c_str(), false);
 	oEntry.GetRef(&sRef);
 
@@ -404,7 +404,7 @@ string EMBeMediaFileManager::ExtractAudioE(const string* p_opFileName)
 		EMDebugger("ERROR! Could not read file format from file!");
 
 	int32 vCount = opFile -> CountTracks();
-	
+
 	for(int32 vIndex = 0; vIndex < vCount; vIndex++)
 	{
 		media_format sFormat;
@@ -412,11 +412,11 @@ string EMBeMediaFileManager::ExtractAudioE(const string* p_opFileName)
 		vError = opTrack -> InitCheck();
 		if(vError != B_OK)
 			EMDebugger("ERROR! Could not initialize BMediaTrack!");
-		
+
 		if(opTrack -> EncodedFormat(&sFormat) != B_OK)
 			EMDebugger("ERROR! Could not get format of BMediaTrack!");
 
-		
+
 		if((sFormat.type == B_MEDIA_RAW_AUDIO || sFormat.type == B_MEDIA_ENCODED_AUDIO) && vIndex == vCount-1)
 		{
 			//media_format sEncodedFormat;
@@ -429,7 +429,7 @@ string EMBeMediaFileManager::ExtractAudioE(const string* p_opFileName)
 			if(vErr != B_OK)
 			{
 				emerr << "ERROR! Format negotiation failed: " << strerror(vErr) << endl;
-			} 
+			}
 
 			EMMediaFormat oDecodedFormat(EM_TYPE_RAW_AUDIO);
 			oDecodedFormat.CreateFormat(&sDecodedFormat);
@@ -442,9 +442,9 @@ string EMBeMediaFileManager::ExtractAudioE(const string* p_opFileName)
 			vFrames=0;
 			int64 vBytesPerFrame = oDecodedFormat.m_vNumChannels * oDecodedFormat.m_vBytesPerSample;
 			media_header sHeader;
-			
+
 			int64 vNumProcessedFrames = 0;
-			int64 vTotalTime = EMBeMediaUtility::FramesToTime(opTrack -> CountFrames(), &oDecodedFormat);
+			int64 vTotalTime = gBeMediaUtility->FramesToTime(opTrack -> CountFrames(), &oDecodedFormat);
 
 			int64 frame_count;
 			frame_count = 0;
@@ -472,18 +472,18 @@ string EMBeMediaFileManager::ExtractAudioE(const string* p_opFileName)
 				{
 					if(m_opNewFile == NULL)
 					{
-						oNewFileName = EMBeMediaUtility::MakeExtractFileName(*p_opFileName); //ParseFullPath(oNoPathFileName, DIRECTORY_ID_AUDIO_DATA_USED);			
+						oNewFileName = gBeMediaUtility->MakeExtractFileName(*p_opFileName); //ParseFullPath(oNoPathFileName, DIRECTORY_ID_AUDIO_DATA_USED);
 						m_opNewFile = new EMWaveFileWriter(oNewFileName);
 						m_opNewFile -> InitCheckE();
 					}
-				
+
 					m_opNewFile -> WriteData(vpData, vFrames * vBytesPerFrame);
 					vNumProcessedFrames += vFrames;
-					
+
 					if((vCount % 50) == 0)
 					{
 						char vpPercentage[10];
-						sprintf(vpPercentage, "%d%%",  (int) (100 * (EMBeMediaUtility::FramesToTime(vNumProcessedFrames, &oDecodedFormat) / (float) vTotalTime)));
+						sprintf(vpPercentage, "%d%%",  (int) (100 * (gBeMediaUtility->FramesToTime(vNumProcessedFrames, &oDecodedFormat) / (float) vTotalTime)));
 						string oString = string("Extracting audio data: ") + vpPercentage;
 						EMMediaEngine::Instance() -> GetCommandRepository() -> ExecuteCommand(COMMAND_WRITE_STATUS_BAR_MESSAGE, const_cast<char*>(oString.c_str()));
 					}
@@ -521,7 +521,7 @@ bool EMBeMediaFileManager::FormatsMatch(const string* p_opQuestionedFileName, co
 
 string EMBeMediaFileManager::CopyTo(const string* p_opSourceFile, const string* p_opTargetDirectory)
 {
-	string oFileName = EMBeMediaUtility::GetFileName(*p_opSourceFile);
+	string oFileName = gBeMediaUtility->GetFileName(*p_opSourceFile);
 	string oTargetFile = *p_opTargetDirectory + "/" + oFileName;
 
 	EMMediaFile* opInFile = NULL;
@@ -535,7 +535,7 @@ string EMBeMediaFileManager::CopyTo(const string* p_opSourceFile, const string* 
 	if(opInFile == NULL)
 		EMDebugger("ERROR! In file still NULL!?");
 	opInFile -> InitCheckE();
-		
+
 
 	EMMediaFile* opOutFile = NULL;
 	if(! EMMediaFileRepository::Instance() -> FindFileName(&oTargetFile))
@@ -547,13 +547,13 @@ string EMBeMediaFileManager::CopyTo(const string* p_opSourceFile, const string* 
 	if(opOutFile == NULL)
 		EMDebugger("ERROR! Out file still NULL!?");
 	opOutFile -> InitCheckE();
-	
+
 	opInFile -> Open(EM_READ);
 	opOutFile -> Open(EM_WRITE);
-	
+
 	int64 vPosition = 0;
 	char vpBuffer[1024];
-	int64 vCount = 0;	
+	int64 vCount = 0;
 	int64 vLength = opInFile -> GetLength();
 	while(vPosition < vLength)
 	{
@@ -569,7 +569,7 @@ string EMBeMediaFileManager::CopyTo(const string* p_opSourceFile, const string* 
 			EMMediaEngine::Instance() -> GetCommandRepository() -> ExecuteCommand(COMMAND_WRITE_STATUS_BAR_MESSAGE, const_cast<char*>(oString.c_str()));
 		}
 	}
-	
+
 	return oTargetFile;
 }
 
@@ -577,7 +577,7 @@ string EMBeMediaFileManager::ConvertAudio(const string* p_oSourceFileName, const
 {
 
 	if(ConvertFileExistsFor(p_oSourceFileName))
-		return EMBeMediaUtility::MakeConvertFileName(*p_oSourceFileName);
+		return gBeMediaUtility->MakeConvertFileName(*p_oSourceFileName);
 
 	EMWaveFileReader* opSourceFile = new EMWaveFileReader(*p_oSourceFileName);
 	opSourceFile -> InitCheckE();
@@ -598,7 +598,7 @@ string EMBeMediaFileManager::ConvertAudio(const string* p_oSourceFileName, const
 		{
 			oConvertedFileName = EMAudioConverter<unsigned char, float>::ConvertAudio(p_oSourceFileName, p_opTargetFormat);
 		}
-		else 
+		else
 			EMDebugger("ERROR! Unknown target type!");
 	else if(opSourceFormat -> m_vBytesPerSample == 2)
 		if(p_opTargetFormat -> m_vBytesPerSample == 1)
@@ -638,12 +638,12 @@ string EMBeMediaFileManager::ConvertAudio(const string* p_oSourceFileName, const
 	return oConvertedFileName;
 }
 
-/*int64 EMMediaFileManager::ConvertAudioChunk(void* p_upSourceChunk, 
-											int64 p_vSourceSize, 
-											const EMMediaFormat* p_opSourceFormat, 
+/*int64 EMMediaFileManager::ConvertAudioChunk(void* p_upSourceChunk,
+											int64 p_vSourceSize,
+											const EMMediaFormat* p_opSourceFormat,
 
-											void* p_upTargetChunk, 
-											int64 p_vTargetSize, 
+											void* p_upTargetChunk,
+											int64 p_vTargetSize,
 											const EMMediaFormat* p_opTargetFormat)
 {
 	return 0; //The number of converted byte(s) (<= p_vTargetSize)

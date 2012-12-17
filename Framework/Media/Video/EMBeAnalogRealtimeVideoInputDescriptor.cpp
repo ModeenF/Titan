@@ -14,12 +14,12 @@
 #include "CommandIDs.h"
 #include <MediaKit.h>
 
-EMBeAnalogRealtimeVideoInputDescriptor::EMBeAnalogRealtimeVideoInputDescriptor(media_output* p_spMediaOutput) 
-: EMBeRealtimeInputDescriptor(p_spMediaOutput, EM_TYPE_ANY_VIDEO)
+EMBeAnalogRealtimeVideoInputDescriptor::EMBeAnalogRealtimeVideoInputDescriptor(media_output* p_spMediaOutput)
+//: EMBeRealtimeInputDescriptor(p_spMediaOutput, EM_TYPE_ANY_VIDEO)
 {
 	/* create the video consumer node */
 	m_AnalogConsumerNode = new EMBeAnalogConsumerNode("ANALOG CONSUMER NODE", NULL, 0, p_spMediaOutput);
-	
+
 	if (!m_AnalogConsumerNode) {
 		EMDebugger("ERROR: can't create a video consumer node !");
 	}
@@ -40,7 +40,7 @@ EMBeAnalogRealtimeVideoInputDescriptor::~EMBeAnalogRealtimeVideoInputDescriptor(
 	thread_info t;
 	get_thread_info(find_thread(NULL), &t);
 	;//cout_commented_out_4_release << "Stop performed by " << t.name << endl;
-	
+
 	;//cout_commented_out_4_release<<"Disconnecting"<<endl;
 	;//cout_commented_out_4_release<<"mIn.destination.port:"<<m_spMediaOutput -> destination.port<<endl;
 	;//cout_commented_out_4_release<<"mIn.source.port:"<<m_spMediaOutput -> source.port<<endl;
@@ -52,7 +52,7 @@ EMBeAnalogRealtimeVideoInputDescriptor::~EMBeAnalogRealtimeVideoInputDescriptor(
 
 	delete m_AnalogConsumerNode;
 	//m_AnalogConsumerNode -> SetDestination(NULL);
-	if (m_spMediaOutput -> node != media_node::null) 
+	if (m_spMediaOutput -> node != media_node::null)
 	{
 		EMBeMediaUtility::GetRosterE()->ReleaseNode(m_spMediaOutput -> node);
 		m_spMediaOutput -> node = media_node::null;
@@ -99,13 +99,13 @@ bool EMBeAnalogRealtimeVideoInputDescriptor::InitCheckE()
 			m_vIsInitialized = false;
 			return false;
 		}
-	} 
+	}
 	else
 		EMDebugger("ERROR! Problem!");
 
 	if(! m_vIsInitialized)
 		emerr << "ERROR! Tried to initialize analog video !" << endl;
-	
+
 	return m_vIsInitialized;
 }
 
@@ -126,22 +126,22 @@ void EMBeAnalogRealtimeVideoInputDescriptor::StartE()
 	}
 	else
 		;//cout_commented_out_4_release << "Shouldn't start EMBeAnalogRealtimeVideoInputDescriptor since no track has it as input!" << endl;
-	
+
 }
 
 bool EMBeAnalogRealtimeVideoInputDescriptor:: ResetAnalogConnectionAndStart()
 {
 	status_t err = EMBeMediaUtility::GetRosterE() -> StopNode(m_AnalogConsumerNode -> Node(), true);
-	if (err < B_OK) 
+	if (err < B_OK)
 	{
 		emerr << "ERROR! mMediaRoster->Disconnect: " << err << endl;
 	}
 
 	thread_info t;
 	get_thread_info(find_thread(NULL), &t);
-	
+
 	err = EMBeMediaUtility::GetRosterE() -> Disconnect(m_spMediaOutput -> node.node, m_spMediaOutput -> source, m_AnalogConsumerNode -> Node().node, m_spMediaOutput -> destination);
-	if (err < B_OK) 
+	if (err < B_OK)
 	{
 		emerr << "ERROR! mMediaRoster->Disconnect: " << strerror(err) << endl;
 	}
@@ -152,7 +152,7 @@ bool EMBeAnalogRealtimeVideoInputDescriptor:: ResetAnalogConnectionAndStart()
 			string oException("Couldn't start analog video capturing with the current settings!?");
 			EMExceptionHandler::Instance() -> HandleException(*(new EMException(EM_DIALOG_ALWAYS, &oException)));
 			return false;
-	} 
+	}
 	else
 	{
 
@@ -160,7 +160,7 @@ bool EMBeAnalogRealtimeVideoInputDescriptor:: ResetAnalogConnectionAndStart()
 		if(status != B_OK)
 			EMDebugger("Couldn't start Producer analog node for some erason");
 
-		status = EMBeMediaUtility::GetRosterE() -> StartNode(m_AnalogConsumerNode -> Node(), 0); 
+		status = EMBeMediaUtility::GetRosterE() -> StartNode(m_AnalogConsumerNode -> Node(), 0);
 		if(status != B_OK)
 			EMDebugger("Couldn't start Consumer analog node for some erason");
 
@@ -180,17 +180,17 @@ bool EMBeAnalogRealtimeVideoInputDescriptor::StartPreviewE()
 			if(status != B_OK)
 				EMDebugger("Couldn't start Producer analog node for some erason");
 
-			status = EMBeMediaUtility::GetRosterE() -> StartNode(m_AnalogConsumerNode -> Node(), 0); 
+			status = EMBeMediaUtility::GetRosterE() -> StartNode(m_AnalogConsumerNode -> Node(), 0);
 			if(status != B_OK)
 				EMDebugger("Couldn't start Consumer analog node for some erason");
 		}
 		else
 			;//cout_commented_out_4_release << "Shouldn't start the NODE in EMBeAnalogRealtimeVideoInputDescriptor (through StartPreviewE), since no track had it as input!" << endl;
-	} 
+	}
 	else if(oRegisteredRecorders.size() > 0)
-	{	
+	{
 		;//cout_commented_out_4_release << "EMBeAnalogRealtimeVideoInputDescriptor::StartPreviewE() is not initialized so calling ResetAnalogConnectionAndStart() instead" << endl;
-		ResetAnalogConnectionAndStart();	
+		ResetAnalogConnectionAndStart();
 	}
 	return true;
 
@@ -211,12 +211,12 @@ void EMBeAnalogRealtimeVideoInputDescriptor::StopE()
 	if(oRegisteredRecorders.size() > 0)
 	{
 		string oString = string("Finishing recording AV... please hold");
-//		EMMediaEngine::Instance() -> GetCommandRepository() -> ExecuteCommand(COMMAND_WRITE_STATUS_BAR_MESSAGE, &oString);	
+//		EMMediaEngine::Instance() -> GetCommandRepository() -> ExecuteCommand(COMMAND_WRITE_STATUS_BAR_MESSAGE, &oString);
 		;//cout_commented_out_4_release << "Now stopping EMBeAnalogRealtimeVideoInputDescriptor since one or more track(s) has it as input!" << endl;
 		m_AnalogConsumerNode -> CloseFile();
 		StopPreviewE();
 		oString = string("Recording AV finished.");
-//		EMMediaEngine::Instance() -> GetCommandRepository() -> ExecuteCommand(COMMAND_WRITE_STATUS_BAR_MESSAGE, &oString);	
+//		EMMediaEngine::Instance() -> GetCommandRepository() -> ExecuteCommand(COMMAND_WRITE_STATUS_BAR_MESSAGE, &oString);
 	}
 	else
 		;//cout_commented_out_4_release << "Shouldn't stop EMBeAnalogRealtimeVideoInputDescriptor since no track had it as input!" << endl;

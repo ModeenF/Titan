@@ -25,7 +25,7 @@ EMBeBufferRepository::EMBeBufferRepository()
 {
 //	EMDebugger("EMBeBufferRepository::EMBeBufferRepository()");
 	m_vID = EMMediaIDManager::MakeID();
-	EMBeMediaUtility::push(this, "EMBeBufferRepository");
+	gBeMediaUtility->push(this, "EMBeBufferRepository");
 	vVideoSemaphore = create_sem(1, "Video buffer array protection sem");
 
 	//FOR VIDEO
@@ -141,7 +141,7 @@ EMBeBufferRepository::~EMBeBufferRepository()
 //		delete m_opBitmapArray[vIndex];
 	m_opInstance = NULL;
 	delete_sem(vVideoSemaphore);
-	EMBeMediaUtility::pop("EMBeBufferRepository");
+	gBeMediaUtility->pop("EMBeBufferRepository");
 }
 
 BBufferGroup* EMBeBufferRepository::GetAudioBufferGroup()

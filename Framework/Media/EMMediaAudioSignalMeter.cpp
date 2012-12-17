@@ -17,7 +17,7 @@ EMMediaAudioSignalMeter::EMMediaAudioSignalMeter()
 		m_vMostRecentGet(0)
 //		m_vIsPaused(true)
 {
-	EMMediaFormat* opFormat = EMMediaUtility::Instance() -> GetSystemAudioFormat();
+	EMMediaFormat* opFormat = gMediaUtility -> GetSystemAudioFormat();
 	int64 vBufferSize = opFormat -> m_vBufferSizeBytes;
 
 	float vAudioFrameRate = (float) *(static_cast<int32*>(EMMediaEngine::Instance() -> GetSettingsRepository() -> GetSetting(SETTING_AUDIO_FRAMERATE)));
@@ -27,7 +27,7 @@ EMMediaAudioSignalMeter::EMMediaAudioSignalMeter()
 		m_opSignalArray[vIndex] = EM_new EMMediaSignal();
 	m_opZeroSignal = EM_new EMMediaSignal();
 	m_opZeroSignal -> m_vpValues[0] = m_opZeroSignal -> m_vpValues[1] = 0.0;
-	
+
 	m_vMax = vNumSignals;
 	m_opSemaphore = EMSemaphore::CreateEMSemaphore(); //create_sem(1, "Signal meter protection sem");
 }
@@ -57,7 +57,7 @@ void EMMediaAudioSignalMeter::Get(float* p_vpSamplesOut)
 		return;
 	}
 
-	int64 vTime = EMMediaTimer::Instance() -> NowFrame() - EMMediaUtility::Instance() -> FramesToTime(64, EMMediaUtility::Instance() -> GetSystemAudioFormat());
+	int64 vTime = EMMediaTimer::Instance() -> NowFrame() - gMediaUtility -> FramesToTime(64, gMediaUtility -> GetSystemAudioFormat());
 	for(int64 vIndex = m_vMostRecentGet; vIndex < m_vMostRecentPut && (EMMediaTimer::Instance() -> GetState() == EM_PLAYING || EMMediaTimer::Instance() -> GetState() == EM_RECORDING); vIndex++)
 	{
 		if(m_opSignalArray[vIndex % m_vMax] -> m_vTime < vTime && (EMMediaTimer::Instance() -> GetState() == EM_PLAYING || EMMediaTimer::Instance() -> GetState() == EM_RECORDING))
@@ -83,7 +83,7 @@ void EMMediaAudioSignalMeter::Put(const float* p_vpSamples, int32 p_vNumChannels
 	if(EMMediaTimer::Instance() -> GetState() != EM_PLAYING && EMMediaTimer::Instance() -> GetState() != EM_RECORDING)
 	{
 		m_opSemaphore -> Release();
-		return; 
+		return;
 	}
 
 	if(m_opSignalArray[m_vMostRecentPut % m_vMax] -> m_vFree)
@@ -96,7 +96,7 @@ void EMMediaAudioSignalMeter::Put(const float* p_vpSamples, int32 p_vNumChannels
 	else
 	{
 		for(int32 vIndex = 0; vIndex < m_vMax; vIndex++)
-		{ 
+		{
 			if(m_opSignalArray[vIndex] -> m_vTime < EMMediaTimer::Instance() -> NowFrame())
 				m_opSignalArray[vIndex] -> Clear();
 			m_vMostRecentGet = vIndex;
@@ -124,7 +124,7 @@ EMMediaDataBuffer* EMMediaAudioSignalMeter::ProcessBufferE(list<EMMediaDataBuffe
 	if(p_opBufferList -> size() != 1)
 		EMDebugger("SignalMeter received an unsupported number of buffers (not 1)");
 	EMMediaDataBuffer* opBuffer = p_opBufferList -> front();
-	
+
 	//We start by finding the peaks in the buffer. One peak for each channel!
 	signed short* vpAllSamples = static_cast<signed short*>(opBuffer -> Data());
 	float vpMaxSamples[5];
@@ -142,7 +142,7 @@ EMMediaDataBuffer* EMMediaAudioSignalMeter::ProcessBufferE(list<EMMediaDataBuffe
 		}
 	}
 	Put(vpMaxSamples, vNumChannels);
-	
+
 	if(GetDestination() == NULL)
 	{
 		opBuffer -> Recycle();

@@ -2,7 +2,7 @@
 * Creator: Richard Kronfalt
 * Portability: Native
 *-------------------------------------------------------
-* 
+*
 *******************************************************/
 
 #include "EMGlobals.h"
@@ -12,7 +12,7 @@
 #ifndef __EM_BE_REALTIME_AUDIO_OUTPUT_DESCRIPTOR
 #define __EM_BE_REALTIME_AUDIO_OUTPUT_DESCRIPTOR
 
-#include "EMRealtimeOutputDescriptor.h"
+#include "EMBeRealtimeOutputDescriptor.h"
 #include "EMMediaDataBuffer.h"
 #include "EMListenerRepository.h"
 #include "EMListener.h"
@@ -36,7 +36,8 @@ public:
 	media_destination m_sDestination;
 };
 
-class EMBeRealtimeAudioOutputDescriptor : public EMRealtimeOutputDescriptor, public EMListener
+class EMBeRealtimeAudioOutputDescriptor
+	: public EMBeRealtimeOutputDescriptor, public EMListener
 {
 public:
 	EMBeRealtimeAudioOutputDescriptor(media_input* p_spMediaInput);
@@ -51,7 +52,7 @@ public:
 	bool ClearData();
 	bool SaveData(EMProjectDataSaver* p_opSaver);
 	bool LoadData(EMProjectDataLoader* p_opLoader);
-	
+
 private:
 	EMBeNodeConnection m_oConnection;
 	sem_id m_vSem;

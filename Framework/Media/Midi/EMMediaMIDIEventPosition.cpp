@@ -33,16 +33,16 @@ EMMediaMIDIEventPosition::EMMediaMIDIEventPosition(const EMMediaMIDIEventPositio
 
 EMMediaMIDIEventPosition::~EMMediaMIDIEventPosition()
 {
-} 
- 
+}
+
 int64 EMMediaMIDIEventPosition::GetClipStart() const
 {
-	return EMMediaUtility::Instance() -> FramesToTime(m_opParentClip -> GetStart(), EMMediaUtility::Instance() -> GetSystemAudioFormat());
+	return gMediaUtility -> FramesToTime(m_opParentClip -> GetStart(), gMediaUtility -> GetSystemAudioFormat());
 }
 
 void EMMediaMIDIEventPosition::SetClipStart(int64 p_vStart)
 {
-	m_opParentClip -> SetStart(EMMediaUtility::Instance() -> TimeToFrames(p_vStart, EMMediaUtility::Instance() -> GetSystemAudioFormat()));
+	m_opParentClip -> SetStart(gMediaUtility -> TimeToFrames(p_vStart, gMediaUtility -> GetSystemAudioFormat()));
 }
 
 int32 EMMediaMIDIEventPosition::GetClipID() const
