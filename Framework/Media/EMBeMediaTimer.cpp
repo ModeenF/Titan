@@ -29,7 +29,8 @@ EMBeMediaTimer::~EMBeMediaTimer()
 	delete_sem(m_vTimeProtectionSemaphore);
 }
 
-bool EMBeMediaTimer::IncreaseNowFrame(int64 p_vWithFrames)
+bool EMBeMediaTimer::IncreaseNowFrame(int64 p_vWithFrames,
+	int32 potentialClockMasterID)
 {
 //	status_t vAcquireResult = acquire_sem(m_vTimeProtectionSemaphore);
 //	if(vAcquireResult != B_NO_ERROR)

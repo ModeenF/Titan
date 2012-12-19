@@ -21,13 +21,13 @@ EMBeAudioClipRepository::EMBeAudioClipRepository()
 		m_opSystemAudioFormat(NULL)
 {
 	m_vID = EMMediaIDManager::MakeID();
-	EMBeMediaUtility::push(this, "EMBeAudioClipRepository");
+	gBeMediaUtility->push(this, "EMBeAudioClipRepository");
 }
 
 EMBeAudioClipRepository::~EMBeAudioClipRepository() //Deleted by MediaProject
 {
 	delete m_opSystemAudioFormat;
-	EMBeMediaUtility::pop("EMBeAudioClipRepository");
+	gBeMediaUtility->pop("EMBeAudioClipRepository");
 }
 
 int32 EMBeAudioClipRepository::GetID() const
@@ -65,7 +65,7 @@ bool EMBeAudioClipRepository::IsSoloActivated()
 int64 EMBeAudioClipRepository::FramesToNextClip(int64 p_vFromFrame)
 {
 
-	//TODO: Handle loop-points. We have to make sure we can offset a buffer 
+	//TODO: Handle loop-points. We have to make sure we can offset a buffer
 	//even if the "next" buffer should lie just in the beginning of a loop, and
 	//we're currently at the very end of the looped region.
 
@@ -95,7 +95,7 @@ int64 EMBeAudioClipRepository::FramesToNextClip(int64 p_vFromFrame)
 void EMBeAudioClipRepository::GetNextBuffers(/*EMMediaTrack* p_opForTrack,*/ list<EMMediaDataBuffer*>* p_opList, EMMediaType p_eType, int64 p_vTimeNow, bool)
 {
 //	Lock();
-	
+
 	int64 vOffset = 0;
 	int64 vNumBuffers = 0;
 	int64 vNow = p_vTimeNow;
@@ -122,7 +122,7 @@ void EMBeAudioClipRepository::GetNextBuffers(/*EMMediaTrack* p_opForTrack,*/ lis
 					int64 vCurrentStartFrame = opCurrentClip -> GetStart();
 					int64 vCurrentDuration = opCurrentClip -> GetActiveLength();
 
-					int64 vFramesPerBuffer = EMBeMediaUtility::BytesToFrames(EM_AUDIO_BUFFER_SIZE, m_opSystemAudioFormat);
+					int64 vFramesPerBuffer = gBeMediaUtility->BytesToFrames(EM_AUDIO_BUFFER_SIZE, m_opSystemAudioFormat);
 
 					//if there's less than a whole buffer's duration to the next clip start, measured from "now"
 					if(! (vCurrentStartFrame <= vNow && vCurrentStartFrame + vCurrentDuration >= vNow) &&
@@ -136,7 +136,7 @@ void EMBeAudioClipRepository::GetNextBuffers(/*EMMediaTrack* p_opForTrack,*/ lis
 						EMMediaDataBuffer* opMediaBuffer = opCurrentClip -> GetBuffer();
 						if(opMediaBuffer == NULL)
 						{
-							EMBeMediaUtility::show();
+							gBeMediaUtility->show();
 							EMDebugger("ERROR! Couldn't get a buffer from the clip!");
 						}
 						opMediaBuffer -> SetFrame(EMMediaTimer::Instance() -> AudioThenFrame());
@@ -147,7 +147,7 @@ void EMBeAudioClipRepository::GetNextBuffers(/*EMMediaTrack* p_opForTrack,*/ lis
 							//if one buffer of data from this files will end up beoynd the Mark-out point!
 							vIONumFrames = (vCurrentStartFrame + vCurrentDuration) - vNow;
 						}
-						
+
 						//To prevent the processing to go beyond the loop-end point, either during looping or during rendering
 	//					if(EMMediaTimer::Instance() -> IsLooped() && vNow + vIONumFrames > EMMediaTimer::Instance() -> GetLoopEnd())
 	//						vIONumFrames = vIONumFrames - ((vNow + vIONumFrames) - EMMediaTimer::Instance() -> GetLoopEnd());
@@ -171,7 +171,7 @@ void EMBeAudioClipRepository::GetNextBuffers(/*EMMediaTrack* p_opForTrack,*/ lis
 	//						if(EMMediaTimer::Instance() -> ThenFrame() == opMediaBuffer -> m_vFrame)
 	//						{
 								p_opList -> push_back(opMediaBuffer);
-	//							int64 val = EMBeMediaUtility::FindMaxNum(static_cast<signed short*>(opMediaBuffer -> Data()), opMediaBuffer -> m_vSizeUsed / (EM_AUDIO_NUM_CHANNELS * EM_AUDIO_SAMPLESIZE), 1);
+	//							int64 val = gBeMediaUtility->FindMaxNum(static_cast<signed short*>(opMediaBuffer -> Data()), opMediaBuffer -> m_vSizeUsed / (EM_AUDIO_NUM_CHANNELS * EM_AUDIO_SAMPLESIZE), 1);
 	//							EMSignalMonitor::Instance() -> PushBack(val, EMMediaTimer::Instance() -> ThenFrame());
 								vNumBuffers++;
 	//							if((opCurrentTrack -> GetType() & EM_TYPE_ANY_VIDEO) > 0)
@@ -203,18 +203,18 @@ void EMBeAudioClipRepository::GetNextBuffers(/*EMMediaTrack* p_opForTrack,*/ lis
 	try
 	{
 		opTracks -> Rewind();
-		
+
 		opProject -> GetUnusedTracks() -> LockContainer();
 		opProject -> GetUnusedTracks() -> Rewind();
-		
+
 		EMMediaTrack* opCurrentTrack = opTracks -> Current();
-		
+
 		if(opCurrentTrack == NULL)
 			opCurrentTrack = opProject -> GetUnusedTracks() -> Current();
-		
+
 		while(opCurrentTrack != NULL)
-		{	
-			if(((find(oID.begin(), oID.end(), opCurrentTrack -> GetID()) == oID.end() && 
+		{
+			if(((find(oID.begin(), oID.end(), opCurrentTrack -> GetID()) == oID.end() &&
 				(opCurrentTrack -> GetType() & p_eType) > 0)) ||
 				(oID.size() == 0 && (opCurrentTrack -> GetType() & p_eType) > 0))
 			{
@@ -223,11 +223,11 @@ void EMBeAudioClipRepository::GetNextBuffers(/*EMMediaTrack* p_opForTrack,*/ lis
 				EMMediaBufferSource* opSilentBufferSource = opCurrentTrack -> GetSilenceGenerator();
 				if(opSilentBufferSource == NULL)
 					EMDebugger("ERROR! Silence generator seems to be NULL, in ClipRepository::GetBuffers");
-				
+
 				EMMediaDataBuffer* opBuffer = opSilentBufferSource -> GetBuffer();
 				if(opBuffer == NULL)
 					EMDebugger("ERROR! Buffer returned from silence generator seems to be NULL, in ClipRepository::GetBuffers");
-				
+
 				opBuffer -> SetFrame(EMMediaTimer::Instance() -> AudioThenFrame());
 				p_opList -> push_back(opBuffer);
 				vNumBuffers++;

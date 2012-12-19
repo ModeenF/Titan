@@ -24,9 +24,9 @@
 #define JITTER		20000
 
 #define	FUNCTION	;//_commented_out_4_release_printf
-#define ERROR		
-#define PROGRESS	
-#define LOOP		
+#define ERROR
+#define PROGRESS
+#define LOOP
 
 #if DEBUG
 	#define FPRINTF fprintf
@@ -45,7 +45,7 @@ EMBeDvConsumerNode::EMBeDvConsumerNode(media_output* p_spPhysicalInOutput)
 		m_spPhysicalInOutput(p_spPhysicalInOutput),
 		m_vFrameCount(0)
 {
-	EMBeMediaUtility::push(this, "EMBeDvConsumerNode");
+	gBeMediaUtility->push(this, "EMBeDvConsumerNode");
 
 	m_opReceiver = NULL;
 	mCurrrentBuffer = 0;
@@ -62,7 +62,7 @@ EMBeDvConsumerNode::EMBeDvConsumerNode(media_output* p_spPhysicalInOutput)
 	mIn.format.u.encoded_video = media_encoded_video_format::wildcard;
 
 	BMediaEventLooper::SetPriority(B_REAL_TIME_DISPLAY_PRIORITY);
-	EMBeMediaUtility::GetRosterE() -> RegisterNode(this);
+	gBeMediaUtility->GetRosterE() -> RegisterNode(this);
 //	mVolume = new BVolume();
 	mTimeCode = new BTimeCode();
 }
@@ -71,7 +71,7 @@ EMBeDvConsumerNode::~EMBeDvConsumerNode()
 {
 ;//cout_commented_out_4_release<<"1"<<endl;
 	if (mRecording) {
-		this->StopRecording();		
+		this->StopRecording();
 		this->FinishRecording();
 	}
 ;//cout_commented_out_4_release<<"2"<<endl;
@@ -96,9 +96,9 @@ EMBeDvConsumerNode::~EMBeDvConsumerNode()
 	if(m_opReceiver != NULL)
 		delete m_opReceiver;
 ;//cout_commented_out_4_release<<"4"<<endl;
-	
+
 	BMediaRoster::Roster() -> UnregisterNode(this);
-	EMBeMediaUtility::pop("EMBeDvConsumerNode");
+	gBeMediaUtility->pop("EMBeDvConsumerNode");
 ;//cout_commented_out_4_release<<"5"<<endl;
 }
 
@@ -139,19 +139,19 @@ EMBeDvConsumerNode::buffer_flusher(void * data)
 	off_t total = 0;
 
 	while (aFileWriter->mRecording && ((size = aFileWriter->mFIFO->BeginGet(&ptr, aFileWriter->mBufferSize, 1000000LL)) > 0)) {
-		if (0 > aFileWriter->mVideoTrack->WriteChunk(ptr, size, B_MEDIA_KEY_FRAME)) 
+		if (0 > aFileWriter->mVideoTrack->WriteChunk(ptr, size, B_MEDIA_KEY_FRAME))
 		{
 			aFileWriter->StopRecording();
 			be_app->PostMessage(B_QUIT_REQUESTED);
 		}
-		else 
+		else
 		{
 		}
 		aFileWriter->mFIFO->EndGet();
 		total += size;
 		aFileWriter->mFrames++;
 	}
-	if (size == 0) 
+	if (size == 0)
 	{
 		//fprintf(stderr, "This probably means a 3 second timeout expired without any data to record.\n");
 	}
@@ -205,17 +205,17 @@ EMBeDvConsumerNode::StopAudioPreview()
 
 void EMBeDvConsumerNode::StartVideoDecoder()
 {
-/*	status_t err = EMBeMediaUtility::GetRosterE()->SetRunModeNode(Node(), B_RECORDING);
+/*	status_t err = gBeMediaUtility->GetRosterE()->SetRunModeNode(Node(), B_RECORDING);
 	if (err < B_OK) {
 		EMDebugger("ERROR: MediaRoster->SetRunModeNode() !");
 	}
 
-	err = EMBeMediaUtility::GetRosterE()->StartNode(m_spPhysicalInOutput -> node, 0);
+	err = gBeMediaUtility->GetRosterE()->StartNode(m_spPhysicalInOutput -> node, 0);
 	if (err < B_OK) {
 		EMDebugger("Couldn't start video input!");
 	}
 
-	err = EMBeMediaUtility::GetRosterE()->StartNode(Node(), 0);
+	err = gBeMediaUtility->GetRosterE()->StartNode(Node(), 0);
 	if (err < B_OK) {
 		EMDebugger("Couldn't start video displayer!");
 	}
@@ -227,21 +227,21 @@ EMBeDvConsumerNode::Start(bigtime_t performance_time)
 {
 
 //START NODE
-	EMBeMediaUtility::GetRosterE() -> StartNode(TimeSource() -> Node(), 0);
+	gBeMediaUtility->GetRosterE() -> StartNode(TimeSource() -> Node(), 0);
 
 	//m_vIsRecording = true;
 
-	status_t err = EMBeMediaUtility::GetRosterE()->SetRunModeNode(Node(), B_RECORDING);
+	status_t err = gBeMediaUtility->GetRosterE()->SetRunModeNode(Node(), B_RECORDING);
 	if (err < B_OK) {
 		EMDebugger("MediaRoster->SetRunModeNode() : EMBeDvConsumerNode");
 	}
 
-	err = EMBeMediaUtility::GetRosterE()->StartNode(m_spPhysicalInOutput -> node, 0);
+	err = gBeMediaUtility->GetRosterE()->StartNode(m_spPhysicalInOutput -> node, 0);
 	if (err < B_OK) {
 		EMDebugger("Couldn't start video input!");
 	}
 
-/*	err = EMBeMediaUtility::GetRosterE()->StartNode(Node(), 0);
+/*	err = gBeMediaUtility->GetRosterE()->StartNode(Node(), 0);
 	if (err < B_OK) {
 		EMDebugger("Couldn't start video displayer!");
 	}
@@ -291,9 +291,9 @@ void EMBeDvConsumerNode::Stop(bigtime_t performance_time, bool immediate)
 {
 
 	BMediaEventLooper::Stop(performance_time, immediate);
-	EMBeMediaUtility::GetRosterE() -> StopNode(m_spPhysicalInOutput -> node, 0);
+	gBeMediaUtility->GetRosterE() -> StopNode(m_spPhysicalInOutput -> node, 0);
 	//m_vIsRecording = false;
-//	EMBeMediaUtility::GetRosterE() -> StopNode(TimeSource() -> Node(), 0);
+//	gBeMediaUtility->GetRosterE() -> StopNode(TimeSource() -> Node(), 0);
 }
 
 bool
@@ -352,12 +352,12 @@ EMBeDvConsumerNode::BufferReceived(BBuffer * p_opBuffer)
 		sprintf(vpPercentage, "%d | Time:%d:%d:%d:%d", (int32) m_vFrameCount, (int32) ((m_vFrameCount / (int32)mIn.format.u.raw_video.field_rate)/3600)%60,(int32) ((m_vFrameCount / (int32)mIn.format.u.raw_video.field_rate)/60)%60,
 														(int32)((m_vFrameCount / (int32)mIn.format.u.raw_video.field_rate))%60, (int32) (m_vFrameCount % (int32)mIn.format.u.raw_video.field_rate));
 		string oString = string("Recording Frame: ") + vpPercentage;
-//		EMMediaEngine::Instance() -> GetCommandRepository() -> ExecuteCommand(COMMAND_WRITE_STATUS_BAR_MESSAGE, &oString);	
+//		EMMediaEngine::Instance() -> GetCommandRepository() -> ExecuteCommand(COMMAND_WRITE_STATUS_BAR_MESSAGE, &oString);
 		err = this->mFIFO->CopyNextBufferIn(p_opBuffer->Data(), p_opBuffer->Header()->size_used, 100000, false);
 		if (err < (int32)p_opBuffer->Header()->size_used) {
 			(new BAlert("", "Couldn't continue recording(Out of HD-space?)", "So Be It"))->Go();
 			StopRecording();
-			FinishRecording();			
+			FinishRecording();
 		}
 	}
 
@@ -366,7 +366,7 @@ EMBeDvConsumerNode::BufferReceived(BBuffer * p_opBuffer)
 		m_opReceiver = new EMBeVideoDisplayer();
 		SetTo(mIn.format);
 	}
-	
+
 	if(m_opReceiver == NULL)
 		EMDebugger("m_opReceiver is NULL!");
 
@@ -375,7 +375,7 @@ EMBeDvConsumerNode::BufferReceived(BBuffer * p_opBuffer)
 		p_opBuffer->Recycle();
 		return;
 	}
-*/	
+*/
 	if(p_opBuffer)
 	{
 		memcpy(mBuffer, p_opBuffer->Data(), p_opBuffer->Header()->size_used);
@@ -391,7 +391,7 @@ EMBeDvConsumerNode::BufferReceived(BBuffer * p_opBuffer)
 				;//_commented_out_4_release_printf("DecodeBuffer (video) failed %s\n", strerror(err));
 			}
 		if(m_opReceiver -> LockPreviewWindow())
-		{	
+		{
 			m_opReceiver -> HandleNativeBuffer(mBitmap[mCurrrentBuffer]);
 		}
 		mCurrrentBuffer++;
@@ -434,7 +434,7 @@ EMBeDvConsumerNode::ProducerDataStatus(
 	bigtime_t at_media_time)
 {
 
-	if (for_whom != mIn.destination)	
+	if (for_whom != mIn.destination)
 		return;
 }
 
@@ -446,7 +446,7 @@ EMBeDvConsumerNode::Connected(
 	media_input * out_input)
 {
 	status_t	err = B_OK;
-	
+
 	mIn.source = producer;
 	mIn.format = with_format;
 	mIn.node = Node();
@@ -516,14 +516,14 @@ writer_found:
 			(new BAlert("", "Format Family not valid for ouput chose another one", "So Be It"))->Go();
 			//It's OK .. this error has been handled return B_OK(for now)
 			return B_OK;
-	}	
+	}
 
 ///
 	m_oFilename = m_oFilename + string(".") + string(mfi.file_extension);
 	entry_ref sEntry;
 	get_ref_for_path(m_oFilename.c_str(), &sEntry);
 
-	if(mMovieFileRef) 
+	if(mMovieFileRef)
 	{
 		delete mMovieFileRef;
 	}
@@ -641,19 +641,19 @@ EMBeDvConsumerNode::AcceptFormat(
 	if (dest != mIn.destination)
 	{
 		emerr << "BAD DESTINATION : EMBeDvConsumerNode" << endl;
-		return B_MEDIA_BAD_DESTINATION;	
+		return B_MEDIA_BAD_DESTINATION;
 	}
-	
+
 	if (format->type == B_MEDIA_NO_TYPE)
 		format->type = B_MEDIA_ENCODED_VIDEO;
-	
+
 	if (format->type != B_MEDIA_ENCODED_VIDEO)
 	{
 		emerr << "BAD FORMAT : EMBeDvConsumerNode" << endl;
 		return B_MEDIA_BAD_FORMAT;
 	}
 
-	char format_string[256];		
+	char format_string[256];
 	string_for_format(*format, format_string, 256);
 
 	return B_OK;
@@ -695,10 +695,10 @@ EMBeDvConsumerNode::GetLatencyFor(
 	media_node_id * out_timesource)
 {
 /*	;//cout_commented_out_4_release<< "EMBeDvConsumerNode::GetLatencyFor" << endl;
-	
+
 	if (for_whom != mIn.destination)
 		return B_MEDIA_BAD_DESTINATION;
-	
+
 	*out_latency = mMyLatency;
 	*out_timesource = TimeSource()->ID();
 */
@@ -708,7 +708,7 @@ EMBeDvConsumerNode::GetLatencyFor(
 status_t
 EMBeDvConsumerNode::FormatChanged(
 	const media_source & producer,
-	const media_destination & consumer, 
+	const media_destination & consumer,
 	int32 from_change_count,
 	const media_format &format)
 {
@@ -719,13 +719,13 @@ EMBeDvConsumerNode::FormatChanged(
 		return B_MEDIA_BAD_SOURCE;
 
 	mIn.format = format;
-	
+
 	return B_OK;
 }
 
 void
 EMBeDvConsumerNode::HandleEvent(
-	const media_timed_event *event, 
+	const media_timed_event *event,
 	bigtime_t lateness,
 	bool realTimeEvent)
 {
@@ -743,7 +743,7 @@ EMBeDvConsumerNode::HandleEvent(
 
 		default:
 			break;
-	}			
+	}
 }
 
 status_t
@@ -847,7 +847,7 @@ EMBeDvConsumerNode::SetTo(const media_format &format)
 
 bool EMBeDvConsumerNode::Initialize()
 {
-	status_t err = EMBeMediaUtility::GetRosterE() -> GetTimeSource(&timesourceNode);
+	status_t err = gBeMediaUtility->GetRosterE() -> GetTimeSource(&timesourceNode);
 	if (err < B_OK) {
 		EMDebugger("Can't get TimeSource!");
 		return false;
@@ -855,8 +855,8 @@ bool EMBeDvConsumerNode::Initialize()
 
 	// find free input to video window
 	int32 cnt = 0;
-	err = EMBeMediaUtility::GetRosterE()->GetFreeInputsFor(Node(), &m_to, 1, &cnt, B_MEDIA_ENCODED_VIDEO);
-	if (err < B_OK || cnt < 1) 
+	err = gBeMediaUtility->GetRosterE()->GetFreeInputsFor(Node(), &m_to, 1, &cnt, B_MEDIA_ENCODED_VIDEO);
+	if (err < B_OK || cnt < 1)
 	{
 		//;//cout_commented_out_4_release<< "The video-recording output is busy!?" << endl;
 		return false;
@@ -867,8 +867,8 @@ bool EMBeDvConsumerNode::Initialize()
 	format.type = B_MEDIA_ENCODED_VIDEO;
 	format.u.encoded_video = media_encoded_video_format::wildcard;
 
-	err = EMBeMediaUtility::GetRosterE()->Connect(m_spPhysicalInOutput -> source, m_to.destination, &format, m_spPhysicalInOutput, &m_to);
-	if (err < B_OK) 
+	err = gBeMediaUtility->GetRosterE()->Connect(m_spPhysicalInOutput -> source, m_to.destination, &format, m_spPhysicalInOutput, &m_to);
+	if (err < B_OK)
 	{
 		emerr << "Connection failed : DvConsumerNode: " << strerror(err) << endl;
 		return false;
@@ -881,16 +881,16 @@ bool EMBeDvConsumerNode::Initialize()
 //	mConnected = true;
 
 	// Set time source for output node
-	err = EMBeMediaUtility::GetRosterE()->SetTimeSourceFor(Node().node, timesourceNode.node);
-	if (err < B_OK) 
+	err = gBeMediaUtility->GetRosterE()->SetTimeSourceFor(Node().node, timesourceNode.node);
+	if (err < B_OK)
 	{
 		//;//cout_commented_out_4_release<< "Couldn't set TimeSource for video display : EMBeDvConsumerNode" << endl;
 		return false;
 	}
 
 	// Set time source for video input
-	err = EMBeMediaUtility::GetRosterE()->SetTimeSourceFor(m_spPhysicalInOutput -> node.node, timesourceNode.node);
-	if (err < B_OK) 
+	err = gBeMediaUtility->GetRosterE()->SetTimeSourceFor(m_spPhysicalInOutput -> node.node, timesourceNode.node);
+	if (err < B_OK)
 	{
 		//;//cout_commented_out_4_release<< "Couldn't set TimeSource for video input : EMBeDvConsumerNode" << endl;
 		return false;
@@ -903,21 +903,21 @@ bool EMBeDvConsumerNode::DisconnectNode()
 		status_t err;
 		// disconnect
 //DVBufferProducer::Disconnect
-		err = EMBeMediaUtility::GetRosterE() -> Disconnect(m_spPhysicalInOutput -> node.node, m_spPhysicalInOutput -> source, Node().node, m_to.destination);
-		if (err < B_OK) 
+		err = gBeMediaUtility->GetRosterE() -> Disconnect(m_spPhysicalInOutput -> node.node, m_spPhysicalInOutput -> source, Node().node, m_to.destination);
+		if (err < B_OK)
 		{
 			//emerr << "Couldn't Disconnect Nodes : EMBeDvConsumerNode" << endl;
 		}
-	
+
 //		;//cout_commented_out_4_release<< "Releasing producer node" << endl;
-/*		EMBeMediaUtility::GetRosterE()->ReleaseNode(m_spPhysicalInOutput -> node);
+/*		gBeMediaUtility->GetRosterE()->ReleaseNode(m_spPhysicalInOutput -> node);
 		if (err < B_OK) {
 			;//cout_commented_out_4_release<< "mMediaRoster->ReleaseNode(mConnection.producer)" << err << endl;
 		}
 */
 
-		EMBeMediaUtility::GetRosterE()->ReleaseNode(Node());
-		if(err < B_OK) 
+		gBeMediaUtility->GetRosterE()->ReleaseNode(Node());
+		if(err < B_OK)
 		{
 			//emerr << "Couldn't release Node : EMBeDvConsumerNode" << endl;
 		}

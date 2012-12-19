@@ -16,20 +16,20 @@ EMBeAudioOutputNode::EMBeAudioOutputNode(media_input* p_spPhysicalOutInput)
 		m_spPhysicalOutInput(p_spPhysicalOutInput)
 {
 	m_vAudioFrameRate = (float) *(static_cast<int32*>(EMMediaEngine::Instance() -> GetSettingsRepository() -> GetSetting(SETTING_AUDIO_FRAMERATE)));
-	EMBeMediaUtility::push(this, "EMBeAudioOutputNode");
+	gBeMediaUtility->push(this, "EMBeAudioOutputNode");
 }
 
 EMBeAudioOutputNode::~EMBeAudioOutputNode()
 {
-	EMBeMediaUtility::pop("EMBeAudioOutputNode");
+	gBeMediaUtility->pop("EMBeAudioOutputNode");
 }
 
 bool EMBeAudioOutputNode::Shutdown()
 {
-	status_t e = EMBeMediaUtility::GetRosterE() -> StopNode(Node(), true);
+	status_t e = gBeMediaUtility->GetRosterE() -> StopNode(Node(), true);
 	if(e != B_OK)
 		EMDebugger((string(string("ERROR! Could not stop node: ") + string(strerror(e)))).c_str());
-	status_t vErrorCode = EMBeMediaUtility::GetRosterE() -> Disconnect(m_oConnection.m_sProducer.node, m_oConnection.m_sOutput.source, m_oConnection.m_sConsumer.node, m_oConnection.m_sInput.destination); //.source, m_oConnection.m_sInput.destination, &m_oConnection.m_sFormat, &m_oConnection.m_sOutput, &m_oConnection.m_sInput);
+	status_t vErrorCode = gBeMediaUtility->GetRosterE() -> Disconnect(m_oConnection.m_sProducer.node, m_oConnection.m_sOutput.source, m_oConnection.m_sConsumer.node, m_oConnection.m_sInput.destination); //.source, m_oConnection.m_sInput.destination, &m_oConnection.m_sFormat, &m_oConnection.m_sOutput, &m_oConnection.m_sInput);
 	if(vErrorCode != B_OK)
 		EMDebugger("ERROR! Could not disconnect Titan's audio output from the system's audio output!");
 	EMBeOutputNode::Shutdown();
@@ -38,8 +38,8 @@ bool EMBeAudioOutputNode::Shutdown()
 
 bool EMBeAudioOutputNode::Initialize()
 {
-	EMBeMediaUtility::GetRosterE() -> RegisterNode(this);
-	
+	gBeMediaUtility->GetRosterE() -> RegisterNode(this);
+
 	//First, call parent's implementation
 	if(! EMBeOutputNode::Initialize())
 	{
@@ -50,29 +50,29 @@ bool EMBeAudioOutputNode::Initialize()
 	media_node mTimeSource;
 	memcpy(&(m_oConnection.m_sProducer), &(Node()), sizeof(media_node));
 	memcpy(&(m_oConnection.m_sConsumer), &(m_spPhysicalOutInput -> node), sizeof(media_node));
-	EMBeMediaUtility::GetRosterE() -> GetTimeSource(&mTimeSource);
-	EMBeMediaUtility::GetRosterE() -> SetTimeSourceFor(m_oConnection.m_sProducer.node, mTimeSource.node);
-	BTimeSource* opTimeSource = EMBeMediaUtility::GetRosterE() -> MakeTimeSourceFor(m_oConnection.m_sProducer);
+	gBeMediaUtility->GetRosterE() -> GetTimeSource(&mTimeSource);
+	gBeMediaUtility->GetRosterE() -> SetTimeSourceFor(m_oConnection.m_sProducer.node, mTimeSource.node);
+	BTimeSource* opTimeSource = gBeMediaUtility->GetRosterE() -> MakeTimeSourceFor(m_oConnection.m_sProducer);
 
-/*	if(EMBeMediaUtility::GetRosterE() -> SetTimeSourceFor(m_oConnection.m_sConsumer.node, opTimeSource -> Node().node) != B_OK)
+/*	if(gBeMediaUtility->GetRosterE() -> SetTimeSourceFor(m_oConnection.m_sConsumer.node, opTimeSource -> Node().node) != B_OK)
 		EMDebugger("ERROR! Could not set time source for consumer node!");
-	EMBeMediaUtility::GetRosterE() -> StartNode(opTimeSource -> Node(), 0);
+	gBeMediaUtility->GetRosterE() -> StartNode(opTimeSource -> Node(), 0);
 	opTimeSource -> Release();
 */
 	int32 count = 1;
-	status_t err = EMBeMediaUtility::GetRosterE() -> GetFreeOutputsFor(Node()/*m_oConnection.m_sProducer*/, &m_oConnection.m_sOutput, 1, &count);
+	status_t err = gBeMediaUtility->GetRosterE() -> GetFreeOutputsFor(Node()/*m_oConnection.m_sProducer*/, &m_oConnection.m_sOutput, 1, &count);
 	memcpy(&(m_oConnection.m_sInput), m_spPhysicalOutInput, sizeof(media_input));
-	m_oConnection.m_sFormat.type = B_MEDIA_RAW_AUDIO;	
+	m_oConnection.m_sFormat.type = B_MEDIA_RAW_AUDIO;
 	memcpy(&(m_oConnection.m_sFormat.u.raw_audio), &(media_raw_audio_format::wildcard), sizeof(media_raw_audio_format));
 
-	err = EMBeMediaUtility::GetRosterE() -> Connect(m_oConnection.m_sOutput.source, m_oConnection.m_sInput.destination, &m_oConnection.m_sFormat, &m_oConnection.m_sOutput, &m_oConnection.m_sInput);
+	err = gBeMediaUtility->GetRosterE() -> Connect(m_oConnection.m_sOutput.source, m_oConnection.m_sInput.destination, &m_oConnection.m_sFormat, &m_oConnection.m_sOutput, &m_oConnection.m_sInput);
 	if(err != B_OK)
 		EMDebugger("ERROR! Could not connect audio titan output to system audio output!");
 
 	memcpy(&(m_oConnection.m_sSource), &(m_oConnection.m_sOutput.source), sizeof(media_source));
 	memcpy(&(m_oConnection.m_sDestination), &(m_oConnection.m_sOutput.destination), sizeof(media_destination));
 
-	EMBeMediaUtility::GetRosterE() -> SetRunModeNode(m_oConnection.m_sProducer, BMediaNode::B_INCREASE_LATENCY);
+	gBeMediaUtility->GetRosterE() -> SetRunModeNode(m_oConnection.m_sProducer, BMediaNode::B_INCREASE_LATENCY);
 	return true;
 }
 
@@ -97,7 +97,7 @@ status_t EMBeAudioOutputNode::CheckFinalFormat(media_format* p_spInOutFormat)
 
 	if(p_spInOutFormat -> u.raw_audio.buffer_size == media_raw_audio_format::wildcard.buffer_size)
 		p_spInOutFormat -> u.raw_audio.buffer_size = EM_AUDIO_BUFFER_SIZE; // pick something comfortable to suggest
-	
+
 	return B_OK;
 }
 

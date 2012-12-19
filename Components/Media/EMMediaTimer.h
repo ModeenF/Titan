@@ -35,7 +35,11 @@ public:
 	bool IncreaseAudioThenFrame(int64 p_vWithFrames); //Will return false if time shouldnt be increased anymore!
 	bool IncreaseMIDIThenTime(int64 p_vWithMicroseconds); //Will return false if time shouldnt be increased anymore!
 	bool IncreaseMetronomeNowTime(int64 p_vWithMicroseconds); //Will return false if time shouldn't be increased anymore!
-	bool IncreaseNowFrame(int64 p_vWithFrames, int32 p_vPotentialClockMasterID); //Will return false if time shouldnt be increased anymore!
+
+			bool			IncreaseNowFrame(int64 withFrames,
+									int32 potentialClockMasterID = -1);
+
+	 //Will return false if time shouldnt be increased anymore!
 	bool IncreaseVideoThenFrame(int64 p_vWithFrames); //Will return false if time shouldnt be increased anymore!
 	bool IsLooped() const;
 	void Lock();

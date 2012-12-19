@@ -25,8 +25,8 @@ void EMBeVideoConsumerNode::Delete()
 	m_opInstance = NULL;
 }
 
-EMBeVideoConsumerNode::EMBeVideoConsumerNode() 
-	: 	BMediaNode("NativeVideoReader"), 
+EMBeVideoConsumerNode::EMBeVideoConsumerNode()
+	: 	BMediaNode("NativeVideoReader"),
 		BBufferConsumer(B_MEDIA_RAW_VIDEO),
 		m_spBitmap(NULL),
 		m_opHistoryBuffer(NULL),
@@ -43,7 +43,7 @@ EMBeVideoConsumerNode::EMBeVideoConsumerNode()
 /*	m_sInput.source = media_source::null;
 	m_sInput.destination = media_destination::null;
 */
-	
+
 	string oVideoName(EM_THREAD_NAME_VIDEO_CONSUMER);
 	strcpy(m_sInput.name, oVideoName.c_str());
 
@@ -53,7 +53,7 @@ EMBeVideoConsumerNode::EMBeVideoConsumerNode()
 	EMBeBufferRepository:: Instance() -> AddListener(this);
 	if(err != B_OK)
 		EMDebugger("ERROR! Could not register video consumer node!");
-	EMBeMediaUtility::push(this, "EMBeVideoConsumerNode");
+	gBeMediaUtility->push(this, "EMBeVideoConsumerNode");
 }
 
 EMBeVideoConsumerNode::~EMBeVideoConsumerNode()
@@ -66,7 +66,7 @@ EMBeVideoConsumerNode::~EMBeVideoConsumerNode()
 	while(wait_for_thread(m_sThread, &vErrorCode) == B_INTERRUPTED)
 		snooze(1000);
 	delete_port(m_sControlPortID);
-	EMBeMediaUtility::pop("EMBeVideoConsumerNode");
+	gBeMediaUtility->pop("EMBeVideoConsumerNode");
 	delete m_opReceiver;
 }
 
@@ -74,13 +74,13 @@ status_t EMBeVideoConsumerNode::AcceptFormat(const media_destination& p_destinat
 {
 	if(p_destination != m_sInput.destination)
 		return B_MEDIA_BAD_DESTINATION;
-	
-	if(p_format->type <= 0) 
+
+	if(p_format->type <= 0)
 	{
 		p_format->type = B_MEDIA_RAW_VIDEO;
 		p_format->u.raw_video = media_raw_video_format::wildcard;
 	}
-	else if(p_format->type != B_MEDIA_RAW_VIDEO) 
+	else if(p_format->type != B_MEDIA_RAW_VIDEO)
 	{
 		p_format->type = B_MEDIA_RAW_VIDEO;
 		p_format->u.raw_video = media_raw_video_format::wildcard;
@@ -132,7 +132,7 @@ void EMBeVideoConsumerNode::BufferReceived(BBuffer* p_opBuffer)
 		m_opEmergencyBuffer = p_opBuffer;
 		m_vLastBufferToReceive = true;
 	}
-		
+
 	if(m_opReceiver == NULL)
 		m_opReceiver = new EMBeVideoDisplayer();
 
@@ -220,14 +220,14 @@ void EMBeVideoConsumerNode::UnlockWindow()
 status_t EMBeVideoConsumerNode::Connected(const media_source& p_source, const media_destination& p_destination, const media_format& p_format, media_input* p_outInput)
 {
 	//Delete Buffers just in case
-//	DeleteBuffers();	
+//	DeleteBuffers();
 	//	Only accept connection requests when we're not already connected.
-	if (m_sInput.source != media_source::null) 
+	if (m_sInput.source != media_source::null)
 	{
 		return B_MEDIA_BAD_DESTINATION;
 	}
 	//	Only accept connection requests on the one-and-only available input.
-	if (p_destination != m_sInput.destination) 
+	if (p_destination != m_sInput.destination)
 	{
 		return B_MEDIA_BAD_DESTINATION;
 	}
@@ -240,20 +240,20 @@ status_t EMBeVideoConsumerNode::Connected(const media_source& p_source, const me
 	//	to the world so it can use it!
 	*p_outInput = m_sInput;
 //	uint32 user_data = 0;
-//	int32 change_tag = 1;	
+//	int32 change_tag = 1;
 
 	if(! EMBeBufferRepository::Instance() -> InitializeVideoE(0, 2, &m_sInput.format))
 		EMDebugger("ERROR! Could not initialize video buffer repository!");
 	m_spBitmap = EMBeBufferRepository::Instance() -> GetVideoBitmaps();
-	
+
 	EMBeBufferRepository:: Instance() -> AddListener(this);
-	
+
 //	if(m_opHistoryBuffer != NULL)
 //	{
 //		m_opHistoryBuffer -> Recycle();
 //		m_opHistoryBuffer = NULL;
 //	}
-	
+
 	return B_OK;
 
 
@@ -292,7 +292,7 @@ EMBeVideoConsumerNode::DeleteBuffers()
 	{
 		delete m_spBuffers;
 		m_spBuffers = NULL;
-		
+
 		for (int32 j = 0; j < EMBeBufferRepository::Instance() -> GetNumVideoBitmaps(); j++)
 			if (m_spBitmap[j] -> IsValid())
 			{
@@ -302,11 +302,11 @@ EMBeVideoConsumerNode::DeleteBuffers()
 	}
 }
 
-void EMBeVideoConsumerNode::Disconnected(const media_source& p_sSource, const media_destination& p_sDestination) 
+void EMBeVideoConsumerNode::Disconnected(const media_source& p_sSource, const media_destination& p_sDestination)
 {
-	if(p_sSource != m_sInput.source) 
+	if(p_sSource != m_sInput.source)
 		return;
-	if(p_sDestination != m_sInput.destination) 
+	if(p_sDestination != m_sInput.destination)
 		return;
 	m_sInput.source = media_source::null;
 }
@@ -324,7 +324,7 @@ status_t EMBeVideoConsumerNode::GetLatencyFor(const media_destination& p_forWhom
 {
 	if(p_forWhom != m_sInput.destination)
 		return B_MEDIA_BAD_DESTINATION;
-	
+
 	*p_outLatency = 40000LL; //FIX THIS!
 	*p_outTimeSource = TimeSource()->ID();
 
@@ -336,18 +336,18 @@ status_t EMBeVideoConsumerNode::GetNextInput(int32* p_cookie, media_input* p_out
 {
 
 
-	if(*p_cookie == 0) 
+	if(*p_cookie == 0)
 	{
-		if (m_sInput.source == media_source::null) 
-		{		
+		if (m_sInput.source == media_source::null)
+		{
 			m_sInput.format.type = B_MEDIA_RAW_VIDEO;
 			m_sInput.format.u.raw_video = media_raw_video_format::wildcard;
 			//m_sInput.format.u.raw_video.format = 4;
 			m_sInput.node = Node();
 			m_sInput.destination.port = ControlPort();
 			m_sInput.destination.id = Node().node;
-			
-		}			
+
+		}
 		*p_outInput = m_sInput;
 		*p_cookie = 1;
 		return B_OK;
@@ -355,7 +355,7 @@ status_t EMBeVideoConsumerNode::GetNextInput(int32* p_cookie, media_input* p_out
 
 	*p_outInput = m_sInput;
 	*p_cookie = 1;
-	
+
 	return B_BAD_INDEX;
 }
 
@@ -403,7 +403,7 @@ void EMBeVideoConsumerNode::ServiceThread()
 		//Set my single input's port to the control port ID we just reserved...
 		m_sInput.destination.port = m_sControlPortID;
 		m_sInput.destination.id = 1;
-		
+
 		char * msg = new char[B_MEDIA_MESSAGE_SIZE];
 
 		while(true)
@@ -414,13 +414,13 @@ void EMBeVideoConsumerNode::ServiceThread()
 			if(size >= 0)
 			{
 				//Did we get a shut-down-message (from the destuctor) ?
-				if(code == EM_PORT_MESSAGE_SHUTDOWN) 
-				{	//Ok, we got a "must-quit-now" message (sent to the port from my 
+				if(code == EM_PORT_MESSAGE_SHUTDOWN)
+				{	//Ok, we got a "must-quit-now" message (sent to the port from my
 					//own destructor, but using a different thread)....
 					break;
 				}
 				else
-				{	//Ok, handle the message.... 
+				{	//Ok, handle the message....
 					//timeoutCount = 0;
 					HandleMessage(code, msg, size);
 				}
@@ -483,7 +483,7 @@ void EMBeVideoConsumerNode::TimeWarp(bigtime_t at_real_time, bigtime_t to_perfor
 {
 }
 
-void EMBeVideoConsumerNode::ProducerDataStatus(const media_destination& p_destination, int32 p_status, bigtime_t p_atPerformanceTime) 
+void EMBeVideoConsumerNode::ProducerDataStatus(const media_destination& p_destination, int32 p_status, bigtime_t p_atPerformanceTime)
 {
 }
 
@@ -509,7 +509,7 @@ void EMBeVideoConsumerNode::RecycleHistoryBuffer()
 		{
 //			if(m_opReceiver -> LockPreviewWindow())
 //			{
-				m_opHistoryBuffer -> Recycle();				
+				m_opHistoryBuffer -> Recycle();
 				m_opHistoryBuffer = NULL;
 				m_vBuffersOutInTheOpen--;
 //				m_opReceiver -> UnlockPreviewWindow();
@@ -541,7 +541,7 @@ bool EMBeVideoConsumerNode::MessageReceived(EMListenerRepository* p_opSender, ui
 		default:
 			break;
 	};
-	
+
 	return true;
 }
 

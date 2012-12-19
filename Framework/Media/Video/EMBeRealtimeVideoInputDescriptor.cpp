@@ -12,7 +12,7 @@
 #include <interface/Alert.h>
 #include "CommandIDs.h"
 
-EMBeRealtimeVideoInputDescriptor::EMBeRealtimeVideoInputDescriptor(media_output* p_spMediaOutput) 
+EMBeRealtimeVideoInputDescriptor::EMBeRealtimeVideoInputDescriptor(media_output* p_spMediaOutput)
 	:	EMRealtimeInputDescriptor(EM_TYPE_ANY_VIDEO),
 		m_vTakeSequenceNumber(0),
 		m_vRecording(false)
@@ -23,14 +23,14 @@ EMBeRealtimeVideoInputDescriptor::EMBeRealtimeVideoInputDescriptor(media_output*
 		EMDebugger("ERROR: can't create a video consumer node !");
 	}
 
-	EMBeMediaUtility::push(this, "EMBeRealtimeVideoInputDescriptor");
+	gBeMediaUtility->push(this, "EMBeRealtimeVideoInputDescriptor");
 }
 
 EMBeRealtimeVideoInputDescriptor::~EMBeRealtimeVideoInputDescriptor()
 {
 
-	//EMBeMediaUtility::GetRosterE() -> ReleaseNode(m_opNode -> Node());
-	EMBeMediaUtility::GetRosterE() -> StopNode(m_opNode -> Node(), 0, true);
+	//gBeMediaUtility->GetRosterE() -> ReleaseNode(m_opNode -> Node());
+	gBeMediaUtility->GetRosterE() -> StopNode(m_opNode -> Node(), 0, true);
 	m_opNode -> DisconnectNode();
 
 //TODO: Check and see why we can't deallocate this object without everything crashing down...
@@ -43,11 +43,11 @@ EMBeRealtimeVideoInputDescriptor::~EMBeRealtimeVideoInputDescriptor()
 	;//cout_commented_out_4_release<< "Checking to see if producer needs to be released" << endl;
 	if (m_spMediaOutput -> node != media_node::null) {
 		;//cout_commented_out_4_release<<"releasing ProducerNode!"<<endl;;
-		EMBeMediaUtility::GetRosterE()->ReleaseNode(m_spMediaOutput -> node);
+		gBeMediaUtility->GetRosterE()->ReleaseNode(m_spMediaOutput -> node);
 		m_spMediaOutput -> node = media_node::null;
 	}
 
-	EMBeMediaUtility::pop("EMBeRealtimeVideoInputDescriptor");
+	gBeMediaUtility->pop("EMBeRealtimeVideoInputDescriptor");
 }
 
 void EMBeRealtimeVideoInputDescriptor::ReadBuffer(EMMediaDataBuffer* p_opBuffer, int64 p_vForFrame)
@@ -71,7 +71,7 @@ bool EMBeRealtimeVideoInputDescriptor::InitCheckE()
 //	EMMediaSignalMeter* opMeter = EMMediaSignalMeterRepository::Instance() -> InstanceSignalMeter(EM_TYPE_RAW_AUDIO);
 //	m_opNode -> SetDestination(opMeter);
 //	m_opNode -> InitCheckE();
-	
+
 	return m_vIsInitialized;
 }
 
@@ -86,13 +86,13 @@ void EMBeRealtimeVideoInputDescriptor::StartE()
 	{
 		;//cout_commented_out_4_release << "Now starting EMBeRealtimeVideoInputDescriptor since one or more track(s) has it as input!" << endl;
 		string* m_opFamilyName = static_cast<string*>(EMMediaEngine::Instance() -> GetSettingsRepository() -> GetSetting(SETTING_RENDER_CODEC_FAMILY));
-		string oFileName = EMBeMediaUtility::MakeVideoRecordingFileName((m_vTakeSequenceNumber++), GetID());
+		string oFileName = gBeMediaUtility->MakeVideoRecordingFileName((m_vTakeSequenceNumber++), GetID());
 		//mFormatFamily = B_AVI_FORMAT_FAMILY;
 		if (strcmp(m_opFamilyName -> c_str(), "unknown") == 0)
 			(new BAlert("", "Format Family not valid for ouput chose another one", "So Be It"))->Go();
 		else
 		{
-			if(m_opNode -> SetFileName(oFileName, m_opFamilyName) < B_OK) 
+			if(m_opNode -> SetFileName(oFileName, m_opFamilyName) < B_OK)
 			{
 				EMDebugger("ERROR: mDvFileWriter -> SetFileName !");
 			}
@@ -105,7 +105,7 @@ void EMBeRealtimeVideoInputDescriptor::StartE()
 	}
 	else
 		;//cout_commented_out_4_release << "Shouldn't start EMBeRealtimeVideoInputDescriptor since no track has it as input!" << endl;
-//	EMBeMediaUtility::GetRosterE() -> StartNode(m_opNode -> Node(), 0); 
+//	gBeMediaUtility->GetRosterE() -> StartNode(m_opNode -> Node(), 0);
 //	m_opNode -> StartVideoDecoder();
 }
 
@@ -114,11 +114,11 @@ bool EMBeRealtimeVideoInputDescriptor::StartPreviewE()
 	if(oRegisteredRecorders.size() > 0)
 	{
 		;//cout_commented_out_4_release << "Now actually starting the NODE for EMBeRealtimeVideoInputDescriptor (through StopPreviewE) since one or more track(s) has it as input!" << endl;
-		EMBeMediaUtility::GetRosterE() -> StartNode(m_opNode -> Node(), 0);
+		gBeMediaUtility->GetRosterE() -> StartNode(m_opNode -> Node(), 0);
 	}
 	else
 		;//cout_commented_out_4_release << "Shouldn't start the NODE in EMBeRealtimeVideoInputDescriptor (through StartPreviewE), since no track had it as input!" << endl;
-		
+
 	return true;
 }
 
@@ -132,7 +132,7 @@ bool EMBeRealtimeVideoInputDescriptor::StopPreviewE()
 			m_opNode -> StopRecording();
 			m_opNode -> FinishRecording();
 		}
-		EMBeMediaUtility::GetRosterE() -> StopNode(m_opNode -> Node(), 0, true);
+		gBeMediaUtility->GetRosterE() -> StopNode(m_opNode -> Node(), 0, true);
 	}
 	else
 		m_vRecording = false;
@@ -147,12 +147,12 @@ void EMBeRealtimeVideoInputDescriptor::StopE()
 		if(m_opNode -> IsRecording())
 		{
 			string oString = string("Finishing recording DV... please hold");
-//			EMMediaEngine::Instance() -> GetCommandRepository() -> ExecuteCommand(COMMAND_WRITE_STATUS_BAR_MESSAGE, &oString);	
+//			EMMediaEngine::Instance() -> GetCommandRepository() -> ExecuteCommand(COMMAND_WRITE_STATUS_BAR_MESSAGE, &oString);
 			m_opNode -> StopRecording();
 			m_opNode -> FinishRecording();
 			StopPreviewE();
 			oString = string("Recording DV finished.");
-//			EMMediaEngine::Instance() -> GetCommandRepository() -> ExecuteCommand(COMMAND_WRITE_STATUS_BAR_MESSAGE, &oString);	
+//			EMMediaEngine::Instance() -> GetCommandRepository() -> ExecuteCommand(COMMAND_WRITE_STATUS_BAR_MESSAGE, &oString);
 		}
 	}
 	else

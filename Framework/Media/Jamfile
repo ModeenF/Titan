@@ -7,10 +7,12 @@ SubDirHdrs [ FDirName $(TOP) Application Commands ] ;
 
 SubDirHdrs [ FDirName $(TOP) Framework ] ;
 SubDirHdrs [ FDirName $(TOP) Framework Globals ] ;
+SubDirHdrs [ FDirName $(TOP) Framework Gui ] ;
 SubDirHdrs [ FDirName $(TOP) Framework Media Audio ] ;
 SubDirHdrs [ FDirName $(TOP) Framework Media Video ] ;
 
 SubDirHdrs [ FDirName $(TOP) Components ] ;
+SubDirHdrs [ FDirName $(TOP) Components Gui ] ;
 SubDirHdrs [ FDirName $(TOP) Components Media ] ;
 
 Library TitanFrameworkMedia :

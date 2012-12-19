@@ -55,9 +55,9 @@ EMBeAnalogConsumerNode::EMBeAnalogConsumerNode(const char * name, BMediaAddOn *a
 	m_spPhysicalInOutput(p_spPhysicalInOutput),
 	m_vRenderFileSequenceNumber(0),
 	m_vFrameCount(0)
-	
+
 {
-	EMBeMediaUtility::push(this, "EMBeAnalogConsumerNode");
+	gBeMediaUtility->push(this, "EMBeAnalogConsumerNode");
 	m_vReadyForWriting = false;
 //	AddNodeKind(B_PHYSICAL_OUTPUT);
 //	SetEventLatency(0);
@@ -72,12 +72,12 @@ EMBeAnalogConsumerNode::EMBeAnalogConsumerNode(const char * name, BMediaAddOn *a
 	BMediaEventLooper::SetBufferDuration(200000);
 	SetEventLatency(2000000);
 
-	status_t status = EMBeMediaUtility::GetRosterE()->RegisterNode(this);
+	status_t status = gBeMediaUtility->GetRosterE()->RegisterNode(this);
 	if (status != B_OK) {
 		EMDebugger("Can't register the analog video");
 	}
 	//BMediaEventLooper::SetPriority(B_DISPLAY_PRIORITY);
-	
+
 	//BMediaEventLooper::SetBufferDuration(200000);
 //	SetEventLatency(2000000);
 	//BMediaEventLooper::SetRunMode(B_DROP_DATA);
@@ -89,16 +89,16 @@ EMBeAnalogConsumerNode::~EMBeAnalogConsumerNode()
 {
 	;//_commented_out_4_release_FUNCTION("EMBeAnalogConsumerNode::~EMBeAnalogConsumerNode\n");
 	//status_t status;
-	
+
 	SetRunState(B_QUITTING);
 	DeleteBuffers();
 	BMediaEventLooper::Quit();
 	SetRunState(B_TERMINATED);
 
 	BMediaRoster::Roster() -> UnregisterNode(this);
-	EMBeMediaUtility::pop("EMBeAnalogConsumerNode");	
-	BMediaEventLooper::Quit();	
-	
+	gBeMediaUtility->pop("EMBeAnalogConsumerNode");
+	BMediaEventLooper::Quit();
+
 }
 
 /********************************
@@ -122,32 +122,32 @@ EMBeAnalogConsumerNode::AddOn(long *cookie) const
 // This implementation is required to get around a bug in
 // the ppc compiler.
 
-void 
+void
 EMBeAnalogConsumerNode::Start(bigtime_t performance_time)
 {
 	BMediaEventLooper::Start(performance_time);
-/*	status_t error = EMBeMediaUtility::GetRosterE() -> StartNode(TimeSource() -> Node(), 0);
+/*	status_t error = gBeMediaUtility->GetRosterE() -> StartNode(TimeSource() -> Node(), 0);
 	if(error != B_OK)
 		EMDebugger("Couldn't start timesource() for some erason");
 
 	//m_vIsRecording = true;
 
-	error = EMBeMediaUtility::GetRosterE()->SetRunModeNode(Node(), B_RECORDING);
+	error = gBeMediaUtility->GetRosterE()->SetRunModeNode(Node(), B_RECORDING);
 	if (error < B_OK) {
 		EMDebugger(";//ERROR_commented_out_4_release_FUNCTION: MediaRoster->SetRunModeNode() !");
 	}
 
-	error = EMBeMediaUtility::GetRosterE()->StartNode(m_spPhysicalInOutput -> node, 0);
+	error = gBeMediaUtility->GetRosterE()->StartNode(m_spPhysicalInOutput -> node, 0);
 	if (error < B_OK)
 		EMDebugger("Couldn't start video input!");
 */
 }
 
-void 
+void
 EMBeAnalogConsumerNode::Stop(bigtime_t performance_time, bool immediate)
 {
 	BMediaEventLooper::Stop(performance_time, immediate);
-/*	EMBeMediaUtility::GetRosterE() -> StopNode(TimeSource() -> Node(), 0);
+/*	gBeMediaUtility->GetRosterE() -> StopNode(TimeSource() -> Node(), 0);
 	int32 vChangeTag;
 	SetOutputEnabled(mIn.source, mDestination, false, NULL, &vChangeTag);
 */
@@ -155,19 +155,19 @@ EMBeAnalogConsumerNode::Stop(bigtime_t performance_time, bool immediate)
 }
 
 /*
-void 
+void
 EMBeAnalogConsumerNode::Seek(bigtime_t media_time, bigtime_t performance_time)
 {
 	BMediaEventLooper::Seek(media_time, performance_time);
 }
 
-void 
+void
 EMBeAnalogConsumerNode::TimeWarp(bigtime_t at_real_time, bigtime_t to_performance_time)
 {
 	BMediaEventLooper::TimeWarp(at_real_time, to_performance_time);
 }
 
-status_t 
+status_t
 EMBeAnalogConsumerNode::DeleteHook(BMediaNode *node)
 {
 	return BMediaEventLooper::DeleteHook(node);
@@ -199,7 +199,7 @@ EMBeAnalogConsumerNode::RequestCompleted(const media_request_info & info)
 //	void* userData;
 
 	;//_commented_out_4_release_FUNCTION("EMBeAnalogConsumerNode::RequestCompleted\n");
-/*	char format_string[256];		
+/*	char format_string[256];
 	string_for_format(info.format, format_string, 256);
 	;//_commented_out_4_release_FUNCTION("EMBeAnalogConsumerNode::AcceptFormat: %s\n", format_string);
 	if((info.format.u.raw_video.display.line_width != m_sFormat.u.raw_video.display.line_width) || (info.format.u.raw_video.display.line_width != m_sFormat.u.raw_video.display.line_width))
@@ -211,7 +211,7 @@ EMBeAnalogConsumerNode::RequestCompleted(const media_request_info & info)
 		DeleteBuffers();
 		;//cout_commented_out_4_release<<"Create buffers"<<endl;
 		CreateBuffers(m_sFormat);
-		;//cout_commented_out_4_release<<"Set output for"<<endl;	
+		;//cout_commented_out_4_release<<"Set output for"<<endl;
 		BBufferConsumer::SetOutputBuffersFor(info.source, info.destination, mBuffers, userData, changeTag, true);
 		;//cout_commented_out_4_release<<"End change format"<<endl;
 	} else
@@ -298,7 +298,7 @@ EMBeAnalogConsumerNode::ProducerDataStatus(
 {
 	;//_commented_out_4_release_FUNCTION("EMBeAnalogConsumerNode::ProducerDataStatus\n");
 
-	if (for_whom != mIn.destination)	
+	if (for_whom != mIn.destination)
 		return;
 }
 
@@ -309,15 +309,15 @@ EMBeAnalogConsumerNode::CreateBuffers(
 	const media_format & with_format)
 {
 	;//_commented_out_4_release_FUNCTION("EMBeAnalogConsumerNode::CreateBuffers\n");
-	
+
 	// delete any old buffers
-	DeleteBuffers();	
+	DeleteBuffers();
 
 	status_t status = B_OK;
 
 	// create a buffer group
 	uint32 mXSize = with_format.u.raw_video.display.line_width;
-	uint32 mYSize = with_format.u.raw_video.display.line_count;	
+	uint32 mYSize = with_format.u.raw_video.display.line_count;
 	//uint32 mRowBytes = with_format.u.raw_video.display.bytes_per_row;
 	color_space mColorspace = with_format.u.raw_video.display.format;
 	;//PROGRESS_commented_out_4_release_FUNCTION("EMBeAnalogConsumerNode::CreateBuffers - Colorspace = %d\n", mColorspace);
@@ -334,7 +334,7 @@ EMBeAnalogConsumerNode::CreateBuffers(
 	{
 		mBitmap[j] = new BBitmap(BRect(0, 0, (mXSize-1), (mYSize - 1)), mColorspace, true, true);
 		if (mBitmap[j]->IsValid())
-		{						
+		{
 			buffer_clone_info info;
 			if ((info.area = area_for(mBitmap[j]->Bits())) == B_ERROR)
 				;//ERROR_commented_out_4_release_FUNCTION("EMBeAnalogConsumerNode::CreateBuffers - ;//ERROR_commented_out_4_release_FUNCTION IN AREA_FOR\n");;
@@ -349,17 +349,17 @@ EMBeAnalogConsumerNode::CreateBuffers(
 				return status;
 			} else ;//PROGRESS_commented_out_4_release_FUNCTION("EMBeAnalogConsumerNode::CreateBuffers - SUCCESSFUL ADD BUFFER TO GROUP\n");
 		}
-		else 
+		else
 		{
 			;//ERROR_commented_out_4_release_FUNCTION("EMBeAnalogConsumerNode::CreateBuffers - ;//ERROR_commented_out_4_release_FUNCTION CREATING VIDEO RING BUFFER: %08x\n", status);
 			return B_ERROR;
-		}	
+		}
 	}
-	
+
 	BBuffer ** buffList = new BBuffer * [3];
 	for (int j = 0; j < 3; j++) buffList[j] = 0;
-	
-	if ((status = mBuffers->GetBufferList(3, buffList)) == B_OK)					
+
+	if ((status = mBuffers->GetBufferList(3, buffList)) == B_OK)
 		for (int j = 0; j < 3; j++)
 			if (buffList[j] != NULL)
 			{
@@ -373,7 +373,7 @@ EMBeAnalogConsumerNode::CreateBuffers(
 			}
 	else
 		;//ERROR_commented_out_4_release_FUNCTION("EMBeAnalogConsumerNode::CreateBuffers ;//ERROR_commented_out_4_release_FUNCTION IN GET BUFFER LIST\n");
-		
+
 	;//_commented_out_4_release_FUNCTION("EMBeAnalogConsumerNode::CreateBuffers - EXIT\n");
 	return status;
 }
@@ -389,14 +389,14 @@ EMBeAnalogConsumerNode::DeleteBuffers()
 	{
 //		mBuffers->ReclaimAllBuffers();
 //		mBuffers->WaitForBuffers();
-	
+
 		delete mBuffers;
 		mBuffers = NULL;
-		
+
 		for (uint32 j = 0; j < 3; j++)
 			if (mBitmap[j]->IsValid())
 			{
-				
+
 				delete mBitmap[j];
 				mBitmap[j] = NULL;
 			}
@@ -422,7 +422,7 @@ EMBeAnalogConsumerNode::Connected(
 	media_input * out_input)
 {
 	;//_commented_out_4_release_FUNCTION("EMBeAnalogConsumerNode::Connected\n");
-	
+
 	mIn.source = producer;
 	mIn.format = with_format;
 	mIn.node = Node();
@@ -430,10 +430,10 @@ EMBeAnalogConsumerNode::Connected(
 	*out_input = mIn;
 
 	uint32 user_data = 0;
-	int32 change_tag = 1;	
+	int32 change_tag = 1;
 	if (CreateBuffers(with_format) == B_OK)
 	{
-		BBufferConsumer::SetOutputBuffersFor(producer, mDestination, 
+		BBufferConsumer::SetOutputBuffersFor(producer, mDestination,
 											mBuffers, (void *)&user_data, &change_tag, true);
 	}
 	else
@@ -442,7 +442,7 @@ EMBeAnalogConsumerNode::Connected(
 		return B_ERROR;
 	}
 
-	
+
 	;//_commented_out_4_release_FUNCTION("EMBeAnalogConsumerNode::Connected - EXIT\n");
 	return B_OK;
 }
@@ -474,12 +474,12 @@ EMBeAnalogConsumerNode::AcceptFormat(
 	if (dest != mIn.destination)
 	{
 		;//ERROR_commented_out_4_release_FUNCTION("EMBeAnalogConsumerNode::AcceptFormat - BAD DESTINATION\n");
-		return B_MEDIA_BAD_DESTINATION;	
+		return B_MEDIA_BAD_DESTINATION;
 	}
-	
+
 	if (format->type == B_MEDIA_NO_TYPE)
 		format->type = B_MEDIA_RAW_VIDEO;
-	
+
 	if (format->type != B_MEDIA_RAW_VIDEO)
 	{
 		;//ERROR_commented_out_4_release_FUNCTION("EMBeAnalogConsumerNode::AcceptFormat - BAD FORMAT\n");
@@ -488,20 +488,20 @@ EMBeAnalogConsumerNode::AcceptFormat(
 
 	if (format->u.raw_video.display.format != B_RGB32 &&
 		format->u.raw_video.display.format != B_RGB16 &&
-		format->u.raw_video.display.format != B_RGB15 &&			
-		format->u.raw_video.display.format != B_GRAY8 &&			
+		format->u.raw_video.display.format != B_RGB15 &&
+		format->u.raw_video.display.format != B_GRAY8 &&
 		format->u.raw_video.display.format != media_raw_video_format::wildcard.display.format)
 	{
 		//ERROR("AcceptFormat - not a format we know about!\n");
 		return B_MEDIA_BAD_FORMAT;
 	}
-		
+
 	if (format->u.raw_video.display.format == media_raw_video_format::wildcard.display.format)
 	{
 		format->u.raw_video.display.format = B_RGB16;
 	}
 
-	char format_string[256];		
+	char format_string[256];
 	string_for_format(*format, format_string, 256);
 	m_sFormat = *format;
 	;//_commented_out_4_release_FUNCTION("EMBeAnalogConsumerNode::AcceptFormat: %s\n", format_string);
@@ -547,10 +547,10 @@ EMBeAnalogConsumerNode::GetNextInput(
 		ERROR("EMBeAnalogConsumerNode::GetNextInput - - BAD INDEX\n");
 		return B_MEDIA_BAD_DESTINATION;
 	}
-*/	
-	if (!*cookie) 
+*/
+	if (!*cookie)
 	{
-		if (mIn.source == media_source::null) 
+		if (mIn.source == media_source::null)
 		{
 			mIn.format.type = B_MEDIA_RAW_VIDEO;
 			mIn.format.u.raw_video = media_raw_video_format::wildcard;
@@ -564,7 +564,7 @@ EMBeAnalogConsumerNode::GetNextInput(
 		return B_OK;
 	}
 	return B_BAD_INDEX;
-	
+
 }
 
 //---------------------------------------------------------------
@@ -583,10 +583,10 @@ EMBeAnalogConsumerNode::GetLatencyFor(
 	media_node_id * out_timesource)
 {
 	;//_commented_out_4_release_FUNCTION("EMBeAnalogConsumerNode::GetLatencyFor\n");
-	
+
 	if (for_whom != mIn.destination)
 		return B_MEDIA_BAD_DESTINATION;
-	
+
 	*out_latency = mMyLatency;
 	*out_timesource = TimeSource()->ID();
 
@@ -599,12 +599,12 @@ EMBeAnalogConsumerNode::GetLatencyFor(
 status_t
 EMBeAnalogConsumerNode::FormatChanged(
 				const media_source & producer,
-				const media_destination & consumer, 
+				const media_destination & consumer,
 				int32 from_change_count,
 				const media_format &format)
 {
 //	;//cout_commented_out_4_release<<"EMBeAnalogConsumerNode::FormatChanged"<<endl;
-	
+
 	if (consumer != mIn.destination)
 		return B_MEDIA_BAD_DESTINATION;
 
@@ -612,7 +612,7 @@ EMBeAnalogConsumerNode::FormatChanged(
 		return B_MEDIA_BAD_SOURCE;
 
 	mIn.format = format;
-	
+
 	return CreateBuffers(format);
 }
 
@@ -625,13 +625,13 @@ EMBeAnalogConsumerNode::HandleEvent(
 	bool realTimeEvent)
 
 {
-	
+
 	BBuffer *buffer;
-	
+
 	uint32 index = 0;
 
 	uint32 user_data = 0;
-	int32 change_tag = 1;	
+	int32 change_tag = 1;
 	int32* mPriority;
 		BBuffer ** buffList = new BBuffer * [3];
 
@@ -642,11 +642,11 @@ EMBeAnalogConsumerNode::HandleEvent(
 			break;
 		case BTimedEventQueue::B_STOP:
 			;//PROGRESS_commented_out_4_release_FUNCTION("EMBeAnalogConsumerNode::HandleEvent - STOP\n");
-			
-			//BBufferConsumer::SetOutputBuffersFor(mIn.source, mDestination, 
+
+			//BBufferConsumer::SetOutputBuffersFor(mIn.source, mDestination,
 			//								NULL, (void *)&user_data, &change_tag, false);
-			//BMediaRoster::SetOutputBuffersFor(mIn.source, NULL);								
-//			BBufferConsumer::SetOutputEnabled(mIn.source, mDestination, 
+			//BMediaRoster::SetOutputBuffersFor(mIn.source, NULL);
+//			BBufferConsumer::SetOutputEnabled(mIn.source, mDestination,
 //											false, (void *)&user_data, &change_tag);
 			;//PROGRESS_commented_out_4_release_FUNCTION("VideoConsumer::HandleEvent - STOP\n");
 			//BBufferConsumer::SetOutputBuffersFor(mIn.source, mDestination, mBuffers, (void *)&user_data, &change_tag, true);
@@ -659,7 +659,7 @@ EMBeAnalogConsumerNode::HandleEvent(
 
 
 /*		for (int j = 0; j < 3; j++) buffList[j] = 0;
-	
+
 		if (mBuffers->GetBufferList(3, buffList) == B_OK)
 		for (int j = 0; j < 3; j++)
 			if (buffList[j] != NULL)
@@ -683,19 +683,19 @@ EMBeAnalogConsumerNode::HandleEvent(
 					break;
 				else
 					index++;
-					
+
 			if (index == 3)
 			{
 				// no, buffers belong to consumer
 				mOurBuffers = false;
 				index = 0;
 			}
-										
+
 				if (!mOurBuffers)
 				{
 					// not our buffers, so we need to copy
 					memcpy(mBitmap[index]->Bits(), buffer->Data(),mBitmap[index]->BitsLength());
-				}	
+				}
 				uint32 flags;
 				if ((mBitmap[index]->ColorSpace() == B_GRAY8) && !bitmaps_support_space(mBitmap[index]->ColorSpace(), &flags))
 				{
@@ -707,19 +707,19 @@ EMBeAnalogConsumerNode::HandleEvent(
 						*p = (*p >> 3) & 0x1f1f1f1f;
 				}
 				//mBuffers->ReclaimAllBuffers();
-				
+
 				//"Start" Preview if not active
 				if(m_opReceiver == NULL)
 				{
 					m_opReceiver = new EMBeVideoDisplayer();
 					//SetTo(mIn.format);
 				}
-	
+
 				if(m_opReceiver == NULL)
 					EMDebugger("m_opReceiver is NULL!");
 
 				if(m_opReceiver -> LockPreviewWindow())
-				{	
+				{
 					m_opReceiver -> HandleNativeBuffer(mBitmap[index]);
 				}
 
@@ -731,7 +731,7 @@ EMBeAnalogConsumerNode::HandleEvent(
 					sprintf(vpPercentage, "%d | Time:%d:%d:%d:%d", (int32) m_vFrameCount, (int32) ((m_vFrameCount / (int32)mIn.format.u.raw_video.field_rate)/3600)%60,(int32) ((m_vFrameCount / (int32)mIn.format.u.raw_video.field_rate)/60)%60,
 														(int32)((m_vFrameCount / (int32)mIn.format.u.raw_video.field_rate))%60, (int32) (m_vFrameCount % (int32)mIn.format.u.raw_video.field_rate));
 					string oString = string("Recording Frame: ") + vpPercentage;
-//					EMMediaEngine::Instance() -> GetCommandRepository() -> ExecuteCommand(COMMAND_WRITE_STATUS_BAR_MESSAGE, &oString);	
+//					EMMediaEngine::Instance() -> GetCommandRepository() -> ExecuteCommand(COMMAND_WRITE_STATUS_BAR_MESSAGE, &oString);
 					status_t err = m_opVideoTrack->WriteFrames(mBitmap[index] -> Bits(), 1, B_MEDIA_KEY_FRAME);//mh.u.encoded_video.field_flags);//field_flag =0 if not a keyframe
 					if(err != B_OK)
 						EMDebugger("ERROR WRITING analog FRAME TO File!");
@@ -739,49 +739,49 @@ EMBeAnalogConsumerNode::HandleEvent(
 				buffer->Recycle();
 
 			break;
-		
+
 		default:
 //			;//cout_commented_out_4_release<<"EMBeAnalogConsumerNode::HandleEvent - BAD EVENT"<<endl;
 			break;
-	}			
+	}
 }
 
 bool EMBeAnalogConsumerNode::Initialize(media_format& p_oFormat)
 {
 //	;//cout_commented_out_4_release<<">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Initializing Analog VIDEO inputs" << endl;
 	/* find the time source */
-	status_t status = EMBeMediaUtility::GetRosterE()->GetTimeSource(&timesourceNode);
+	status_t status = gBeMediaUtility->GetRosterE()->GetTimeSource(&timesourceNode);
 	if (status != B_OK) {
 //		;//cout_commented_out_4_release<<"Can't get a time source:" << status << endl;
 		return false;
 	}
 
 
-	
+
 	/* register the node */
-//	status = EMBeMediaUtility::GetRosterE()->RegisterNode(fVideoConsumer);
+//	status = gBeMediaUtility->GetRosterE()->RegisterNode(fVideoConsumer);
 
 
 	//fPort = fVideoConsumer->ControlPort();
 
-	
+
 
 	/* find free consumer input */
 	int32 cnt = 0;
-	status = EMBeMediaUtility::GetRosterE()->GetFreeInputsFor(Node(), &m_to, 1, &cnt, B_MEDIA_RAW_VIDEO);
+	status = gBeMediaUtility->GetRosterE()->GetFreeInputsFor(Node(), &m_to, 1, &cnt, B_MEDIA_RAW_VIDEO);
 	if (status != B_OK || cnt < 1) {
 		status = B_RESOURCE_UNAVAILABLE;
 //		;//cout_commented_out_4_release<< "Can't find an available connection to the video window:" << strerror(status) << endl;
 		return false;
 	}
 	/* Connect The Nodes!!! */
-	
+
 	/* connect producer to consumer */
-	status = EMBeMediaUtility::GetRosterE()->Connect(m_spPhysicalInOutput -> source, m_to.destination, &p_oFormat, m_spPhysicalInOutput, &m_to);
+	status = gBeMediaUtility->GetRosterE()->Connect(m_spPhysicalInOutput -> source, m_to.destination, &p_oFormat, m_spPhysicalInOutput, &m_to);
 	if (status != B_OK) {
 		emerr << "ERROR! Can't connect the video source to the video window: Gonna try interlaced" << status << endl;
 		p_oFormat.u.raw_video.interlace = 2;
-		status = EMBeMediaUtility::GetRosterE()->Connect(m_spPhysicalInOutput -> source, m_to.destination, &p_oFormat, m_spPhysicalInOutput, &m_to);
+		status = gBeMediaUtility->GetRosterE()->Connect(m_spPhysicalInOutput -> source, m_to.destination, &p_oFormat, m_spPhysicalInOutput, &m_to);
 		if (status != B_OK)
 		{
 			emerr << "ERROR! Can't still connect the video source to the video window:" << strerror(status) << endl;
@@ -793,7 +793,7 @@ bool EMBeAnalogConsumerNode::Initialize(media_format& p_oFormat)
 /*	DeleteBuffers();
 	if (CreateBuffers(with_format) == B_OK)
 	{
-		BBufferConsumer::SetOutputBuffersFor(producer, mDestination, 
+		BBufferConsumer::SetOutputBuffersFor(producer, mDestination,
 											mBuffers, (void *)&user_data, &change_tag, true);
 	}
 	else
@@ -804,14 +804,14 @@ bool EMBeAnalogConsumerNode::Initialize(media_format& p_oFormat)
 */
 
 	// Set time source for output node
-/*	status = EMBeMediaUtility::GetRosterE()->SetTimeSourceFor(Node().node, timesourceNode.node);
+/*	status = gBeMediaUtility->GetRosterE()->SetTimeSourceFor(Node().node, timesourceNode.node);
 	if (status < B_OK) {
 		EMDebugger("Couldn't set TimeSource for video display!");
 		return false;
 	}
 
 	// Set time source for video input
-	status = EMBeMediaUtility::GetRosterE()->SetTimeSourceFor(m_spPhysicalInOutput -> node.node, timesourceNode.node);
+	status = gBeMediaUtility->GetRosterE()->SetTimeSourceFor(m_spPhysicalInOutput -> node.node, timesourceNode.node);
 	if (status < B_OK) {
 		EMDebugger("Couldn't set TimeSource for video input!");
 		return false;
@@ -824,14 +824,14 @@ bool EMBeAnalogConsumerNode::DisconnectNode()
 {
 		status_t err;
 		// disconnect
-//		EMBeMediaUtility::GetRosterE() -> StopNode(TimeSource() -> Node(), 0);
-//		EMBeMediaUtility::GetRosterE() -> StopNode(Node(), 0, true);
+//		gBeMediaUtility->GetRosterE() -> StopNode(TimeSource() -> Node(), 0);
+//		gBeMediaUtility->GetRosterE() -> StopNode(Node(), 0, true);
 		//ANALOGBufferProducer::Disconnect
-		err = EMBeMediaUtility::GetRosterE()->Disconnect(m_spPhysicalInOutput -> node.node, m_spPhysicalInOutput -> source, Node().node, m_to.destination);
+		err = gBeMediaUtility->GetRosterE()->Disconnect(m_spPhysicalInOutput -> node.node, m_spPhysicalInOutput -> source, Node().node, m_to.destination);
 		if (err < B_OK) {
 			emerr << "EMBeAnalogConsumerNode: occured when mMediaRoster -> Disconnect" << err << endl;
 		}
-		EMBeMediaUtility::GetRosterE()->ReleaseNode(Node());
+		gBeMediaUtility->GetRosterE()->ReleaseNode(Node());
 		if (err < B_OK) {
 			emerr << "EMBeAnalogConsumerNode: occured when mMediaRoster->ReleaseNode(mConnection.consumer): " << err << endl;
 		}
@@ -850,14 +850,14 @@ bool EMBeAnalogConsumerNode::PrepareForRecording()
 	m_opAudioCodecName = static_cast<string*>(EMMediaEngine::Instance() -> GetSettingsRepository() -> GetSetting(SETTING_AUDIO_RENDER_CODEC));
 	int vQuality = *(static_cast<int*>(EMMediaEngine::Instance() -> GetSettingsRepository() -> GetSetting(SETTING_RENDER_CODEC_QUALITY)));
 
-	string oRenderFileName = EMBeMediaUtility::MakeVideoRecordingFileName(m_vRenderFileSequenceNumber++, ID());
+	string oRenderFileName = gBeMediaUtility->MakeVideoRecordingFileName(m_vRenderFileSequenceNumber++, ID());
 	m_vpQuality = float(vQuality/100.0);
 
 	if( *m_opFamilyName == "unknown")
 		return true;
-		
+
 	int32 vCookie = 0;
-	if(m_opMediaFile == NULL)	
+	if(m_opMediaFile == NULL)
 	{
 		entry_ref sRef;
 		if(get_ref_for_path(oRenderFileName.c_str(), &sRef) != B_OK)
@@ -872,7 +872,7 @@ bool EMBeAnalogConsumerNode::PrepareForRecording()
 				break;
 			}
 		}
-		
+
 		//END GETTINg FAMILY
 		m_opMediaFile = new BMediaFile(&sRef, &m_sFileFormat);
 		if(m_opMediaFile -> InitCheck() != B_OK)
@@ -880,14 +880,14 @@ bool EMBeAnalogConsumerNode::PrepareForRecording()
 	}
 
 //	if(HaveAudioConnection() && HaveVideoConnection() && m_opVideoTrack == NULL && m_opMediaFile != NULL)
-//	{	
+//	{
 		media_format sFormat;
 		memcpy(&sFormat, &m_sFormat, sizeof(media_format));
-		
+
 		media_codec_info mci;
 		vCookie = 0;
 		media_format outfmt;
-		
+
 		while(get_next_encoder(&vCookie, &m_sFileFormat, &sFormat, &outfmt, &mci) == B_OK)
 		{
 			if(strcmp(mci.pretty_name, m_opVideoCodecName -> c_str()) == 0)
@@ -898,11 +898,11 @@ bool EMBeAnalogConsumerNode::PrepareForRecording()
 		}
 
 		if(m_vRenderVideo)
-		{	
+		{
 			sFormat.u.raw_video.field_rate = m_sFormat.u.raw_video.field_rate;
 			m_opVideoTrack = m_opMediaFile -> CreateTrack(&sFormat, &mci);
 			if(m_opVideoTrack == NULL)
-				EMDebugger("EMBeAnalogConsumerNode: Could not create video track in BMediaFile");	
+				EMDebugger("EMBeAnalogConsumerNode: Could not create video track in BMediaFile");
 
 			if(m_opVideoTrack -> InitCheck() != B_OK)
 				EMDebugger("EMBeAnalogConsumerNode: Could not initialize video track in BMediaFile!");
@@ -914,10 +914,10 @@ bool EMBeAnalogConsumerNode::PrepareForRecording()
 	//}
 
 	if((m_opVideoTrack != NULL) && ! (m_vReadyForWriting))
-	{	
+	{
 		if(m_opMediaFile -> CommitHeader() != B_OK)
 			EMDebugger("EMBeAnalogConsumerNode: Could not commit header of BMediaFile");
-		
+
 		m_vReadyForWriting = true;
 	}
 	return true;
@@ -930,7 +930,7 @@ bool EMBeAnalogConsumerNode::CloseFile()
 	{
 		if(m_opMediaFile -> CloseFile() != B_OK)
 			emerr << "EMBeAnalogConsumerNode: The media file could not be closed!" << endl;
-		
+
 		if(m_opVideoTrack != NULL)
 		{
 			m_opMediaFile -> ReleaseTrack(m_opVideoTrack);
@@ -946,7 +946,7 @@ bool EMBeAnalogConsumerNode::CloseFile()
 		delete m_opMediaFile;
 		m_opMediaFile = NULL;
 	}
-	
+
 	return true;
 }
 

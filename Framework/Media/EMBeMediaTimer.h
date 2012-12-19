@@ -42,7 +42,8 @@ public:
 	void SeekToFrame(int64 p_vNewFrame);
 
 	//Actual song time
-	bool IncreaseNowFrame(int64 p_vWithFrames);
+	bool IncreaseNowFrame(int64 p_vWithFrames,
+			int32 potentialClockMasterID = -1);
 	int64 NowFrame() const;
 	int64 NowTime();
 	int64 RealTime() const;

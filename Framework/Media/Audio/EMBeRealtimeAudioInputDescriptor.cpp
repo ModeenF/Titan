@@ -21,14 +21,14 @@
 #include <MediaKit.h>
 
 
-EMBeRealtimeAudioInputDescriptor::EMBeRealtimeAudioInputDescriptor(const media_node* p_spInputNode) 
+EMBeRealtimeAudioInputDescriptor::EMBeRealtimeAudioInputDescriptor(const media_node* p_spInputNode)
 	:	EMRealtimeInputDescriptor(EM_TYPE_ANY_AUDIO),
 		m_opSignalMeter(NULL),
 		m_vTakeSequenceNumber(0),
 		m_opNode(NULL)
 {
 	memcpy(&m_sSystemInputNode, p_spInputNode, sizeof(media_node));
-	EMBeMediaUtility::push(this, "EMBeRealtimeAudioInputDescriptor");
+	gBeMediaUtility->push(this, "EMBeRealtimeAudioInputDescriptor");
 	m_vIsInitialized = false;
 }
 
@@ -41,15 +41,15 @@ EMBeRealtimeAudioInputDescriptor::~EMBeRealtimeAudioInputDescriptor()
 		if(! m_opNode -> Shutdown())
 			EMDebugger("ERROR! Turns out the audio consumer node couldn't disconnect properly!");
 
-		EMBeMediaUtility::GetRosterE() -> StopNode(m_opNode -> Node(), true);
+		gBeMediaUtility->GetRosterE() -> StopNode(m_opNode -> Node(), true);
 //		m_opNode -> SetDestination(NULL);
-		EMBeMediaUtility::GetRosterE() -> ReleaseNode(m_opNode -> Node());
+		gBeMediaUtility->GetRosterE() -> ReleaseNode(m_opNode -> Node());
 	}
 
-	//Return the dormant node that we borrowed from the system!	
-	EMBeMediaUtility::GetRosterE() -> ReleaseNode(m_sSystemInputNode);
+	//Return the dormant node that we borrowed from the system!
+	gBeMediaUtility->GetRosterE() -> ReleaseNode(m_sSystemInputNode);
 
-	EMBeMediaUtility::pop("EMBeRealtimeAudioInputDescriptor");
+	gBeMediaUtility->pop("EMBeRealtimeAudioInputDescriptor");
 	delete m_opRecording;
 }
 
@@ -79,16 +79,16 @@ bool EMBeRealtimeAudioInputDescriptor::InitCheckE()
 	memset(&sOutputToUse, 0, sizeof(media_output));
 
 //snooze(1000000);
-	
+
 	int32 vNumOutputs = 5;
 	media_output spOutputs[5];
 
-	status_t vErrorCode = EMBeMediaUtility::GetRosterE() -> GetAllOutputsFor(m_sSystemInputNode, spOutputs, 5, &vNumOutputs);
+	status_t vErrorCode = gBeMediaUtility->GetRosterE() -> GetAllOutputsFor(m_sSystemInputNode, spOutputs, 5, &vNumOutputs);
 	if(vErrorCode != B_OK)
 	{
 		EMDebugger("ERROR! Could not get any free outgoing ports from the system's audio input node!");
 	}
-	
+
 //	snooze(1000000);
 
 	media_format sWantedFormat;
@@ -150,14 +150,14 @@ void EMBeRealtimeAudioInputDescriptor::StartE()
 		for(opListIterator = oRegisteredRecorders.begin(); opListIterator != oRegisteredRecorders.end(); opListIterator++)
 			m_opRecording -> m_oRecorderTracks.push_back(*opListIterator);
 
-		m_opRecording -> m_oFileName = EMBeMediaUtility::MakeAudioRecordingFileName((m_vTakeSequenceNumber++), GetID());
+		m_opRecording -> m_oFileName = gBeMediaUtility->MakeAudioRecordingFileName((m_vTakeSequenceNumber++), GetID());
 		if(m_opNode != NULL)
 			m_opNode -> SetTargetFile(m_opRecording -> m_oFileName.c_str());
 		m_opRecording -> m_vStartTime = EMMediaTimer::Instance() -> NowTime();
 
 		if(m_opNode != NULL)
-			EMBeMediaUtility::GetRosterE() -> StartNode(m_opNode -> Node(), 0); 
-			
+			gBeMediaUtility->GetRosterE() -> StartNode(m_opNode -> Node(), 0);
+
 	}
 	else
 		;//emerr << "WARNING! Can't start, since audio input " << GetID() << " has no recorders!" << endl;
@@ -165,15 +165,15 @@ void EMBeRealtimeAudioInputDescriptor::StartE()
 
 void EMBeRealtimeAudioInputDescriptor::StopE()
 {
-	
+
 	if(oRegisteredRecorders.size() > 0)
 	{
 		if(m_opNode != NULL)
 		{
-			EMBeMediaUtility::GetRosterE() -> StopNode(m_opNode -> Node(), true);
+			gBeMediaUtility->GetRosterE() -> StopNode(m_opNode -> Node(), true);
 			m_opNode -> CloseTargetFile();
 		}
-	
+
 		int32 vpArray[2];
 		;//cout_commented_out_4_release << "OK! Recording done. The filename is \"" << m_opRecording -> m_oFileName << "\"" << endl;
 		EMMediaEngine::Instance() -> GetMediaProject() -> GetMediaPool() -> AddMediaFileE(m_opRecording -> m_oFileName.c_str(), vpArray);
@@ -192,7 +192,7 @@ bool EMBeRealtimeAudioInputDescriptor::StopPreviewE()
 
 bool EMBeRealtimeAudioInputDescriptor::ClearData()
 {
-	m_vIsInitialized = false; 
+	m_vIsInitialized = false;
 	m_vTakeSequenceNumber = 0;
 	return true;
 }

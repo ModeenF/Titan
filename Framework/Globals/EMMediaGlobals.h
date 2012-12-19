@@ -48,9 +48,9 @@ const int32 EM_OUTPUT_TYPE_EFFECTSLOT 			= 0x2;
 const int32 EM_OUTPUT_TYPE_MASTER 				= 0x4;
 const int32 EM_OUTPUT_TYPE_PREEFFECTS 			= 0x8;
 
-const int32 EM_TIMED_EVENT_SHUTDOWN 			= 0;//BTimedEventQueue::B_USER_EVENT + 1;
-const int32 EM_TIMED_EVENT_FLUSH_CASH			= 1;//BTimedEventQueue::B_USER_EVENT + 2;
-const int32 EM_TIMED_EVENT_RESET				= 2;//BTimedEventQueue::B_USER_EVENT + 3;
+const int32 EM_TIMED_EVENT_SHUTDOWN 			= BTimedEventQueue::B_USER_EVENT + 1;
+const int32 EM_TIMED_EVENT_FLUSH_CASH			= BTimedEventQueue::B_USER_EVENT + 2;
+const int32 EM_TIMED_EVENT_RESET				= BTimedEventQueue::B_USER_EVENT + 3;
 const int32 EM_EVENT_PAUSE					= BTimedEventQueue::B_USER_EVENT + 4;
 const int32 EM_EVENT_RESUME					= BTimedEventQueue::B_USER_EVENT + 5;
 

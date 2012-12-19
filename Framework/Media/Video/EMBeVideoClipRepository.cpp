@@ -20,12 +20,12 @@ EMBeVideoClipRepository::EMBeVideoClipRepository()
 	:	EMMediaClipRepository(EM_TYPE_ANY_VIDEO)
 {
 	m_vID = EMMediaIDManager::MakeID();
-	EMBeMediaUtility::push(this, "EMBeVideoClipRepository");
+	gBeMediaUtility->push(this, "EMBeVideoClipRepository");
 }
 
 EMBeVideoClipRepository::~EMBeVideoClipRepository() //Deleted by MediaProject
 {
-	EMBeMediaUtility::pop("EMBeVideoClipRepository");
+	gBeMediaUtility->pop("EMBeVideoClipRepository");
 }
 
 int32 EMBeVideoClipRepository::GetID() const
@@ -56,7 +56,7 @@ bool EMBeVideoClipRepository::IsSoloActivated()
 int64 EMBeVideoClipRepository::FramesToNextClip(int64 p_vFromFrame)
 {
 
-	//TODO: Handle loop-points. We have to make sure we can offset a buffer 
+	//TODO: Handle loop-points. We have to make sure we can offset a buffer
 	//even if the "next" buffer should lie just in the beginning of a loop, and
 	//we're currently at the very end of the looped region.
 
@@ -79,7 +79,7 @@ int64 EMBeVideoClipRepository::FramesToNextClip(int64 p_vFromFrame)
 void EMBeVideoClipRepository::GetNextBuffers(list<EMMediaDataBuffer*>* p_opList, EMMediaType p_eType, int64 p_vTimeNow, bool p_vSeeking)
 {
 //	Lock();
-	//;//cout_commented_out_4_release<<"I'm IN EMBeVideoClipRepository"<<endl;	
+	//;//cout_commented_out_4_release<<"I'm IN EMBeVideoClipRepository"<<endl;
 	int64 vOffset = 0;
 	int64 vNumBuffers = 0;
 	int64 vNow = p_vTimeNow;
@@ -103,8 +103,8 @@ void EMBeVideoClipRepository::GetNextBuffers(list<EMMediaDataBuffer*>* p_opList,
 						break;
 					opCurrentTrack = opCurrentClip -> GetTrack();
 			}
-			
-			
+
+
 			if((! vSoloMode && opCurrentTrack -> GetMuteState() == EM_MUTE_OFF) ||
 				(vSoloMode && opCurrentTrack -> IsSoloed()))
 			{
@@ -115,15 +115,15 @@ void EMBeVideoClipRepository::GetNextBuffers(list<EMMediaDataBuffer*>* p_opList,
 //				opMediaBuffer -> SetFrame(EMMediaTimer::Instance() -> VideoThenFrame()); //p_vTimeNow;
 				if(opMediaBuffer == NULL)
 					EMDebugger("EMMediaDataBuffer is NULL!");
-					
-				int64 vFramesPerBuffer = EMBeMediaUtility::BytesToFrames(opMediaBuffer -> m_vSizeAvailable, &(opMediaBuffer -> m_oFormat));
-			
+
+				int64 vFramesPerBuffer = gBeMediaUtility->BytesToFrames(opMediaBuffer -> m_vSizeAvailable, &(opMediaBuffer -> m_oFormat));
+
 				//if there's less than a whole buffer's duration to the next clip start, measured from "now"
 				if(! (vCurrentStartFrame <= vNow && vCurrentStartFrame + vCurrentDuration >= vNow) &&
 					vFramesToNextClip < vFramesPerBuffer && vFramesToNextClip != 0)
 					vOffset = vFramesToNextClip;
-			
-			
+
+
 				//If "this" clip intersects the current frame
 				if(vCurrentStartFrame <= vNow + vOffset &&
 					vCurrentStartFrame + vCurrentDuration >= vNow)
@@ -138,7 +138,7 @@ void EMBeVideoClipRepository::GetNextBuffers(list<EMMediaDataBuffer*>* p_opList,
 					if(vNow > opCurrentClip -> GetMediaStart())
 						vFramePosition = vNow - opCurrentClip -> GetMediaStart(); //Make sure we get the file-orientation corrent (discard MarkIN values here!
 					EMMediaDataBuffer* opSecondaryBuffer = opCurrentClip -> GetBuffer();
-										
+
 					bool vResult = opCurrentClip -> GetDescriptor() -> ReadFrames(&opMediaBuffer, &opSecondaryBuffer /*The secondary buffer*/, vFramePosition, vOffset, vIONumFrames, p_vSeeking);
 					vFramePosition = 0;
 					if(vResult)
@@ -151,11 +151,11 @@ void EMBeVideoClipRepository::GetNextBuffers(list<EMMediaDataBuffer*>* p_opList,
 							opMediaBuffer -> m_vPan = opCurrentTrack -> GetPan();
 						}
 							oID.push_back(opCurrentTrack -> GetID());
-						
+
 //						if(EMMediaTimer::Instance() -> ThenFrame() == opMediaBuffer -> m_vFrame)
 //						{
 							p_opList -> push_back(opMediaBuffer);
-//							int64 val = EMBeMediaUtility::FindMaxNum(static_cast<signed short*>(opMediaBuffer -> Data()), opMediaBuffer -> m_vSizeUsed / (EM_AUDIO_NUM_CHANNELS * EM_AUDIO_SAMPLESIZE), 1);
+//							int64 val = gBeMediaUtility->FindMaxNum(static_cast<signed short*>(opMediaBuffer -> Data()), opMediaBuffer -> m_vSizeUsed / (EM_AUDIO_NUM_CHANNELS * EM_AUDIO_SAMPLESIZE), 1);
 //							EMSignalMonitor::Instance() -> PushBack(val, EMMediaTimer::Instance() -> ThenFrame());
 							vNumBuffers++;
 //							if((opCurrentTrack -> GetType() & EM_TYPE_ANY_VIDEO) > 0)
@@ -176,24 +176,24 @@ void EMBeVideoClipRepository::GetNextBuffers(list<EMMediaDataBuffer*>* p_opList,
 	}
 
 	UnlockContainer();
-	
+
 	EMMediaProject* opProject = EMMediaEngine::Instance() -> GetMediaProject();
 	EMMediaTrackRepository* opTracks = opProject -> GetUsedTracks();
 
 	opTracks -> LockContainer();
 	opTracks -> Rewind();
-	
+
 	opProject -> GetUnusedTracks() -> LockContainer();
 	opProject -> GetUnusedTracks() -> Rewind();
-	
+
 	EMMediaTrack* opCurrentTrack = opTracks -> Current();
-	
+
 	if(opCurrentTrack == NULL)
 		opCurrentTrack = opProject -> GetUnusedTracks() -> Current();
-	
+
 	while(opCurrentTrack != NULL)
-	{	
-		if(((find(oID.begin(), oID.end(), opCurrentTrack -> GetID()) == oID.end() && 
+	{
+		if(((find(oID.begin(), oID.end(), opCurrentTrack -> GetID()) == oID.end() &&
 			(opCurrentTrack -> GetType() & p_eType) > 0)) ||
 			(oID.size() == 0 && (opCurrentTrack -> GetType() & p_eType) > 0))
 		{
@@ -214,7 +214,7 @@ void EMBeVideoClipRepository::GetNextBuffers(list<EMMediaDataBuffer*>* p_opList,
 		opTracks -> Next();
 		opCurrentTrack = opTracks -> Current();
 	}
-	
+
 	opProject -> GetUnusedTracks() -> UnlockContainer();
 	opTracks -> UnlockContainer();
 
@@ -288,7 +288,7 @@ EMMediaClip* EMBeVideoClipRepository::GetPriorityClip(int64 p_vNow, int64 p_vFra
 
 	if(opCurrentClip != NULL)
 	{
-		p_oID -> push_back(opCurrentClip -> GetTrack() -> GetID());						
+		p_oID -> push_back(opCurrentClip -> GetTrack() -> GetID());
 	}
 	return opCurrentClip;
 }
@@ -325,7 +325,7 @@ void EMBeVideoClipRepository::SeekAndDisplay(int64 p_vNow)
 			}
 			else
 				opCurrentClip -> GetDescriptor() -> SeekTo(0);
-		} 
+		}
 		else
 			break;
 		Next();

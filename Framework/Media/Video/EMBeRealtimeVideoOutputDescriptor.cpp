@@ -18,24 +18,24 @@
 #include <MediaKit.h>
 
 EMBeRealtimeVideoOutputDescriptor::EMBeRealtimeVideoOutputDescriptor(media_input* p_spMediaInput)
-	:	EMRealtimeOutputDescriptor(EM_TYPE_ANY_VIDEO), 
-		m_vAwaitingNewBufferFormat(false) , 
-		m_ReadyForFormatChange(false), 
+	:	EMRealtimeOutputDescriptor(EM_TYPE_ANY_VIDEO),
+		m_vAwaitingNewBufferFormat(false) ,
+		m_ReadyForFormatChange(false),
 		m_opBufferGroup(NULL),
 		m_opBuffer(NULL),
 		m_opNode(NULL)
 {
 	m_opNode = new EMBeVideoOutputNode(p_spMediaInput);
 	EMMediaTimer::Instance() -> AddListener(this);
-	EMBeMediaUtility::push(this, "EMBeRealtimeVideoOutputDescriptor");
+	gBeMediaUtility->push(this, "EMBeRealtimeVideoOutputDescriptor");
 }
 
 EMBeRealtimeVideoOutputDescriptor::~EMBeRealtimeVideoOutputDescriptor()
 {
 	m_opNode -> Shutdown();
 	EMMediaTimer::Instance() -> RemoveListener(this);
-	EMBeMediaUtility::GetRosterE() -> ReleaseNode(m_opNode -> Node());
-	EMBeMediaUtility::pop("EMBeRealtimeVideoOutputDescriptor");
+	gBeMediaUtility->GetRosterE() -> ReleaseNode(m_opNode -> Node());
+	gBeMediaUtility->pop("EMBeRealtimeVideoOutputDescriptor");
 /*	if(m_opBuffer != NULL)
 		m_opBuffer -> Recycle();
 */
@@ -44,14 +44,14 @@ EMBeRealtimeVideoOutputDescriptor::~EMBeRealtimeVideoOutputDescriptor()
 bool EMBeRealtimeVideoOutputDescriptor::PrepareToPlayE()
 {
 	m_opBufferRepository = EMBeBufferRepository::Instance();
-	
+
 	//TODO: Init video stuff instead
 //	if(! m_opBufferRepository -> InitializeVideoE(304*168*8/2, 10))
 //	{
 //		EMDebugger("ERROR! Could not initialize buffer repository for video!");
 //		return false;
 //	}
-	
+
 	return true;
 }
 
@@ -65,7 +65,7 @@ EMMediaDataBuffer* EMBeRealtimeVideoOutputDescriptor::ProcessBufferE(list<EMMedi
 		m_opBufferGroup = m_opBufferRepository -> GetVideoBufferGroup();
 
 	media_format oMediaFormat;
-	oMediaFormat.type = B_MEDIA_RAW_VIDEO;		
+	oMediaFormat.type = B_MEDIA_RAW_VIDEO;
 	oMediaFormat.u.raw_video.display.line_width = opTarget -> m_oFormat.m_vWidth;
 	oMediaFormat.u.raw_video.display.line_count = opTarget -> m_oFormat.m_vHeight;
  	oMediaFormat.u.raw_video.display.format = static_cast<color_space>(opTarget -> m_oFormat.m_vDepth);
@@ -100,7 +100,7 @@ EMMediaDataBuffer* EMBeRealtimeVideoOutputDescriptor::ProcessBufferE(list<EMMedi
 		emerr << "ERROR! Result of mix operation is NULL!" << endl;
 
 
-	//There, now copy the mixed result into a BBuffer's data area	
+	//There, now copy the mixed result into a BBuffer's data area
 	if(m_opBufferGroup != NULL)
 	{
 
@@ -150,18 +150,18 @@ EMMediaDataBuffer* EMBeRealtimeVideoOutputDescriptor::ProcessBufferE(list<EMMedi
 						oDummyBuffers.push_back(opDummy);
 				}
 				EMMediaEngine::Instance() -> GetMediaProject() -> LockVideo();
-				
+
 				while(oDummyBuffers.size() > 0)
 				{
 					BBuffer* opBuffer = oDummyBuffers.front();
 					oDummyBuffers.pop_front();
 					opBuffer -> Recycle();
 				}
-				
+
 				m_opBufferRepository -> ResetVideoE(&oMediaFormat);
 				m_ReadyForFormatChange = false;
 			//}
-				
+
 		}
 
 		if(m_opBuffer != NULL)
@@ -175,17 +175,17 @@ EMMediaDataBuffer* EMBeRealtimeVideoOutputDescriptor::ProcessBufferE(list<EMMedi
 				((int64*) m_opBuffer -> Header() -> user_data)[0] = EMMediaTimer::Instance() -> VideoThenFrame();
 				BBuffer** ptr = &m_opBuffer;
 
-				//Store the format in the user-data area of the BBuffer (the only place where we can store it)				
+				//Store the format in the user-data area of the BBuffer (the only place where we can store it)
 				char* vpUserData = (char*) m_opBuffer -> Header() -> user_data;
 				memcpy(vpUserData, &(opTarget -> m_oFormat), sizeof(EMMediaFormat));
-				
+
 				status_t err = write_port_etc(m_opNode -> ControlPort(), EM_PORT_MESSAGE_INCOMING_BUFFER, ptr, sizeof(BBuffer), B_TIMEOUT, 25000);
 				if(err != B_OK)
 				{
 					m_opBuffer -> Recycle();
 					EMDebugger("ERROR! Buffer addition to node timed out!");
 				}
-			}	
+			}
 			else
 				m_opBuffer -> Recycle();
 			if(opTarget -> m_vShouldBeDeleted)
@@ -203,12 +203,12 @@ EMMediaDataBuffer* EMBeRealtimeVideoOutputDescriptor::ProcessBufferE(list<EMMedi
 
 void EMBeRealtimeVideoOutputDescriptor::StartE()
 {
-	EMBeMediaUtility::GetRosterE() -> StartNode(m_opNode -> Node(), 0); 
+	gBeMediaUtility->GetRosterE() -> StartNode(m_opNode -> Node(), 0);
 }
 
 void EMBeRealtimeVideoOutputDescriptor::StopE()
 {
-	EMBeMediaUtility::GetRosterE() -> StopNode(m_opNode -> Node(), 0, true); 
+	gBeMediaUtility->GetRosterE() -> StopNode(m_opNode -> Node(), 0, true);
 }
 
 bool EMBeRealtimeVideoOutputDescriptor::InitCheckE()
@@ -244,7 +244,7 @@ bool EMBeRealtimeVideoOutputDescriptor::MessageReceived(EMListenerRepository* p_
 		//TODO: timeout-handling!
 		return true;
 	}
-	
+
 	return false;
 }
 

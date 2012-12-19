@@ -24,7 +24,7 @@ Library TitanFrameworkGUI :
 	EMBeMenuBarContainer.cpp
 	EMBeMenuContainer.cpp
 	EMBeMenuItem.cpp
-	EMBeMenuItEMContainer.cpp
+	EMBeMenuItemContainer.cpp
 	EMBeMessageTranslator.cpp
 	EMBePopUpMenu.cpp
 	EMBePopUpMenuContainer.cpp

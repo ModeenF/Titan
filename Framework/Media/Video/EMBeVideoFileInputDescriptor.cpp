@@ -2,7 +2,7 @@
 * Creator: Jesper Svensson
 * Portability: hon-native
 *-------------------------------------------------------
-* 
+*
 *******************************************************/
 
 #include "EMGlobals.h"
@@ -13,17 +13,17 @@
 #include "EMBeMediaUtility.h"
 #include "EMMediaDataBuffer.h"
 
-EMBeVideoFileInputDescriptor::EMBeVideoFileInputDescriptor(string p_oFileName) 
+EMBeVideoFileInputDescriptor::EMBeVideoFileInputDescriptor(string p_oFileName)
 	:	EMBeFileInputDescriptor(p_oFileName, EM_TYPE_ANY_VIDEO),
 		m_opVideoFile(NULL)
 {
-	EMBeMediaUtility::push(this, "EMBeVideoFileInputDescriptor");
+	gBeMediaUtility->push(this, "EMBeVideoFileInputDescriptor");
 }
 
 EMBeVideoFileInputDescriptor::~EMBeVideoFileInputDescriptor()
 {
 	delete m_opVideoFile;
-	EMBeMediaUtility::pop("EMBeVideoFileInputDescriptor");
+	gBeMediaUtility->pop("EMBeVideoFileInputDescriptor");
 }
 
 EMMediaFormat* EMBeVideoFileInputDescriptor::GetFormat()
@@ -40,7 +40,7 @@ bool EMBeVideoFileInputDescriptor::InitCheckE()
 	}
 	else
 		EMDebugger("ERROR! Only raw audio implemented so far, in EMBeFileInputDescriptor::InitCheckE");
-	
+
 	if(! m_opVideoFile -> InitCheckE())
 	{
 		delete m_opVideoFile;
@@ -50,17 +50,17 @@ bool EMBeVideoFileInputDescriptor::InitCheckE()
 	//Calculate the duration of the media file, and store it in our member-attribute
 //	EMMediaFormat* opFormat = m_opVideoFile -> ReadFormatE();
 //	int64 vNumVideoFrames = m_opVideoFile -> NumberOfFramesInFile();
-//	int64 vVideoTime = EMBeMediaUtility::FramesToTime(vNumVideoFrames, opFormat);
+//	int64 vVideoTime = gBeMediaUtility->FramesToTime(vNumVideoFrames, opFormat);
 
-	m_vNumFrames = EMBeMediaUtility::TimeToFrames(m_opVideoFile -> GetDuration(), EMBeMediaUtility::GetSystemAudioFormat());
+	m_vNumFrames = gBeMediaUtility->TimeToFrames(m_opVideoFile -> GetDuration(), gBeMediaUtility->GetSystemAudioFormat());
 	return true;
 }
 
 bool EMBeVideoFileInputDescriptor::ReadFrames(EMMediaDataBuffer** p_opPrimaryBuffer, EMMediaDataBuffer** p_opSecondaryBuffer, int64 p_vMediaFramePosition, int64 p_vOffsetFrames, int64 & p_vOutNumRead, bool p_vSeeking)
 {
 	//Convert the offset value from "frames" into "bytes"
-	int64 vOffset = 0;// EMBeMediaUtility::FramesToBytes(p_vOffsetFrames, m_opVideoFile -> GetFormat());
-	int64 vMediaTimePosition = EMBeMediaUtility::FramesToTime(p_vMediaFramePosition, EMBeMediaUtility::GetSystemAudioFormat());// m_opVideoFile -> GetFormat());
+	int64 vOffset = 0;// gBeMediaUtility->FramesToBytes(p_vOffsetFrames, m_opVideoFile -> GetFormat());
+	int64 vMediaTimePosition = gBeMediaUtility->FramesToTime(p_vMediaFramePosition, gBeMediaUtility->GetSystemAudioFormat());// m_opVideoFile -> GetFormat());
 	//Fill the buffer by sending it into the file's read-method, and also specify the buffer-offset in "bytes"
 	p_vOutNumRead = m_opVideoFile -> ReadData(p_opPrimaryBuffer , p_opSecondaryBuffer, vMediaTimePosition, vOffset, p_vSeeking);
 	if(p_vOutNumRead == 0)
@@ -81,7 +81,7 @@ bool EMBeVideoFileInputDescriptor::ReadFrames(EMMediaDataBuffer** p_opPrimaryBuf
 		p_vOutNumRead = p_opBuffer -> m_vSizeAvailable;
 	}
 */
-	return true;		
+	return true;
 }
 
 bool EMBeVideoFileInputDescriptor::SeekTo(int64 p_vNewMediaFrame)

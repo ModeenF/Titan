@@ -34,13 +34,13 @@ EMBeOutputNode::EMBeOutputNode(media_type p_vType)
 {
 	m_vNumberOfReceivedFrames = 0;
 	m_vIsClockMaster = false;
-	EMBeMediaUtility::push(this, "EMBeOutputNode");
+	gBeMediaUtility->push(this, "EMBeOutputNode");
 }
 
 EMBeOutputNode::~EMBeOutputNode()
 {
 	delete m_opSystemAudioFormat;
-	EMBeMediaUtility::pop("EMBeOutputNode");
+	gBeMediaUtility->pop("EMBeOutputNode");
 }
 
 bool EMBeOutputNode::Shutdown()
@@ -49,7 +49,7 @@ bool EMBeOutputNode::Shutdown()
 
 	while(EventQueue() -> FindFirstMatch(0, BTimedEventQueue::B_ALWAYS, true, BTimedEventQueue::B_HANDLE_BUFFER) != NULL)
 		EventQueue() -> RemoveEvent(EventQueue() -> FindFirstMatch(0, BTimedEventQueue::B_ALWAYS, true, BTimedEventQueue::B_HANDLE_BUFFER));
-	
+
 	delete m_opConnectedEMMediaFormat;
 
 	//if(m_opBuffer != NULL)
@@ -76,12 +76,12 @@ status_t EMBeOutputNode::FormatSuggestionRequested(media_type p_sSuggestedType, 
 	memcpy(p_spFinalFormat, &m_sPreferredOutputFormat, sizeof(media_format));
 
 	// a wildcard type is okay; we can specialize it
-	if(p_sSuggestedType == B_MEDIA_UNKNOWN_TYPE) 
+	if(p_sSuggestedType == B_MEDIA_UNKNOWN_TYPE)
 		p_sSuggestedType = m_sPreferredOutputFormat.type;
 
-	if(p_sSuggestedType != m_sPreferredOutputFormat.type) 
+	if(p_sSuggestedType != m_sPreferredOutputFormat.type)
 		return B_MEDIA_BAD_FORMAT;
-	else 
+	else
 		return B_OK;
 }
 
@@ -172,11 +172,11 @@ status_t EMBeOutputNode::PrepareToConnect(const media_source& p_sSource, const m
 	// *must* fully specialize the format before returning!
 
 	// trying to connect something that isn't our source?
-	if(p_sSource != m_sOutput.source) 
+	if(p_sSource != m_sOutput.source)
 		return B_MEDIA_BAD_SOURCE;
 
 	// are we already connected?
-	if(m_sOutput.destination != media_destination::null) 
+	if(m_sOutput.destination != media_destination::null)
 		return B_MEDIA_ALREADY_CONNECTED;
 
 	// the format may not yet be fully specialized (the consumer might have
@@ -188,13 +188,13 @@ status_t EMBeOutputNode::PrepareToConnect(const media_source& p_sSource, const m
 	status_t vError = CheckFinalFormat(p_spFormat);
 	if(vError != B_OK)
 		return vError;
-	
+
 	// Now reserve the connection, and return information about it
 	memcpy(&(m_sOutput.destination), &p_sDestination, sizeof(media_destination));
 	memcpy(&(m_sOutput.format), p_spFormat, sizeof(media_format));
 	memcpy(p_spOutSource, &(m_sOutput.source), sizeof(media_source));
 	strncpy(p_vpOutName, m_sOutput.name, B_MEDIA_NAME_LENGTH);
-	return B_OK; 
+	return B_OK;
 
 }
 
@@ -206,17 +206,17 @@ void EMBeOutputNode::Connect(status_t error, const media_source& p_sSource, cons
 		m_sOutput.format = m_sPreferredOutputFormat;
 		return;
 	}
-	
+
 	media_output* spDesiredOutput = NULL;
 	if(m_sOutput.source == p_sSource)
 		spDesiredOutput = &m_sOutput;
 	else
 		return;
-	
+
 	spDesiredOutput -> destination = media_destination::null;
 	spDesiredOutput -> destination = p_sDestination;
 	spDesiredOutput -> format = p_sFormat;
-	
+
 	strncpy(p_vpName, Name(), B_MEDIA_NAME_LENGTH);
 
 	media_node_id id;
@@ -224,11 +224,11 @@ void EMBeOutputNode::Connect(status_t error, const media_source& p_sSource, cons
 	mInternalLatency = 12000;
 	BMediaEventLooper::SetEventLatency(mLatency + mInternalLatency);
 
-	int64 vDuration = EMBeMediaUtility::FramesToTime(EMBeMediaUtility::FramesPerBuffer(GetConnectedEMMediaFormat()), GetConnectedEMMediaFormat());
+	int64 vDuration = gBeMediaUtility->FramesToTime(gBeMediaUtility->FramesPerBuffer(GetConnectedEMMediaFormat()), GetConnectedEMMediaFormat());
 	if(vDuration < 0)
 		vDuration = 40000;
 	GetConnectedEMMediaFormat() -> Display();
-	
+
 	SetBufferDuration(vDuration); */
 
 
@@ -258,7 +258,7 @@ void EMBeOutputNode::Connect(status_t error, const media_source& p_sSource, cons
 	SetEventLatency(mLatency + mInternalLatency);
 
 	// reset our buffer duration, etc. to avoid later calculations
-	bigtime_t duration = GetBufferDuration(); 
+	bigtime_t duration = GetBufferDuration();
 	SetBufferDuration(duration);
 }
 
@@ -335,7 +335,7 @@ void EMBeOutputNode::LatencyChanged(const media_source& source, const media_dest
 	// buffers earlier (or later) than we were previously.  Make sure that the
 	// connection that changed is ours, and adjust to the new downstream
 	// latency if so.
-	
+
 	if ((source == m_sOutput.source) && (destination == m_sOutput.destination))
 	{
 		mLatency = new_latency;
@@ -355,8 +355,13 @@ void EMBeOutputNode::NodeRegistered()
 	// set up as much information about our output as we can
 	m_sOutput.source.port = ControlPort();
 	m_sOutput.source.id = 0;
-	memcpy(&(m_sOutput.node), &(Node()), sizeof(media_node));
-	
+
+	media_node node = Node();
+
+	memcpy(&(m_sOutput.node),
+		&node,
+		sizeof(media_node));
+
 	::strcpy(m_sOutput.name, "Titan Alpha 0.1");
 
 	// Start the BMediaEventLooper thread
@@ -437,7 +442,7 @@ void FlushBuffers(BTimedEventQueue* Q)
 		vInclusive = false;
 		vTimeOfFirstBufferEvent = sBufferEventToSave.event_time;
 	}
-		
+
 	media_timed_event sEventToFlush;
 	while(Q -> FindFirstMatch(vTimeOfFirstBufferEvent, BTimedEventQueue::B_AFTER_TIME, false, BTimedEventQueue::B_HANDLE_BUFFER) != NULL)
 	{
@@ -446,7 +451,7 @@ void FlushBuffers(BTimedEventQueue* Q)
 		BBuffer* opBufferToRecycle = static_cast<BBuffer*>(sEventToFlush.pointer);
 		if(opBufferToRecycle != NULL)
 			opBufferToRecycle -> Recycle();
-		
+
 	}
 */
 }
@@ -469,16 +474,16 @@ status_t EMBeOutputNode::HandleMessage(int32 message, const void* data, size_t s
 			EMMediaFormat* opFormat = GetConnectedEMMediaFormat();
 			if((opFormat -> m_eType & EM_TYPE_ANY_VIDEO) > 0)
 			{
-				opFormat -> m_vFrameRate = *(static_cast<float*>(EMMediaEngine::Instance() -> GetSettingsRepository() -> GetSetting(SETTING_VIDEO_FRAMERATE)));			
+				opFormat -> m_vFrameRate = *(static_cast<float*>(EMMediaEngine::Instance() -> GetSettingsRepository() -> GetSetting(SETTING_VIDEO_FRAMERATE)));
 			}
 
-			int64 vFrames = EMBeMediaUtility::FramesInBuffer(m_opBuffer, opFormat, EM_TYPE_RAW_AUDIO); // + 44100 / 4;
+			int64 vFrames = gBeMediaUtility->FramesInBuffer(m_opBuffer, opFormat, EM_TYPE_RAW_AUDIO); // + 44100 / 4;
 			m_vNumberOfReceivedFrames += vFrames;
-			int64 vTime = EMBeMediaUtility::FramesToTime(m_vNumberOfReceivedFrames, m_opSystemAudioFormat);
+			int64 vTime = gBeMediaUtility->FramesToTime(m_vNumberOfReceivedFrames, m_opSystemAudioFormat);
 			int64 vNextBufferPerf = static_cast<uint64>(floor(static_cast<float>(m_vStartingTime) + vTime));
-			
+
 			m_opBuffer -> Header() -> start_time = vNextBufferPerf;
-			
+
 			media_timed_event sEvent(vNextBufferPerf, BTimedEventQueue::B_HANDLE_BUFFER);
 			sEvent.pointer = m_opBuffer;
 			sEvent.cleanup = BTimedEventQueue::B_RECYCLE_BUFFER;
@@ -503,7 +508,7 @@ status_t EMBeOutputNode::HandleMessage(int32 message, const void* data, size_t s
 		media_timed_event sEvent(TimeSource() -> Now(), EM_TIMED_EVENT_RESET);
 		EventQueue() -> AddEvent(sEvent);
 	}
-	else 
+	else
 	{
 		;//emout_commented_out_4_release << "ERROR! Received unknown message!" << endl;
 		BMediaNode::HandleBadMessage(message, data, size);
@@ -539,7 +544,7 @@ void EMBeOutputNode::HandleEvent(const media_timed_event* event, bigtime_t laten
 			m_vNumberOfReceivedFrames = 0;
 //			m_vStartingTime = TimeSource() -> Now(); //event -> event_time;
 			m_vStartingTime = event -> event_time;
-			vCount = 0;		
+			vCount = 0;
 		}
 		case BTimedEventQueue::B_HANDLE_BUFFER:
 		{
@@ -549,17 +554,18 @@ void EMBeOutputNode::HandleEvent(const media_timed_event* event, bigtime_t laten
 				emerr << "ERROR! Received NULL BBuffer in HandleEvent!" << endl;
 				break;
 			}
-			
-			if((RunState() == BMediaEventLooper::B_STARTED) && 
+
+			if((RunState() == BMediaEventLooper::B_STARTED) &&
 				(m_sOutput.destination != media_destination::null))
 			{
-				int64 vFrames = EMBeMediaUtility::FramesInBuffer(opBuffer, GetConnectedEMMediaFormat(), EM_TYPE_RAW_AUDIO);
-				if(mOutputEnabled) 
+				int64 vFrames = gBeMediaUtility->FramesInBuffer(opBuffer, GetConnectedEMMediaFormat(), EM_TYPE_RAW_AUDIO);
+				if(mOutputEnabled)
 				{
 					opBuffer -> Header() -> start_time = event -> event_time;
 					opBuffer -> Header() -> type = m_sOutput.format.type;
-					
-					status_t err = SendBuffer(opBuffer, m_sOutput.destination);
+
+					status_t err = SendBuffer(opBuffer, m_sOutput.source,
+						 m_sOutput.destination);
 					if(err != B_OK)
 					{
 						emerr << "ERROR! Could not send buffer to downstream node: " << strerror(err) << endl;
@@ -570,7 +576,8 @@ void EMBeOutputNode::HandleEvent(const media_timed_event* event, bigtime_t laten
 						bool m_vIsCurrentlyRecording = (EMMediaEngine::Instance() -> GetMediaProject() -> IsArmed() && EMMediaEngine::Instance() -> GetMediaProject() -> IsPlaying());
 //						bool m_vIsCurrentlyPlaying = (! EMMediaEngine::Instance() -> GetMediaProject() -> IsArmed() && EMMediaEngine::Instance() -> GetMediaProject() -> IsPlaying());
 						if(m_vIsClockMaster && ! m_vIsCurrentlyRecording)
-							EMMediaTimer::Instance() -> IncreaseNowFrame(vFrames);
+							EMMediaTimer::Instance()->
+								IncreaseNowFrame(vFrames);
 					}
 				}
 				else
@@ -585,11 +592,11 @@ void EMBeOutputNode::HandleEvent(const media_timed_event* event, bigtime_t laten
 			FlushBuffers(EventQueue());
 			m_vStartingTime = event -> event_time;
 			m_vNumberOfReceivedFrames = 0;
-			Notify(EM_TIMED_EVENT_FLUSH_CASH);			
+			Notify(EM_TIMED_EVENT_FLUSH_CASH);
 			break;
 		}
 		default:
-		{	
+		{
 			;//emout_commented_out_4_release << "ERROR! EMBeOutoutNode received unknown event!" << endl;
 			break;
 		}

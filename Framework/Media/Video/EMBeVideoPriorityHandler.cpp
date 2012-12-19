@@ -9,23 +9,23 @@
 
 #include <iostream>
 
-EMBeVideoPriorityHandler::EMBeVideoPriorityHandler() 
+EMBeVideoPriorityHandler::EMBeVideoPriorityHandler()
 	:	EMBufferDestination(EM_OUTPUT_TYPE_PREEFFECTS, EM_TRACK),
 		m_fpMixFunction(NULL)
 {
-	EMBeMediaUtility::push(this, "EMBeVideoPriorityHandler");
+	gBeMediaUtility->push(this, "EMBeVideoPriorityHandler");
 }
 
 EMBeVideoPriorityHandler::~EMBeVideoPriorityHandler()
 {
-	EMBeMediaUtility::pop("EMBeVideoPriorityHandler");
+	gBeMediaUtility->pop("EMBeVideoPriorityHandler");
 }
 
 bool EMBeVideoPriorityHandler::PrepareToPlayE()
 {
 	//Set mixer-function hooks
 /*	if(!IsPreFader())
-		m_fpMixFunction = EMBeMixFunctions::AudioMixPreFader; 	
+		m_fpMixFunction = EMBeMixFunctions::AudioMixPreFader;
 	else
 		m_fpMixFunction = EMBeMixFunctions::AudioMixPostFader;
 */
@@ -37,7 +37,7 @@ EMMediaDataBuffer* EMBeVideoPriorityHandler::ProcessBufferE(list<EMMediaDataBuff
 {
 	if(p_opBufferList -> size() <= 0)
 		return NULL;
-	
+
 	if(m_fpMixFunction == NULL)
 		EMDebugger("ERROR! No mixing-function set in VideoClipMixer!");
 	EMMediaDataBuffer* opResult = (*m_fpMixFunction)(p_opBufferList);

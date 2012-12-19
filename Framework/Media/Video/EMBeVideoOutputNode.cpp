@@ -17,24 +17,24 @@ EMBeVideoOutputNode::EMBeVideoOutputNode(media_input* p_spPhysicalOutInput)
 {
 	if(m_spPhysicalOutInput -> format.type != B_MEDIA_RAW_VIDEO)
 		EMDebugger("ERROR! We can't use an input that is non-raw video!");
-		
-	status_t err = EMBeMediaUtility::GetRosterE() -> RegisterNode(this);
+
+	status_t err = gBeMediaUtility->GetRosterE() -> RegisterNode(this);
 	if(err)
 		EMDebugger("ERROR! Could not register video output producer node!");
-	EMBeMediaUtility::push(this, "EMBeVideoOutputNode");
+	gBeMediaUtility->push(this, "EMBeVideoOutputNode");
 }
 
 EMBeVideoOutputNode::~EMBeVideoOutputNode()
 {
-	EMBeMediaUtility::pop("EMBeVideoOutputNode");
+	gBeMediaUtility->pop("EMBeVideoOutputNode");
 }
 
 bool EMBeVideoOutputNode::Shutdown()
 {
-	status_t e = EMBeMediaUtility::GetRosterE() -> StopNode(Node(), true);
+	status_t e = gBeMediaUtility->GetRosterE() -> StopNode(Node(), true);
 	if(e != B_OK)
 		EMDebugger((string(string("ERROR! Could not stop Titan video output node: ") + string(strerror(e)))).c_str());
-	status_t vErrorCode = EMBeMediaUtility::GetRosterE() -> Disconnect(m_oConnection.m_sProducer.node, m_oConnection.m_sOutput.source, m_oConnection.m_sConsumer.node, m_oConnection.m_sInput.destination); //.source, m_oConnection.m_sInput.destination, &m_oConnection.m_sFormat, &m_oConnection.m_sOutput, &m_oConnection.m_sInput);
+	status_t vErrorCode = gBeMediaUtility->GetRosterE() -> Disconnect(m_oConnection.m_sProducer.node, m_oConnection.m_sOutput.source, m_oConnection.m_sConsumer.node, m_oConnection.m_sInput.destination); //.source, m_oConnection.m_sInput.destination, &m_oConnection.m_sFormat, &m_oConnection.m_sOutput, &m_oConnection.m_sInput);
 	if(vErrorCode != B_OK)
 		EMDebugger("ERROR! Could not disconnect Titan's video output from the video consumer!");
 	EMBeOutputNode::Shutdown();
@@ -55,20 +55,20 @@ bool EMBeVideoOutputNode::Initialize()
 	m_oConnection.m_sConsumer = m_spPhysicalOutInput -> node;
 	r -> GetTimeSource(&mTimeSource);
 	r -> SetTimeSourceFor(m_oConnection.m_sProducer.node, mTimeSource.node);
-	BTimeSource* opTimeSource = EMBeMediaUtility::GetRosterE() -> MakeTimeSourceFor(m_oConnection.m_sProducer);
-/*	if(EMBeMediaUtility::GetRosterE() -> SetTimeSourceFor(m_oConnection.m_sConsumer.node, opTimeSource -> Node().node) != B_OK)
+	BTimeSource* opTimeSource = gBeMediaUtility->GetRosterE() -> MakeTimeSourceFor(m_oConnection.m_sProducer);
+/*	if(gBeMediaUtility->GetRosterE() -> SetTimeSourceFor(m_oConnection.m_sConsumer.node, opTimeSource -> Node().node) != B_OK)
 		EMDebugger("ERROR! Could not set time source for consumer node!");
-	EMBeMediaUtility::GetRosterE() -> StartNode(opTimeSource -> Node(), 0);
+	gBeMediaUtility->GetRosterE() -> StartNode(opTimeSource -> Node(), 0);
 	opTimeSource -> Release();
 */
 	// got the nodes; now we find the endpoints of the connection
 	int32 count = 1;
 	status_t err = r -> GetFreeOutputsFor(m_oConnection.m_sProducer, &m_oConnection.m_sOutput, 1, &count);
 	m_oConnection.m_sInput = *m_spPhysicalOutInput;
-		
+
 	// got the endpoints; now we connect it!
 	m_oConnection.m_sFormat = m_spPhysicalOutInput -> format;
-	m_oConnection.m_sFormat.type = B_MEDIA_RAW_VIDEO;	
+	m_oConnection.m_sFormat.type = B_MEDIA_RAW_VIDEO;
 	m_oConnection.m_sFormat.u.raw_video = media_raw_video_format::wildcard;
 	err = r -> Connect(m_oConnection.m_sOutput.source, m_oConnection.m_sInput.destination, &m_oConnection.m_sFormat, &m_oConnection.m_sOutput, &m_oConnection.m_sInput);
 	if(err != B_OK)
@@ -79,7 +79,7 @@ bool EMBeVideoOutputNode::Initialize()
 	// after Connect() finishes to save their contents.
 	m_oConnection.m_sSource = m_oConnection.m_sOutput.source;
 	m_oConnection.m_sDestination = m_oConnection.m_sOutput.destination;
-	EMBeMediaUtility::GetRosterE() -> SetRunModeNode(m_oConnection.m_sProducer, BMediaNode::B_INCREASE_LATENCY);
+	gBeMediaUtility->GetRosterE() -> SetRunModeNode(m_oConnection.m_sProducer, BMediaNode::B_INCREASE_LATENCY);
 
 	return true;
 }
@@ -89,9 +89,9 @@ EMBeVideoOutputNode::SetUpDVNodes()
 {
 	dormant_node_info	dni;
 	dormant_node_info	dni2;
-	
+
 	// find TimeSource
-	status_t err = EMBeMediaUtility::GetRosterE()->GetTimeSource(&timesourceNode);
+	status_t err = gBeMediaUtility->GetRosterE()->GetTimeSource(&timesourceNode);
 	if (err < B_OK) {
 		EMDebugger("Can't get TimeSource!");
 		return false;
@@ -108,7 +108,7 @@ EMBeVideoOutputNode::SetUpDVNodes()
 	// register the node
 	// make sure the Media Roster knows that we're using the node
 /*
-	err = EMBeMediaUtility::GetRosterE()->GetNodeFor(m_DvConsumerNode->Node().node, &mConnection.consumer);
+	err = gBeMediaUtility->GetRosterE()->GetNodeFor(m_DvConsumerNode->Node().node, &mConnection.consumer);
 	if (err < B_OK) {
 		EMDebugger("Can't get node for the video consumer");
 		return false;
@@ -121,7 +121,7 @@ EMBeVideoOutputNode::SetUpDVNodes()
 	tryFormat.type = B_MEDIA_ENCODED_VIDEO;
 	tryFormat.u.encoded_video = media_encoded_video_format::wildcard;
 
-	err = EMBeMediaUtility::GetRosterE()->GetDormantNodes(
+	err = gBeMediaUtility->GetRosterE()->GetDormantNodes(
 		&dni, &inOutNumNodes, NULL, &tryFormat,
 		"Default DV Input", B_BUFFER_PRODUCER
 	);
@@ -132,7 +132,7 @@ EMBeVideoOutputNode::SetUpDVNodes()
 	}
 
 	// instantiate a copy of the node for our use
-	err = EMBeMediaUtility::GetRosterE()->InstantiateDormantNode(dni, &mConnection.producer, B_FLAVOR_IS_LOCAL);
+	err = gBeMediaUtility->GetRosterE()->InstantiateDormantNode(dni, &mConnection.producer, B_FLAVOR_IS_LOCAL);
 	if (err < B_OK) {
 		EMDebugger("error: roster->InstantiateDormantNode");
 		return false;
@@ -150,7 +150,7 @@ EMBeVideoOutputNode::SetUpDVNodes()
 	tryFormat2.type = B_MEDIA_ENCODED_VIDEO;
 	tryFormat2.u.encoded_video = media_encoded_video_format::wildcard;
 
-	err = EMBeMediaUtility::GetRosterE()->GetDormantNodes(
+	err = gBeMediaUtility->GetRosterE()->GetDormantNodes(
 		&dni2, &inOutNumNodes2, &tryFormat2, NULL,
 		"Default DV Output", B_BUFFER_CONSUMER
 	);
@@ -161,14 +161,14 @@ EMBeVideoOutputNode::SetUpDVNodes()
 	} else ;//_commented_out_4_release_printf("SUCESSS!!");
 
 	// instantiate a copy of the node for our use
-	err = EMBeMediaUtility::GetRosterE()->InstantiateDormantNode(dni2, &mConnection2.producer, B_FLAVOR_IS_LOCAL);
+	err = gBeMediaUtility->GetRosterE()->InstantiateDormantNode(dni2, &mConnection2.producer, B_FLAVOR_IS_LOCAL);
 	if (err < B_OK) {
 		error("error: roster->InstantiateDormantNode", err);
 		return false;
 	}
 	BParameterWeb * aWeb2 = NULL;
 
-	err = EMBeMediaUtility::GetRosterE()->GetParameterWebFor(mConnection2.producer, &aWeb2);
+	err = gBeMediaUtility->GetRosterE()->GetParameterWebFor(mConnection2.producer, &aWeb2);
 	if (err < B_OK) {
 		error("can't get parameter web", err);
 		return false;
@@ -186,7 +186,7 @@ EMBeVideoOutputNode::SetUpDVNodes()
 /*
 	BParameterWeb * aWeb = NULL;
 
-	err = EMBeMediaUtility::GetRosterE()->GetParameterWebFor(mConnection.producer, &aWeb);
+	err = gBeMediaUtility->GetRosterE()->GetParameterWebFor(mConnection.producer, &aWeb);
 	if (err < B_OK) {
 		EMDebugger("can't get parameter web");
 		return false;
@@ -204,7 +204,7 @@ EMBeVideoOutputNode::SetUpDVNodes()
 
 	// find free output from video source
 	int32 cnt = 0;
-	err = EMBeMediaUtility::GetRosterE()->GetFreeOutputsFor(mConnection.producer, &m_from, 1, &cnt, B_MEDIA_ENCODED_VIDEO);
+	err = gBeMediaUtility->GetRosterE()->GetFreeOutputsFor(mConnection.producer, &m_from, 1, &cnt, B_MEDIA_ENCODED_VIDEO);
 	if (err < B_OK || cnt < 1) {
 		EMDebugger("Video stream 1 is busy!");
 		return false;
@@ -212,7 +212,7 @@ EMBeVideoOutputNode::SetUpDVNodes()
 
 	// find free input to video window
 	cnt = 0;
-	err = EMBeMediaUtility::GetRosterE()->GetFreeInputsFor(mConnection.consumer, &m_to, 1, &cnt, B_MEDIA_ENCODED_VIDEO);
+	err = gBeMediaUtility->GetRosterE()->GetFreeInputsFor(mConnection.consumer, &m_to, 1, &cnt, B_MEDIA_ENCODED_VIDEO);
 	if (err < B_OK || cnt < 1) {
 		EMDebugger("The video output is busy!");
 		return false;
@@ -223,7 +223,7 @@ EMBeVideoOutputNode::SetUpDVNodes()
 	format.type = B_MEDIA_ENCODED_VIDEO;
 	format.u.encoded_video = media_encoded_video_format::wildcard;
 
-	err = EMBeMediaUtility::GetRosterE()->Connect(m_from.source, m_to.destination, &format, &m_from, &m_to);
+	err = gBeMediaUtility->GetRosterE()->Connect(m_from.source, m_to.destination, &format, &m_from, &m_to);
 	if (err < B_OK) {
 		EMDebugger("Couldn't connect video input 1 to video display!");
 		return false;
@@ -235,39 +235,39 @@ EMBeVideoOutputNode::SetUpDVNodes()
 //	mConnected = true;
 
 	// Set time source for output node
-	err = EMBeMediaUtility::GetRosterE()->SetTimeSourceFor(mConnection.consumer.node, timesourceNode.node);
+	err = gBeMediaUtility->GetRosterE()->SetTimeSourceFor(mConnection.consumer.node, timesourceNode.node);
 	if (err < B_OK) {
 		EMDebugger("Couldn't set TimeSource for video display!");
 		return false;
 	}
 
 	// Set time source for video input
-	err = EMBeMediaUtility::GetRosterE()->SetTimeSourceFor(mConnection.producer.node, timesourceNode.node);
+	err = gBeMediaUtility->GetRosterE()->SetTimeSourceFor(mConnection.producer.node, timesourceNode.node);
 	if (err < B_OK) {
 		EMDebugger("Couldn't set TimeSource for video input!");
 		return false;
 	}
-*/	
+*/
 /*
 //START NODE
-	err = EMBeMediaUtility::GetRosterE()->SetRunModeNode(mConnection.consumer, BMediaNode::B_RECORDING);
+	err = gBeMediaUtility->GetRosterE()->SetRunModeNode(mConnection.consumer, BMediaNode::B_RECORDING);
 	if (err < B_OK) {
 		EMDebugger("ERROR: MediaRoster->SetRunModeNode() !");
 		return false;
 	}
 
-	err = EMBeMediaUtility::GetRosterE()->StartNode(mConnection.producer, 0);
+	err = gBeMediaUtility->GetRosterE()->StartNode(mConnection.producer, 0);
 	if (err < B_OK) {
 		EMDebugger("Couldn't start video input!");
 		return false;
 	}
 
-	err = EMBeMediaUtility::GetRosterE()->StartNode(mConnection.consumer, 0);
+	err = gBeMediaUtility->GetRosterE()->StartNode(mConnection.consumer, 0);
 	if (err < B_OK) {
 		EMDebugger("Couldn't start video displayer!");
 		return false;
 	}
-	
+
 */
 	return true;
 }
@@ -275,23 +275,23 @@ EMBeVideoOutputNode::SetUpDVNodes()
 
 bool EMBeVideoOutputNode::InitializeVideoProducer()
 {
-	status_t vErrorCode; 
-	media_format sTryFormat; 
-	dormant_node_info m_sNodeInfo; 
-//	int32 m_vNodeCount; 
+	status_t vErrorCode;
+	media_format sTryFormat;
+	dormant_node_info m_sNodeInfo;
+//	int32 m_vNodeCount;
 	int32 vNum;
 	media_output sProducerOutput;
 
 	/* Find the time source */
-	vErrorCode = EMBeMediaUtility::GetRosterE()->GetTimeSource(&m_sTimeSourceNode);
+	vErrorCode = gBeMediaUtility->GetRosterE()->GetTimeSource(&m_sTimeSourceNode);
 	if (vErrorCode != B_OK)
 	{
 		emerr << "ERROR! Can't get a time source: " << vErrorCode << endl;
 		return false;
 	}
-	
+
 	/* Find free producer output */
-	vErrorCode = EMBeMediaUtility::GetRosterE() -> GetFreeOutputsFor(Node(), &sProducerOutput, 1, &vNum);
+	vErrorCode = gBeMediaUtility->GetRosterE() -> GetFreeOutputsFor(Node(), &sProducerOutput, 1, &vNum);
 	if (vErrorCode != B_OK || vNum < 1)
 	{
 		vErrorCode = B_RESOURCE_UNAVAILABLE;
@@ -301,45 +301,45 @@ bool EMBeVideoOutputNode::InitializeVideoProducer()
 
 	sTryFormat = sProducerOutput.format;
 
-//	sTryFormat.type = B_MEDIA_RAW_VIDEO; 
-//	sTryFormat.u.raw_video = media_raw_video_format::wildcard; 
+//	sTryFormat.type = B_MEDIA_RAW_VIDEO;
+//	sTryFormat.u.raw_video = media_raw_video_format::wildcard;
 	media_format sFormat = m_spPhysicalOutInput -> format;
 	/* Connect producer with COnsumer */
-	vErrorCode = EMBeMediaUtility::GetRosterE() -> Connect(sProducerOutput.source, m_spPhysicalOutInput->destination, &sTryFormat, &sProducerOutput, m_spPhysicalOutInput);
+	vErrorCode = gBeMediaUtility->GetRosterE() -> Connect(sProducerOutput.source, m_spPhysicalOutInput->destination, &sTryFormat, &sProducerOutput, m_spPhysicalOutInput);
 	if (vErrorCode != B_OK)
 	{
 		emerr << "ERROR! Can't connect consumer to producer: " << strerror(vErrorCode) << endl;
 		return false;
 	}
 
-/*	
+/*
 //	fMediaRoster->SetProducerRate(fProducerNode, 1, 20);
-	// set time sources 
+	// set time sources
 	status = fMediaRoster->SetTimeSourceFor(fProducerNode.node, fTimeSourceNode.node);
 	if (status != B_OK) {
 		ErrorAlert("Can't set the timesource for the video source", status);
 		return status;
 	}
-	
+
 	status = fMediaRoster->SetTimeSourceFor(fVideoConsumer->ID(), fTimeSourceNode.node);
 	if (status != B_OK) {
 		ErrorAlert("Can't set the timesource for the video window", status);
 		return status;
 	}
-	
-	// figure out what recording delay to use 
+
+	// figure out what recording delay to use
 	latency = 0;
 	status = fMediaRoster->GetLatencyFor(fProducerNode, &latency);
 	status = fMediaRoster->SetProducerRunModeDelay(fProducerNode, latency);
 
-	// start the nodes 
+	// start the nodes
 	initLatency = 0;
 	status = fMediaRoster->GetInitialLatencyFor(fProducerNode, &initLatency);
 	if (status < B_OK) {
-		ErrorAlert("error getting initial latency for fCaptureNode", status);	
+		ErrorAlert("error getting initial latency for fCaptureNode", status);
 	}
 	initLatency += estimate_max_scheduling_latency();
-	
+
 	timeSource = fMediaRoster->MakeTimeSourceFor(fProducerNode);
 	bool running = timeSource->IsRunning();
 */
@@ -408,7 +408,7 @@ status_t EMBeVideoOutputNode::CheckFinalFormat(media_format* p_spInOutFormat)
 int64 EMBeVideoOutputNode::GetBufferDuration() const
 {
 	EMMediaFormat oFormat(EM_TYPE_RAW_VIDEO);
-	return EMBeMediaUtility::FramesToTime(1, &oFormat);
+	return gBeMediaUtility->FramesToTime(1, &oFormat);
 }
 
 #endif

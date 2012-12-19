@@ -16,7 +16,7 @@
 #include <MediaKit.h>
 #include <math.h>
 
-EMBeRealtimeAudioOutputDescriptor::EMBeRealtimeAudioOutputDescriptor(media_input* p_spMediaInput) 
+EMBeRealtimeAudioOutputDescriptor::EMBeRealtimeAudioOutputDescriptor(media_input* p_spMediaInput)
 	:	EMRealtimeOutputDescriptor(EM_TYPE_ANY_AUDIO),
 		m_opBufferGroup(NULL),
 		m_opNode(NULL)
@@ -24,16 +24,16 @@ EMBeRealtimeAudioOutputDescriptor::EMBeRealtimeAudioOutputDescriptor(media_input
 	m_opNode = EM_new EMBeAudioOutputNode(p_spMediaInput);
 	EMMediaTimer::Instance() -> AddListener(this); //This is where we get the original calls to flush the node from!
 	m_opNode -> AddListener(this); //We listen to this node in order to release a semaphore after FLUSH:s have been done. That's it!
-	EMBeMediaUtility::push(this, "EMBeRealtimeAudioOutputDescriptor");
+	gBeMediaUtility->push(this, "EMBeRealtimeAudioOutputDescriptor");
 }
 
 EMBeRealtimeAudioOutputDescriptor::~EMBeRealtimeAudioOutputDescriptor()
 {
 	m_opNode -> RemoveListener(this);
 	m_opNode -> Shutdown();
-	EMBeMediaUtility::GetRosterE() -> ReleaseNode(m_opNode -> Node());
+	gBeMediaUtility->GetRosterE() -> ReleaseNode(m_opNode -> Node());
 	EMMediaTimer::Instance() -> RemoveListener(this);
-	EMBeMediaUtility::pop("EMBeRealtimeAudioOutputDescriptor");
+	gBeMediaUtility->pop("EMBeRealtimeAudioOutputDescriptor");
 }
 
 bool EMBeRealtimeAudioOutputDescriptor::InitCheckE()
@@ -77,7 +77,7 @@ EMMediaDataBuffer* EMBeRealtimeAudioOutputDescriptor::ProcessBufferE(list<EMMedi
 	if(opDataBuffer == NULL)
 		emerr << "ERROR! Result of mix operation is NULL!" << endl;
 
-	//There, now copy the mixed result into a BBuffer's data area	
+	//There, now copy the mixed result into a BBuffer's data area
 	if(m_opBufferGroup != NULL)
 	{
 		BBuffer* opBeBuffer = NULL;
@@ -89,7 +89,7 @@ EMMediaDataBuffer* EMBeRealtimeAudioOutputDescriptor::ProcessBufferE(list<EMMedi
 //			if(system_time() - vStart > 500000)
 //				break;
 //		}
-	
+
 		opBeBuffer = m_opBufferGroup -> RequestBuffer(opDataBuffer -> m_vSizeUsed);
 		if(opBeBuffer != NULL)
 		{
@@ -101,7 +101,7 @@ EMMediaDataBuffer* EMBeRealtimeAudioOutputDescriptor::ProcessBufferE(list<EMMedi
 				BBuffer** ptr = &opBeBuffer;
 				((int64*) opBeBuffer -> Header() -> user_data)[0] = EMMediaTimer::Instance() -> AudioThenFrame();
 				status_t err = write_port(m_opNode -> ControlPort(), EM_PORT_MESSAGE_INCOMING_BUFFER, ptr, sizeof(BBuffer)); //, B_TIMEOUT, B_INFINITE_TIMEOUT);
-				if(err != B_OK)	
+				if(err != B_OK)
 				{
 					;//emout_commented_out_4_release << "ERROR! Buffer addition to node timed out!" << endl;
 					opBeBuffer -> Recycle();
@@ -115,10 +115,10 @@ EMMediaDataBuffer* EMBeRealtimeAudioOutputDescriptor::ProcessBufferE(list<EMMedi
 		}
 		else
 			;//emout_commented_out_4_release << "ERROR! Buffer request from buffer group timed out!" << endl;
-		
+
 		if(opDataBuffer -> m_vShouldBeDeleted)
 			delete opDataBuffer;
-		else 	
+		else
 			opDataBuffer -> Recycle();
 	}
 	else
@@ -128,14 +128,14 @@ EMMediaDataBuffer* EMBeRealtimeAudioOutputDescriptor::ProcessBufferE(list<EMMedi
 
 void EMBeRealtimeAudioOutputDescriptor::StartE()
 {
-	status_t err = EMBeMediaUtility::GetRosterE() -> StartNode(m_opNode -> Node(), 0);
+	status_t err = gBeMediaUtility->GetRosterE() -> StartNode(m_opNode -> Node(), 0);
 	if(err)
 		EMDebugger("ERROR! Could not start audio node!");
 }
 
 void EMBeRealtimeAudioOutputDescriptor::StopE()
 {
-	status_t err = EMBeMediaUtility::GetRosterE() -> StopNode(m_opNode -> Node(), 0, true); 
+	status_t err = gBeMediaUtility->GetRosterE() -> StopNode(m_opNode -> Node(), 0, true);
 	if(err)
 		emerr << "ERROR! Could not stop node!" << endl;
 }
@@ -173,7 +173,7 @@ bool EMBeRealtimeAudioOutputDescriptor::MessageReceived(EMListenerRepository* p_
 		//TODO: timeout-handling!
 		return true;
 	}
-	
+
 	return false;
 }
 

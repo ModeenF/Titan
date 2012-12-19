@@ -1,10 +1,9 @@
 #include "EMBitmapBuffer.h"
 #include "EMBitmap.h"
-#include "EMWinBitmap.h"
 
 #include "EMMediaEngine.h"
 #include "EMSettingsRepository.h"
-#include "EMSettingIds.h"
+#include "EMSettingIDs.h"
 
 #include "stdio.h"
 
@@ -24,7 +23,7 @@ EMBitmapBuffer::EMBitmapBuffer()
 	m_vFrontBuffer = 0;
 	m_vIsNew = false;
 }
-	
+
 EMBitmapBuffer::~EMBitmapBuffer()
 {
 	if(m_opBitmaps[0] != NULL)
@@ -96,14 +95,14 @@ void EMBitmapBuffer::PutMediaBuffer(EMMediaDataBuffer* p_opBuffer)
 
 		m_vHeight[m_vFrontBuffer] = p_opBuffer -> m_oFormat.m_vHeight;
 		m_vWidth[m_vFrontBuffer] = p_opBuffer -> m_oFormat.m_vWidth;
-		
+
 		m_opBitmaps[m_vFrontBuffer] = CreateBitmap(m_vHeight[m_vFrontBuffer], m_vWidth[m_vFrontBuffer]);
 	}
 
 	/*
 	unsigned char Header[18];
 
-	memset(&Header, 0, 18); 
+	memset(&Header, 0, 18);
 
 	*(WORD*)(Header + 12) = p_opBuffer -> m_oFormat.m_vWidth;
 	*(WORD*)(Header + 14) = p_opBuffer -> m_oFormat.m_vHeight;

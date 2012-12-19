@@ -24,15 +24,15 @@ EMBeAnalogRealtimeVideoInputDescriptor::EMBeAnalogRealtimeVideoInputDescriptor(m
 		EMDebugger("ERROR: can't create a video consumer node !");
 	}
 
-	EMBeMediaUtility::push(this, "EMBeAnalogRealtimeVideoInputDescriptor");
+	gBeMediaUtility->push(this, "EMBeAnalogRealtimeVideoInputDescriptor");
 }
 
 EMBeAnalogRealtimeVideoInputDescriptor::~EMBeAnalogRealtimeVideoInputDescriptor()
 {
 
-	//EMBeMediaUtility::GetRosterE() -> ReleaseNode(m_DvConsumerNode -> Node());
+	//gBeMediaUtility->GetRosterE() -> ReleaseNode(m_DvConsumerNode -> Node());
 	;//cout_commented_out_4_release<<"FIRST STOPPING PRODUCER!"<<endl;
-	status_t err = EMBeMediaUtility::GetRosterE() -> StopNode(m_AnalogConsumerNode -> Node(), true);
+	status_t err = gBeMediaUtility->GetRosterE() -> StopNode(m_AnalogConsumerNode -> Node(), true);
 	if (err < B_OK) {
 		;//cout_commented_out_4_release<< "mMediaRoster->Disconnect" << err << endl;
 	}
@@ -45,7 +45,7 @@ EMBeAnalogRealtimeVideoInputDescriptor::~EMBeAnalogRealtimeVideoInputDescriptor(
 	;//cout_commented_out_4_release<<"mIn.destination.port:"<<m_spMediaOutput -> destination.port<<endl;
 	;//cout_commented_out_4_release<<"mIn.source.port:"<<m_spMediaOutput -> source.port<<endl;
 
-	err = EMBeMediaUtility::GetRosterE()->Disconnect(m_spMediaOutput -> node.node, m_spMediaOutput -> source, m_AnalogConsumerNode -> Node().node, m_spMediaOutput -> destination);
+	err = gBeMediaUtility->GetRosterE()->Disconnect(m_spMediaOutput -> node.node, m_spMediaOutput -> source, m_AnalogConsumerNode -> Node().node, m_spMediaOutput -> destination);
 	if (err < B_OK) {
 		;//cout_commented_out_4_release<< "mMediaRoster->Disconnect" << strerror(err) << endl;
 	}
@@ -54,11 +54,11 @@ EMBeAnalogRealtimeVideoInputDescriptor::~EMBeAnalogRealtimeVideoInputDescriptor(
 	//m_AnalogConsumerNode -> SetDestination(NULL);
 	if (m_spMediaOutput -> node != media_node::null)
 	{
-		EMBeMediaUtility::GetRosterE()->ReleaseNode(m_spMediaOutput -> node);
+		gBeMediaUtility->GetRosterE()->ReleaseNode(m_spMediaOutput -> node);
 		m_spMediaOutput -> node = media_node::null;
 	}
 
-	EMBeMediaUtility::pop("EMBeAnalogRealtimeVideoInputDescriptor");
+	gBeMediaUtility->pop("EMBeAnalogRealtimeVideoInputDescriptor");
 
 }
 
@@ -131,7 +131,7 @@ void EMBeAnalogRealtimeVideoInputDescriptor::StartE()
 
 bool EMBeAnalogRealtimeVideoInputDescriptor:: ResetAnalogConnectionAndStart()
 {
-	status_t err = EMBeMediaUtility::GetRosterE() -> StopNode(m_AnalogConsumerNode -> Node(), true);
+	status_t err = gBeMediaUtility->GetRosterE() -> StopNode(m_AnalogConsumerNode -> Node(), true);
 	if (err < B_OK)
 	{
 		emerr << "ERROR! mMediaRoster->Disconnect: " << err << endl;
@@ -140,7 +140,7 @@ bool EMBeAnalogRealtimeVideoInputDescriptor:: ResetAnalogConnectionAndStart()
 	thread_info t;
 	get_thread_info(find_thread(NULL), &t);
 
-	err = EMBeMediaUtility::GetRosterE() -> Disconnect(m_spMediaOutput -> node.node, m_spMediaOutput -> source, m_AnalogConsumerNode -> Node().node, m_spMediaOutput -> destination);
+	err = gBeMediaUtility->GetRosterE() -> Disconnect(m_spMediaOutput -> node.node, m_spMediaOutput -> source, m_AnalogConsumerNode -> Node().node, m_spMediaOutput -> destination);
 	if (err < B_OK)
 	{
 		emerr << "ERROR! mMediaRoster->Disconnect: " << strerror(err) << endl;
@@ -156,11 +156,11 @@ bool EMBeAnalogRealtimeVideoInputDescriptor:: ResetAnalogConnectionAndStart()
 	else
 	{
 
-		status_t status = EMBeMediaUtility::GetRosterE() -> StartNode(m_spMediaOutput -> node, 0);// perf);
+		status_t status = gBeMediaUtility->GetRosterE() -> StartNode(m_spMediaOutput -> node, 0);// perf);
 		if(status != B_OK)
 			EMDebugger("Couldn't start Producer analog node for some erason");
 
-		status = EMBeMediaUtility::GetRosterE() -> StartNode(m_AnalogConsumerNode -> Node(), 0);
+		status = gBeMediaUtility->GetRosterE() -> StartNode(m_AnalogConsumerNode -> Node(), 0);
 		if(status != B_OK)
 			EMDebugger("Couldn't start Consumer analog node for some erason");
 
@@ -176,11 +176,11 @@ bool EMBeAnalogRealtimeVideoInputDescriptor::StartPreviewE()
 		if(oRegisteredRecorders.size() > 0)
 		{
 			;//cout_commented_out_4_release << "Now actually starting the NODE for EMBeAnalogRealtimeVideoInputDescriptor (through StopPreviewE) since one or more track(s) has it as input!" << endl;
-			status_t status = EMBeMediaUtility::GetRosterE() -> StartNode(m_spMediaOutput -> node, 0);// perf);
+			status_t status = gBeMediaUtility->GetRosterE() -> StartNode(m_spMediaOutput -> node, 0);// perf);
 			if(status != B_OK)
 				EMDebugger("Couldn't start Producer analog node for some erason");
 
-			status = EMBeMediaUtility::GetRosterE() -> StartNode(m_AnalogConsumerNode -> Node(), 0);
+			status = gBeMediaUtility->GetRosterE() -> StartNode(m_AnalogConsumerNode -> Node(), 0);
 			if(status != B_OK)
 				EMDebugger("Couldn't start Consumer analog node for some erason");
 		}
@@ -201,7 +201,7 @@ bool EMBeAnalogRealtimeVideoInputDescriptor::StopPreviewE()
 	if(m_vIsInitialized)
 	{
 		;//cout_commented_out_4_release << "Now actually stopping the NODE for EMBeAnalogRealtimeVideoInputDescriptor (through StopPreviewE) since one or more track(s) has it as input!" << endl;
-		EMBeMediaUtility::GetRosterE() -> StopNode(m_AnalogConsumerNode -> Node(), 0, true);
+		gBeMediaUtility->GetRosterE() -> StopNode(m_AnalogConsumerNode -> Node(), 0, true);
 	}
 	return true;
 }

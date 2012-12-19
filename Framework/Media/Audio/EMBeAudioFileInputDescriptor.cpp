@@ -8,19 +8,19 @@
 #include "EMMediaTimer.h"
 #include "EMMediaFormat.h"
 
-EMBeAudioFileInputDescriptor::EMBeAudioFileInputDescriptor(string p_oFileName) 
+EMBeAudioFileInputDescriptor::EMBeAudioFileInputDescriptor(string p_oFileName)
 	:	EMBeFileInputDescriptor(p_oFileName, EM_TYPE_ANY_AUDIO),
 		m_opWaveFile(NULL),
 		m_opSystemAudioFormat(NULL)
 {
-	EMBeMediaUtility::push(this, "EMBeAudioFileInputDescriptor");
+	gBeMediaUtility->push(this, "EMBeAudioFileInputDescriptor");
 }
 
 EMBeAudioFileInputDescriptor::~EMBeAudioFileInputDescriptor()
 {
 	delete m_opWaveFile;
 	delete m_opSystemAudioFormat;
-	EMBeMediaUtility::pop("EMBeAudioFileInputDescriptor");
+	gBeMediaUtility->pop("EMBeAudioFileInputDescriptor");
 }
 
 EMMediaFormat* EMBeAudioFileInputDescriptor::GetFormat()
@@ -34,7 +34,7 @@ bool EMBeAudioFileInputDescriptor::InitCheckE()
 		m_opWaveFile = EM_new EMWaveFileReader(GetFileName());
 	else
 		EMDebugger("ERROR! Only raw audio implemented so far, in EMBeFileInputDescriptor::InitCheckE");
-	
+
 	if(! m_opWaveFile -> InitCheckE())
 	{
 		delete m_opWaveFile;
@@ -43,7 +43,7 @@ bool EMBeAudioFileInputDescriptor::InitCheckE()
 
 	//Calculate the duration of the media file, and store it in our member-attribute
 //	m_opWaveFile -> ReadFormatE();
-	m_vNumFrames = m_opWaveFile -> NumberOfFramesInFile(); //EMBeMediaUtility::BytesToFrames(m_opWaveFile -> NumberOfFramesInFile(), sFormat);
+	m_vNumFrames = m_opWaveFile -> NumberOfFramesInFile(); //gBeMediaUtility->BytesToFrames(m_opWaveFile -> NumberOfFramesInFile(), sFormat);
 
 	m_opSystemAudioFormat = EM_new EMMediaFormat(EM_TYPE_ANY_AUDIO);
 
@@ -54,9 +54,9 @@ bool EMBeAudioFileInputDescriptor::ReadFrames(EMMediaDataBuffer** p_opPrimaryBuf
 {
 	//Convert the offset value from "frames" into "bytes"
 
-	int64 vSilentBufferOffsetBytes = EMBeMediaUtility::FramesToBytes(p_vOffsetFrames, m_opWaveFile -> GetFormat());
-	int64 vFromPositionBytes = EMBeMediaUtility::FramesToBytes(p_vMediaFramePosition, m_opWaveFile -> GetFormat());
-	int64 vLimitBytes = EMBeMediaUtility::FramesToBytes(p_vOutNumReadFrames, m_opWaveFile -> GetFormat());
+	int64 vSilentBufferOffsetBytes = gBeMediaUtility->FramesToBytes(p_vOffsetFrames, m_opWaveFile -> GetFormat());
+	int64 vFromPositionBytes = gBeMediaUtility->FramesToBytes(p_vMediaFramePosition, m_opWaveFile -> GetFormat());
+	int64 vLimitBytes = gBeMediaUtility->FramesToBytes(p_vOutNumReadFrames, m_opWaveFile -> GetFormat());
 	//Fill the buffer by sending it into the file's read-method, and also specify the buffer-offset in "bytes"
 
 	int64 vIOReadNum = ((*p_opPrimaryBuffer) -> m_vSizeAvailable > vLimitBytes ? vLimitBytes : (*p_opPrimaryBuffer) -> m_vSizeAvailable);
@@ -64,7 +64,7 @@ bool EMBeAudioFileInputDescriptor::ReadFrames(EMMediaDataBuffer** p_opPrimaryBuf
 
 	if(vIOReadNum == 0)
 		return false;
-		
+
 	(*p_opPrimaryBuffer) -> m_oFormat.m_vNumChannels = EM_AUDIO_NUM_CHANNELS;
 	(*p_opPrimaryBuffer) -> SetFrame(EMMediaTimer::Instance() -> AudioThenFrame());
 
@@ -78,8 +78,8 @@ bool EMBeAudioFileInputDescriptor::ReadFrames(EMMediaDataBuffer** p_opPrimaryBuf
 //		p_opBuffer -> m_vSizeUsed = p_opBuffer -> m_vSizeAvailable;
 		//p_vOutNumRead = p_opBuffer -> m_vSizeAvailable;
 	}
-	p_vOutNumReadFrames = EMBeMediaUtility::BytesToFrames(vIOReadNum, m_opSystemAudioFormat);
-	return true;		
+	p_vOutNumReadFrames = gBeMediaUtility->BytesToFrames(vIOReadNum, m_opSystemAudioFormat);
+	return true;
 }
 
 bool EMBeAudioFileInputDescriptor::SeekTo(int64 p_vNewMediaFrame)
