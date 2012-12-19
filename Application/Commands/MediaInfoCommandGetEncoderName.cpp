@@ -3,8 +3,6 @@
 #include "EMMediaEngine.h"
 #include "EMEncoderRepository.h"
 #include "EMRealtimeEncoderDescriptor.h"
-#include "EMWinQuickTimeWriterSuper.h"
-#include "EMWinMediaSingletonMuxer.h"
 #include <list>
 
 MediaInfoCommandGetEncoderName::MediaInfoCommandGetEncoderName()

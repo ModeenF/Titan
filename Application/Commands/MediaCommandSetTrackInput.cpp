@@ -10,12 +10,11 @@
 #include "EMMediaMIDITrack.h"
 #include "EMRealtimeMIDIInputDescriptor.h"
 #include "EMRealtimeMIDIOutputDescriptor.h"
-#include "EMWinDXMIDIConsumer.h"
 
 MediaCommandSetTrackInput::MediaCommandSetTrackInput(int32 p_vRecentTrackID, int32 p_vRecentInputID)
 	:	m_vRecentTrackID(p_vRecentTrackID),
 		m_vRecentInputID(p_vRecentInputID)
-{ 
+{
 }
 
 void* MediaCommandSetTrackInput::ExecuteE(void* p_upTrackID, void* p_upInputID, void*)
@@ -55,7 +54,7 @@ void* MediaCommandSetTrackInput::ExecuteE(void* p_upTrackID, void* p_upInputID, 
 		}
 		opProject -> GetUnusedTracks() -> UnlockContainer();
 	}
-	
+
 	EMRealtimeInputDescriptor* opInput = NULL;
 	opInputs -> LockContainer();
 	try
@@ -67,7 +66,7 @@ void* MediaCommandSetTrackInput::ExecuteE(void* p_upTrackID, void* p_upInputID, 
 		EMDebugger("ERROR! Exception in MediaCommandSetTrackInput::ExecuteE");
 	}
 	opInputs -> UnlockContainer();
-	
+
 	if(opTrack != NULL && opInput != NULL)
 	{
 		m_vRecentTrackID = vTrackID;
@@ -77,7 +76,7 @@ void* MediaCommandSetTrackInput::ExecuteE(void* p_upTrackID, void* p_upInputID, 
 
 		opTrack -> SetInput(opInput);
 		EMMediaEngine::Instance() -> GetMediaProject() -> SetDirty(true);
-	
+
 		if((opTrack -> GetType() & EM_TYPE_MIDI) > 0)
 		{
 //			if(static_cast<EMMediaMIDITrack*>(opTrack) -> IsActive())
@@ -89,7 +88,7 @@ void* MediaCommandSetTrackInput::ExecuteE(void* p_upTrackID, void* p_upInputID, 
 //					EMWinDXMIDIProducer::Instance() -> UnmapInput(static_cast<EMRealtimeMIDIInputDescriptor*>(opInput));
 //					EMWinDXMIDIProducer::Delete();
 				}
-				
+
 				EMWinDXMIDIConsumer::Instance() -> SetTrackAsListener(static_cast<EMMediaMIDITrack*>(opTrack), static_cast<EMRealtimeMIDIInputDescriptor*>(opInput), static_cast<EMRealtimeMIDIOutputDescriptor*>(opTrack -> GetTrackDestination()));
 //				EMWinDXMIDIProducer::Instance() -> MapInputToOutput(static_cast<EMRealtimeMIDIInputDescriptor*>(opInput), static_cast<EMRealtimeMIDIOutputDescriptor*>(opTrack -> GetTrackDestination()), vMIDIChannel);
 //				EMWinDXMIDIProducer::Delete();
@@ -111,7 +110,7 @@ void MediaCommandSetTrackInput::UndoE()
 		EMMediaEngine* opEngine = EMMediaEngine::Instance();
 		EMMediaProject* opProject = opEngine -> GetMediaProject();
 		EMInputRepository* opInputs = EMInputRepository::Instance();
-		
+
 		EMMediaTrack* opTrack = NULL;
 		opProject -> GetUsedTracks() -> LockContainer();
 		try
@@ -136,7 +135,7 @@ void MediaCommandSetTrackInput::UndoE()
 			}
 			opProject -> GetUnusedTracks() -> UnlockContainer();
 		}
-		
+
 		EMRealtimeInputDescriptor* opInput = NULL;
 		opInputs -> LockContainer();
 		try

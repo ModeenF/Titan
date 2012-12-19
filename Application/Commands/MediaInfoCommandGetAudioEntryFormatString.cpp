@@ -7,7 +7,7 @@
 #include "EMMediaPoolAudioEntry.h"
 #include "EMMediaProject.h"
 #include "EMMediaUtility.h"
-#include "EMWinMediaUtility.h"
+
 
 MediaInfoCommandGetAudioEntryFormatString::MediaInfoCommandGetAudioEntryFormatString()
 {

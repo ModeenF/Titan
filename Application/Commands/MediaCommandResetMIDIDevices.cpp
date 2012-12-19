@@ -1,7 +1,6 @@
 #include "MediaCommandResetMIDIDevices.h"
 
 #include "EMMIDIGlobals.h"
-#include "EMWinDXMIDIProducer.h"
 
 const struct EMStandardMIDIMessage
 {
@@ -24,26 +23,26 @@ MediaCommandResetMIDIDevices::MediaCommandResetMIDIDevices()
 void* MediaCommandResetMIDIDevices::ExecuteE(void*, void*, void*)
 {
 	uint8 vpStandardMIDIMessage[3];
-	
+
 	vpStandardMIDIMessage[0] = EM_MIDI_EVENT_TYPE_SYSTEM_RESET;
 	vpStandardMIDIMessage[1] = 0;
 	vpStandardMIDIMessage[2] = 0;
-	EMWinDXMIDIProducer::Instance() -> BroadcastMIDIMessage(1, vpStandardMIDIMessage); 
+	EMWinDXMIDIProducer::Instance() -> BroadcastMIDIMessage(1, vpStandardMIDIMessage);
 
 	vpStandardMIDIMessage[0] = EM_MIDI_EVENT_TYPE_CONTROL_CHANGE;
 	vpStandardMIDIMessage[1] = EM_MIDI_CONTROL_CHANGE_TYPE_ALL_NOTES_OFF;
 	vpStandardMIDIMessage[2] = 0;
-	EMWinDXMIDIProducer::Instance() -> BroadcastMIDIMessage(3, vpStandardMIDIMessage); 
+	EMWinDXMIDIProducer::Instance() -> BroadcastMIDIMessage(3, vpStandardMIDIMessage);
 
 	vpStandardMIDIMessage[0] = EM_MIDI_EVENT_TYPE_CONTROL_CHANGE;
 	vpStandardMIDIMessage[1] = EM_MIDI_CONTROL_CHANGE_TYPE_ALL_SOUND_OFF;
 	vpStandardMIDIMessage[2] = 0;
-	EMWinDXMIDIProducer::Instance() -> BroadcastMIDIMessage(3, vpStandardMIDIMessage); 
+	EMWinDXMIDIProducer::Instance() -> BroadcastMIDIMessage(3, vpStandardMIDIMessage);
 
 	vpStandardMIDIMessage[0] = EM_MIDI_EVENT_TYPE_CONTROL_CHANGE;
 	vpStandardMIDIMessage[1] = EM_MIDI_CONTROL_CHANGE_TYPE_RESET_ALL_CONTROLLERS;
 	vpStandardMIDIMessage[2] = 0;
-	EMWinDXMIDIProducer::Instance() -> BroadcastMIDIMessage(3, vpStandardMIDIMessage); 
+	EMWinDXMIDIProducer::Instance() -> BroadcastMIDIMessage(3, vpStandardMIDIMessage);
 	return NULL;
 }
 

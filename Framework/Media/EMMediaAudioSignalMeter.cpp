@@ -128,12 +128,17 @@ EMMediaDataBuffer* EMMediaAudioSignalMeter::ProcessBufferE(list<EMMediaDataBuffe
 	//We start by finding the peaks in the buffer. One peak for each channel!
 	signed short* vpAllSamples = static_cast<signed short*>(opBuffer -> Data());
 	float vpMaxSamples[5];
-	for(int32 vIndex = 0; vIndex < 5; vIndex++)
+
+	int32 vIndex = 0;
+
+	for(vIndex = 0; vIndex < 5; vIndex++)
 		vpMaxSamples[vIndex] = 0;
+
 	int32 vNumChannels = 2;
 	int32 vSampleSize = 2; //bytes per sample
-	for(vIndex = 0; vIndex < opBuffer -> m_vSizeUsed / vSampleSize; vIndex += vNumChannels)
-	{
+
+	for(vIndex = 0; vIndex < opBuffer->m_vSizeUsed / vSampleSize;
+		vIndex += vNumChannels) {
 		for(int vChannel = 0; vChannel < vNumChannels; vChannel++)
 		{
 			float vCurrentFloatValue = static_cast<float>(abs(vpAllSamples[vIndex + vChannel])) / static_cast<float>(32768.0);

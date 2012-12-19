@@ -7,7 +7,7 @@
 * of effects (i e plugins) that are connected in a chain.
 * It has an output (e g Layla24 Analog Out 1/2) and a
 * start plugin in the chain. As plugins are added to the
-* track, the destinations of the respective plugins 
+* track, the destinations of the respective plugins
 * (the plugins inherit from EMBufferDestination, so they
 * have a destination) need to be updated to keep the
 * chain valid.
@@ -51,7 +51,7 @@ public:
 	bool DeleteEffect(uint32 p_vSlotNumber);
 	bool IsSlotEmpty(uint32 p_vSlotNumber);
 	uint32 GetNumberOfSlots() const;
-	uint32 GetLastEffect();
+	int32 GetLastEffect();
 	uint32 CountEffects();
 	void DisplaySlots();
 	EMPlugin* FindEffect(int32 p_vID);

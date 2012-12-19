@@ -2,7 +2,6 @@
 #include "EMplugin.h"
 #include "EMMediaEngine.h"
 #include "EMMediaProject.h"
-#include "EMWinVideoTransitionClipRepository.h"
 
 MediaCommandSetTransitionProperties::MediaCommandSetTransitionProperties()
 {

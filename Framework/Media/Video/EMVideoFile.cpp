@@ -13,7 +13,7 @@
 #include "EMSettingIDs.h"
 #include "EMSettingsRepository.h"
 #include "EMSemaphore.h"
-#include "EMWinVideoFile.h"
+
 //TODO: Delete semaphore somehow!
 EMSemaphore* EMVideoFile::m_opVideoImageProcessingSemaphore = NULL;
 

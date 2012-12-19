@@ -7,7 +7,6 @@
 #include "EMMediaClip.h"
 #include "EMDestructiveFadeOut.h"
 #include "EMFileInputDescriptor.h"
-#include "EMWinMediaUtility.h"
 
 
 MediaCommandDestructiveFadeOut::MediaCommandDestructiveFadeOut()

@@ -2,7 +2,6 @@
 
 #include "EMMediaEngine.h"
 #include "EMMediaProject.h"
-#include "EMWinMediaSingletonMuxer.h"
 
 MediaCommandSetEncoderFamily::MediaCommandSetEncoderFamily()
 {

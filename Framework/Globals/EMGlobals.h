@@ -61,9 +61,14 @@
 #endif
 
 
+#define MessageBox(...)
+#define MB_OK	"Okay"
+
+
+
 #include <new> // Needed for bad_alloc exception handling
 
-#include "../../Components/EMDebugOutput.h"
+#include "EMDebugOutput.h"
 	// This one needs to be included last in the file
 
 #endif // __EM_GLOBALS

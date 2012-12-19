@@ -7,7 +7,6 @@
 #include "EMMediaClip.h"
 #include "EMDestructiveFadeIn.h"
 #include "EMFileInputDescriptor.h"
-#include "EMWinMediaUtility.h"
 
 
 

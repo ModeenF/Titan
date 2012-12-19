@@ -2,7 +2,7 @@
 * Creator: Martin Johansosn
 * Portability: Native
 *-------------------------------------------------------
-* 
+*
 * This class simply represents a media file.
 * It exists in one instance per "physical" file.
 *
@@ -23,9 +23,8 @@ class EMMediaFormat;
 class EMMediaDataBuffer;
 class EMImageFileInputDescriptor;
 
-#include <dshow.h>
 
-class EMMediaPoolImageEntry : public EMMediaPoolEntry 
+class EMMediaPoolImageEntry : public EMMediaPoolEntry
 {
 public:
 	EMMediaPoolImageEntry(string p_oFileName, EMMediaType p_eType);
@@ -42,7 +41,7 @@ public:
 	virtual string GetFormatString();
 
 	EMImageFileInputDescriptor* CloneDescriptor();
-	
+
 	float* GetAspectRatio();
 
 	int64* NumberOfFramesInWFPS(float p_vFramerateCurrentFPS);
@@ -54,7 +53,7 @@ public:
 	virtual int64 BitDepth() const;
 
 protected:
-	IPin* FindOutputPin(IGraphBuilder* p_opIGraph);
+//	IPin* FindOutputPin(IGraphBuilder* p_opIGraph);
 
 protected:
 	EMMediaFormat m_oFormat;

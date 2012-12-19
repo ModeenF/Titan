@@ -2,7 +2,7 @@
 * Creator: Richard Kronfalt
 * Portability: Native
 *-------------------------------------------------------
-* 
+*
 * This class opens a file, finds out which format it is
 * and reads from it, filling a buffer with data.
 *
@@ -18,10 +18,7 @@
 
 #include <string>
 
-//TEMP
-#include <dshow.h>
-#include <qedit.h>
-//TEMP
+
 //#include "EMListener.h"
 #include "EMBitmap.h"
 class EMMediaDataBuffer;
@@ -50,7 +47,7 @@ public:
 //	virtual void ResetScaling(const long width, const long height) = 0;
 //	virtual void Scale(void *src, void *dest) = 0;
 	virtual void SeekToFrame(int64 p_vToFrame) = 0;
-	virtual HBITMAP ReadAndScaleData(int64 p_vTime, int16 p_vHeight) = 0; //TEMP
+//	virtual HBITMAP ReadAndScaleData(int64 p_vTime, int16 p_vHeight) = 0; //TEMP
 
 	virtual void SetOutputFormat(EMMediaFormat *p_opFormat) = 0;
 

@@ -16,13 +16,6 @@
 //#define EM_OUTPUT_TO_MONITOR "SB Live! Wave Device" //Richards SB-Live! card
 //#define EM_SHOW_AUDIO_CACHE
 
-#ifdef _DEBUG
-#ifdef EM_SHOW_AUDIO_CACHE
-//Only here for temporary debugging reasons...
-#include "EMWinRealtimeAudioOutputDescriptor.h"
-#include "EMWinDirectSoundPlayback.h"
-#endif
-#endif
 
 MediaInfoCommandGetMIDISignalMeterValue::MediaInfoCommandGetMIDISignalMeterValue()
 {

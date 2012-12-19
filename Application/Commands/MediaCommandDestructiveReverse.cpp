@@ -7,7 +7,6 @@
 #include "EMMediaClip.h"
 #include "EMDestructiveReverse.h"
 #include "EMFileInputDescriptor.h"
-#include "EMWinMediaUtility.h"
 
 
 MediaCommandDestructiveReverse::MediaCommandDestructiveReverse()

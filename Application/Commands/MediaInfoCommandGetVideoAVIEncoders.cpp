@@ -3,8 +3,6 @@
 #include "EMMediaEngine.h"
 #include "EMEncoderRepository.h"
 #include "EMRealtimeEncoderDescriptor.h"
-#include "EMWinQuickTimeWriterSuper.h"
-#include "EMWinMediaSingletonMuxer.h"
 #include <list>
 
 MediaInfoCommandGetVideoAVIEncoders::MediaInfoCommandGetVideoAVIEncoders()
@@ -31,7 +29,7 @@ void* MediaInfoCommandGetVideoAVIEncoders::ExecuteE(void* p_upIDs, void*, void*)
 		while(opOutputs -> Current() != NULL)
 		{
 			int32 vOutputID = opOutputs -> Current() -> GetID();
-			
+
 			if((opOutputs -> Current() ->GetType () & EM_TYPE_ANY_VIDEO) > 0)
 				vpIDs[cnt++] = vOutputID;
 

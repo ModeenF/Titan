@@ -1,8 +1,6 @@
 #include "MediaInfoCommandHasEncoderPropertyPage.h"
 
 #include "EMMediaEngine.h"
-#include "EMWinMediaSingletonMuxer.h"
-#include "EMWinQuickTimeWriterSuper.h"
 
 MediaInfoCommandHasEncoderPropertyPage::MediaInfoCommandHasEncoderPropertyPage()
 {

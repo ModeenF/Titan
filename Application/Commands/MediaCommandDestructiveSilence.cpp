@@ -7,7 +7,7 @@
 #include "EMMediaClip.h"
 #include "EMDestructiveSilence.h"
 #include "EMFileInputDescriptor.h"
-#include "EMWinMediaUtility.h"
+
 
 MediaCommandDestructiveSilence::MediaCommandDestructiveSilence()
 {

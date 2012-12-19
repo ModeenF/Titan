@@ -19,7 +19,8 @@
 #include "EMBeBufferRepository.h"
 
 
-EMInputRepository* EMInputRepository::m_opInstance = NULL;
+EMInputRepository*
+EMInputRepository	::	m_opInstance = NULL;
 
 EMInputRepository::EMInputRepository()
 	:	EMMediaItemContainer<EMRealtimeInputDescriptor>(EM_TYPE_ANY),
@@ -30,14 +31,16 @@ EMInputRepository::EMInputRepository()
 	EMMediaTimer::Instance() -> AddListener(this);
 }
 
-EMInputRepository* EMInputRepository::Instance()
+EMInputRepository*
+EMInputRepository	::	Instance()
 {
 	if(m_opInstance == NULL)
 		m_opInstance = EM_new EMInputRepository();
 	return m_opInstance;
 }
 
-void EMInputRepository::Delete()
+void
+EMInputRepository	::	Delete()
 {
 //	int64 v = m_opInstance -> Size();
 	if(m_opInstance != NULL)
@@ -52,7 +55,8 @@ EMInputRepository::~EMInputRepository()
 	m_vIsInitialized = false;
 }
 
-void EMInputRepository::OnItemAdd()
+void
+EMInputRepository	::	OnItemAdd()
 {
 	//We could make the project dirty here, but we won't!
 	//Why, you ask you simple person? Because the encoder repository
@@ -64,12 +68,14 @@ void EMInputRepository::OnItemAdd()
 	//Added by Richard, 010821
 }
 
-void EMInputRepository::OnItemRemove()
+void
+EMInputRepository	::	OnItemRemove()
 {
 	//Same story here, as in OnItemAdd
 }
 
-bool EMInputRepository::InitCheckE()
+bool
+EMInputRepository	::	InitCheckE()
 {
 	float vAudioFrameRate = 0;
 	int64 vAudioBufferSize = 0;
@@ -142,12 +148,14 @@ bool EMInputRepository::InitCheckE()
 	return true;
 }
 
-bool EMInputRepository::PrepareToPlayE()
+bool
+EMInputRepository	::	PrepareToPlayE()
 {
 	return true;
 }
 
-bool EMInputRepository::StartE()
+bool
+EMInputRepository	::	StartE()
 {
 	LockContainer();
 	try
@@ -167,7 +175,8 @@ bool EMInputRepository::StartE()
 	return true;
 }
 
-bool EMInputRepository::StopE()
+bool
+EMInputRepository	::	StopE()
 {
 	LockContainer();
 	try
@@ -186,7 +195,8 @@ bool EMInputRepository::StopE()
 	return true;
 }
 
-bool EMInputRepository::SetAsActiveMIDIInput(int32 p_vInputID, int32 p_vOutputID)
+bool
+EMInputRepository	::	SetAsActiveMIDIInput(int32 p_vInputID, int32 p_vOutputID)
 {
 	LockContainer();
 	try
@@ -197,11 +207,13 @@ bool EMInputRepository::SetAsActiveMIDIInput(int32 p_vInputID, int32 p_vOutputID
 			EMRealtimeInputDescriptor* opInput = Current();
 			if((opInput -> GetType() & EM_TYPE_MIDI) > 0)
 			{
-				EMRealtimeMIDIInputDescriptor* opMIDIInput = static_cast<EMRealtimeMIDIInputDescriptor*>(opInput);
+				EMRealtimeMIDIInputDescriptor* opMIDIInput =
+					 static_cast<EMRealtimeMIDIInputDescriptor*>(opInput);
+
 				if(opMIDIInput -> GetID() == p_vInputID)
 					opMIDIInput -> SetActive(true, p_vOutputID);
 				else
-					opMIDIInput -> SetActive(false, NULL);
+					opMIDIInput -> SetActive(false, 0);
 			}
 			Next();
 		}
@@ -214,7 +226,8 @@ bool EMInputRepository::SetAsActiveMIDIInput(int32 p_vInputID, int32 p_vOutputID
 	return true;
 }
 
-list<EMRecording*>* EMInputRepository::GetLastRecordings()
+list<EMRecording*>*
+EMInputRepository	::	GetLastRecordings()
 {
 	m_oRecordings.clear();
 	LockContainer();
@@ -236,7 +249,8 @@ list<EMRecording*>* EMInputRepository::GetLastRecordings()
 	return &m_oRecordings;
 }
 
-int32 EMInputRepository::FindName(string p_oName)
+int32
+EMInputRepository	::	FindName(string p_oName)
 {
 	LockContainer();
 	try
@@ -260,7 +274,8 @@ int32 EMInputRepository::FindName(string p_oName)
 	return -1;
 }
 
-bool EMInputRepository::ClearData()
+bool
+EMInputRepository	::	ClearData()
 {
 	m_vIsInitialized = false;
 	LockContainer();
@@ -280,7 +295,8 @@ bool EMInputRepository::ClearData()
 	return true;
 }
 
-bool EMInputRepository::SaveData(EMProjectDataSaver* p_opSaver)
+bool
+EMInputRepository	::	SaveData(EMProjectDataSaver* p_opSaver)
 {
 	LockContainer();
 	try
@@ -299,7 +315,8 @@ bool EMInputRepository::SaveData(EMProjectDataSaver* p_opSaver)
 	return true;
 }
 
-bool EMInputRepository::LoadData(EMProjectDataLoader* p_opLoader)
+bool
+EMInputRepository	::	LoadData(EMProjectDataLoader* p_opLoader)
 {
 	LockContainer();
 	try
@@ -318,7 +335,8 @@ bool EMInputRepository::LoadData(EMProjectDataLoader* p_opLoader)
 	return true;
 }
 
-bool EMInputRepository::StartPreviewE()
+bool
+EMInputRepository	::	StartPreviewE()
 {
 	LockContainer();
 	try
@@ -337,7 +355,8 @@ bool EMInputRepository::StartPreviewE()
 	return true;
 }
 
-bool EMInputRepository::StopPreviewE()
+bool
+EMInputRepository	::	StopPreviewE()
 {
 	LockContainer();
 	try
@@ -356,17 +375,20 @@ bool EMInputRepository::StopPreviewE()
 	return true;
 }
 
-bool EMInputRepository::LockContainer()
+bool
+EMInputRepository	::	LockContainer()
 {
 	return EMMediaItemContainer<EMRealtimeInputDescriptor>::LockContainer();
 }
 
-void EMInputRepository::UnlockContainer()
+void
+EMInputRepository	::	UnlockContainer()
 {
 	EMMediaItemContainer<EMRealtimeInputDescriptor>::UnlockContainer();
 }
 
-bool EMInputRepository::MessageReceived(EMListenerRepository* p_opSender, uint32 p_vMessage)
+bool
+EMInputRepository	::	MessageReceived(EMListenerRepository* p_opSender, uint32 p_vMessage)
 {
 	switch(p_vMessage)
 	{

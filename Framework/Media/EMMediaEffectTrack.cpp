@@ -17,9 +17,6 @@
 #include "EMMediaProject.h"
 #include "EMMediaTrackRepository.h"
 
-//Temp
-#include "EMWinDirectXPlugin.h"
-
 #include <map>
 
 EMMediaEffectTrack::EMMediaEffectTrack(EMMediaType p_eType)
@@ -78,7 +75,7 @@ bool EMMediaEffectTrack::InitCheckE()
 	m_opSlots = EM_new EMPlugin*[m_vNumSlots];
 	for(uint32 vSlotIndex = 0; vSlotIndex < m_vNumSlots; vSlotIndex++)
 		m_opSlots[vSlotIndex] = NULL;
-	return true;	
+	return true;
 }
 
 string EMMediaEffectTrack::GetName() const
@@ -342,7 +339,7 @@ uint32 EMMediaEffectTrack::GetFirstAvailableSlot()
 }
 */
 
-uint32 EMMediaEffectTrack::GetLastEffect()
+int32 EMMediaEffectTrack::GetLastEffect()
 {
 	for(uint32 vSlotIndex = m_vNumSlots - 1; vSlotIndex >= 0; vSlotIndex--)
 	{
@@ -464,8 +461,8 @@ bool EMMediaEffectTrack::SaveData(EMProjectDataSaver* p_opSaver)
 	p_opSaver -> SaveString("EMMediaEffectTrack_DATABEGIN");
 	p_opSaver -> SaveString(m_oName.c_str());
 
-	uint32 vCount = 0;
-	for(uint32 vIndex = 0; vIndex < m_vNumSlots; vIndex++)
+	uint32 vCount = 0, vIndex = 0;
+	for(vIndex = 0; vIndex < m_vNumSlots; vIndex++)
 	{
 		if(m_opSlots[vIndex] != NULL)
 			vCount++;
@@ -486,7 +483,7 @@ bool EMMediaEffectTrack::SaveData(EMProjectDataSaver* p_opSaver)
 	}
 
 	if(m_opOutput == NULL)
-	{	
+	{
 		//This is an error anyhow...
 		p_opSaver -> SaveInt32(EM_EFFECT);
 		p_opSaver -> SaveInt32(-1);
@@ -503,12 +500,12 @@ bool EMMediaEffectTrack::SaveData(EMProjectDataSaver* p_opSaver)
 		case EM_EFFECT:
 			//Anuther fx-track
 			p_opSaver -> SaveInt32(EM_EFFECT);
-			p_opSaver -> SaveInt32(m_opOutput -> GetID()); 
+			p_opSaver -> SaveInt32(m_opOutput -> GetID());
 			break;
 		case EM_OUTPUT:
 			//An output??
 			p_opSaver -> SaveInt32(EM_OUTPUT);
-			p_opSaver -> SaveString(static_cast<EMOutputDescriptor*>(m_opOutput) -> GetName().c_str()); 
+			p_opSaver -> SaveString(static_cast<EMOutputDescriptor*>(m_opOutput) -> GetName().c_str());
 			break;
 		default:
 			EMDebugger("EMMediaEffectTrack::SaveData - Error code 1");
@@ -574,7 +571,7 @@ bool EMMediaEffectTrack::LoadData(EMProjectDataLoader* p_opLoader)
 	case EM_OUTPUT:
 		oOutput = p_opLoader -> LoadString();
 
-		EMOutputRepository::Instance() -> LockContainer(); 
+		EMOutputRepository::Instance() -> LockContainer();
 		EMOutputRepository::Instance() -> Rewind();
 		while(EMOutputRepository::Instance() -> Current() != NULL && EMOutputRepository::Instance() -> Current() -> GetName() != oOutput)
 			EMOutputRepository::Instance() -> Next();
@@ -584,7 +581,7 @@ bool EMMediaEffectTrack::LoadData(EMProjectDataLoader* p_opLoader)
 			SetOutput(EMOutputRepository::Instance() -> Current());
 		}
 		else
-		{		
+		{
 			if((GetType() & EM_TYPE_ANY_AUDIO) > 0)
 			{
 				EMRealtimeOutputDescriptor* opOut = EMOutputRepository::Instance() -> First(EM_TYPE_ANY_AUDIO);
@@ -627,7 +624,7 @@ bool EMMediaEffectTrack::RestoreAfterLoad()
 	{
 		try
 		{
-			 opFXTrack = EMMediaEffectTrackRepository::Instance() -> Find(m_vOutputId);	
+			 opFXTrack = EMMediaEffectTrackRepository::Instance() -> Find(m_vOutputId);
 		}
 		catch(...)
 		{
@@ -658,8 +655,8 @@ bool EMMediaEffectTrack::RestoreAfterLoad()
 			SetOutput(opTrack -> GetClipDataDestination());
 	}
 
-
-	for(uint32 vIndex = 0; vIndex < m_vNumSlots, m_opSlots[vIndex] == NULL; vIndex++);
+	uint32 vIndex = 0;
+	for(vIndex = 0; vIndex < m_vNumSlots, m_opSlots[vIndex] == NULL; vIndex++);
 
 	if(vIndex < m_vNumSlots)
 	{

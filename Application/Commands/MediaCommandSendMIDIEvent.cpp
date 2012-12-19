@@ -12,7 +12,6 @@
 #include "EMMIDIClip.h"
 #include "EMMIDIGlobals.h"
 #include "EMRealtimeMIDIOutputDescriptor.h"
-#include "EMWinDXMIDIProducer.h"
 
 MediaCommandSendMIDIEvent::MediaCommandSendMIDIEvent()
 {

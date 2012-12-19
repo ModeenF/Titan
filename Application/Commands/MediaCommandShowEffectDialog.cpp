@@ -3,7 +3,6 @@
 #include "EMMediaEffectTrack.h"
 #include "EMMediaEffectTrackRepository.h"
 #include "EMPlugin.h"
-#include "EMWinDirectXPlugin.h"
 
 MediaCommandShowEffectDialog::MediaCommandShowEffectDialog()
 {
@@ -18,7 +17,7 @@ void* MediaCommandShowEffectDialog::ExecuteE(void* p_upPluginID, void* p_upEffec
 	EMMediaEffectTrack* opFXTrack = EMMediaEffectTrackRepository::Instance() -> Find(vFXTrackID);
 	if(opFXTrack == NULL)
 		EMDebugger("ERROR! Could not locate the specified effect track ID!");
- 
+
 	EMPlugin* opPlugin = opFXTrack -> FindEffect(vPluginID);
 	if(opPlugin == NULL)
 		EMDebugger("ERROR! Could not locate the specified plugin ID!");
@@ -28,8 +27,8 @@ void* MediaCommandShowEffectDialog::ExecuteE(void* p_upPluginID, void* p_upEffec
 //		EMDebugger("ERROR! Unknown plugin, or ShowDialog not implemented for that type of plugin!");
 	}
 
-	return NULL; 
-}	
+	return NULL;
+}
 
 bool MediaCommandShowEffectDialog::RequiresParameters()
 {

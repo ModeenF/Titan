@@ -10,8 +10,6 @@
 #include "EMMediaEffectTrackRepository.h"
 
 #include "EMMediaMIDITrack.h"
-#include "EMWinDXMIDIConsumer.h"
-#include "EMWinDXMIDIProducer.h"
 #include "EMRealtimeMIDIInputDescriptor.h"
 #include "EMRealtimeMIDIOutputDescriptor.h"
 #include "EMMediaTimer.h"
@@ -20,12 +18,12 @@ MediaCommandSetTrackOutput::MediaCommandSetTrackOutput(int32 p_vRecentTrackID, i
 	:	m_vRecentTrackID(p_vRecentTrackID),
 		m_vRecentOutputID(p_vRecentOutputID)
 {
-} 
+}
 
 void* MediaCommandSetTrackOutput::ExecuteE(void* p_upTrackID, void* p_upOutputID, void* p_upIsEffectTrack)
 {
 	//eo << "MediaCommandSetTrackOutput" << ef;
- 
+
 	EMMediaEngine* opEngine = EMMediaEngine::Instance();
 	EMMediaProject* opProject = opEngine -> GetMediaProject();
 	EMOutputRepository* opOutputs = EMOutputRepository::Instance();
@@ -151,7 +149,7 @@ void* MediaCommandSetTrackOutput::ExecuteE(void* p_upTrackID, void* p_upOutputID
 			EMDebugger("ERROR! Exception in MediaCommandSetTrackOutput::ExecuteE");
 		}
 		EMMediaEffectTrackRepository::Instance() -> UnlockContainer();
-		
+
 		if(opMediaEffectTrack != NULL)
 		{
 			SetTrackEffectOutput(opTrack, opMediaEffectTrack);
@@ -176,7 +174,7 @@ void MediaCommandSetTrackOutput::UndoE()
 		EMMediaEngine* opEngine = EMMediaEngine::Instance();
 		EMMediaProject* opProject = opEngine -> GetMediaProject();
 		EMOutputRepository* opOutputs = EMOutputRepository::Instance();
-		
+
 		EMMediaTrack* opTrack = NULL;
 		opProject -> GetUsedTracks() -> LockContainer();
 		try
@@ -204,7 +202,7 @@ void MediaCommandSetTrackOutput::UndoE()
 		}
 
 		EMRealtimeOutputDescriptor* opOutput = NULL;
-		opOutputs -> LockContainer();		
+		opOutputs -> LockContainer();
 		try
 		{
 			opOutput = opOutputs -> Find(m_vRecentOutputID);
@@ -214,7 +212,7 @@ void MediaCommandSetTrackOutput::UndoE()
 			EMDebugger("ERROR! Exception in MediaCommandSetTrackOutput::ExecuteE");
 		}
 		opOutputs -> UnlockContainer();
-		
+
 		if(opTrack != NULL && opOutput != NULL)
 			opTrack -> SetTrackDestination(opOutput);
 	}
@@ -251,7 +249,7 @@ bool MediaCommandSetTrackOutput::SetTrackPhysicalOutput(EMMediaTrack* p_opTrack,
 
 		bool vProjectAudioRenderStatus = false;
 		bool vProjectVideoRenderStatus = false;
-	
+
 		try
 		{
 			opProject -> GetUsedTracks() -> LockContainer();
@@ -274,7 +272,7 @@ bool MediaCommandSetTrackOutput::SetTrackPhysicalOutput(EMMediaTrack* p_opTrack,
 			EMDebugger("ERROR! Exception in MediaCommandSetTrackOutput::ExecuteE");
 		}
 		opProject -> GetUsedTracks() -> UnlockContainer();
-		
+
 		opProject -> GetUnusedTracks() -> LockContainer();
 		try
 		{
@@ -296,7 +294,7 @@ bool MediaCommandSetTrackOutput::SetTrackPhysicalOutput(EMMediaTrack* p_opTrack,
 			EMDebugger("ERROR! Exception in MediaCommandSetTrackOutput::ExecuteE");
 		}
 		opProject -> GetUnusedTracks() -> UnlockContainer();
-		
+
 		opProject -> SetRenderingAudio(vProjectAudioRenderStatus);
 		opProject -> SetRenderingVideo(vProjectVideoRenderStatus);
 	}
@@ -345,7 +343,7 @@ bool MediaCommandSetTrackOutput::SetTrackPhysicalOutput(EMMediaTrack* p_opTrack,
 bool MediaCommandSetTrackOutput::SetTrackEffectOutput(EMMediaTrack* p_opTrack, EMMediaEffectTrack* p_opEffectTrack)
 {
 	eo << "Now setting a media track's (" << p_opTrack ->GetID() << ") output to be an effect track (" << p_opEffectTrack ->GetID() << ")" << ef;
-	
+
 //	p_opEffectTrack ->SetDestination(p_opTrack -> GetTrackDestination());
 	p_opTrack -> SetTrackDestination(p_opEffectTrack);
 	return true;

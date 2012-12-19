@@ -14,6 +14,8 @@
 #include "EMMediaEngine.h"
 #include "EMMediaProject.h"
 
+#include "EMBeAudioClipRepository.h"
+#include "EMBeVideoClipRepository.h"
 
 EMMediaClipRepository* EMMediaClipRepository::New(EMMediaType p_eType)
 {

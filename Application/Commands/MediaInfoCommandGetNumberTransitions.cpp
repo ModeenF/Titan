@@ -2,7 +2,6 @@
 #include "EMMediaEngine.h"
 #include "EMMediaProject.h"
 #include "EMMediaVideoTransitionClip.h"
-#include "EMWinVideoTransitionClipRepository.h"
 #include "EMPluginRepository.h"
 
 

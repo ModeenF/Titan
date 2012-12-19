@@ -1,6 +1,5 @@
 #include "MediaCommandSetAudioRenderParameters.h"
 
-#include "EMWinAudioDiskWriter.h"
 #include "EMMediaEngine.h"
 #include "EMMediaProject.h"
 
@@ -23,7 +22,7 @@ void* MediaCommandSetAudioRenderParameters::ExecuteE(void* p_vSampleRate, void* 
 	{
 		m_vRet = EMWinAudioDiskWriter::Instance() -> InitConverter(vSampleRate, vNumBits, vIsMono);
 	}
-	
+
 	EMMediaEngine::Instance() -> GetMediaProject() -> SetDirty(true);
 
 	return &m_vRet;

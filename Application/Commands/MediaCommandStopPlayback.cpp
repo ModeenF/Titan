@@ -3,7 +3,6 @@
 #include "EMMediaEngine.h"
 #include "EMMediaProject.h"
 #include "EMMediaTimer.h"
-#include "EMWinAudioDiskWriter.h"
 
 MediaCommandStopPlayback::MediaCommandStopPlayback()
 {
@@ -26,7 +25,7 @@ void MediaCommandStopPlayback::ExecuteE()
 		opTimer -> SetState(EM_STOPPED);
 		EMWinAudioDiskWriter::Instance() -> Stop();
 		if(eState == EM_RECORDING)
-			opProject -> SetArmed(false); 
+			opProject -> SetArmed(false);
 	}
 }
 

@@ -52,7 +52,7 @@
 #ifndef __EM_BE_AUDIO_CLIP_REPOSITORY
 #define __EM_BE_AUDIO_CLIP_REPOSITORY
 
-#include "../../GlobalsEMMediaGlobals.h"
+#include "EMMediaGlobals.h"
 #include "EMMediaClip.h"
 #include "EMMediaDataBuffer.h"
 #include "EMMediaClipRepository.h"

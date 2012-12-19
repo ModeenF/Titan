@@ -10,7 +10,6 @@
 #include "EMMediaEffectTrackRepository.h"
 #include "EMMediaTimer.h"
 #include "EMMediaUtility.h"
-#include "EMWinMediaUtility.h"
 
 MediaCommandSetEffectTrackOutput::MediaCommandSetEffectTrackOutput(int32 p_vRecentTrackID, int32 p_vRecentOutputID)
 	:	m_vRecentTrackID(p_vRecentTrackID),
@@ -33,7 +32,7 @@ void* MediaCommandSetEffectTrackOutput::ExecuteE(void* p_upFXTrackID, void* p_up
 
 	//eo << "Attempting to locate effect track ID " << vEffectTrackID << ef;
 	//eo << "As well as output ID " << vOutputID << ef;
-	
+
 	EMMediaEffectTrack* opFXTrack = NULL;
 	opFXTracks -> LockContainer();
 	try
@@ -92,7 +91,7 @@ void* MediaCommandSetEffectTrackOutput::ExecuteE(void* p_upFXTrackID, void* p_up
 			m_vRecentTrackID = vEffectTrackID;
 			m_vRecentOutputID = -1;
 		}
-			
+
 /*		if(opOutput -> IsRenderOutput())
 		{
 		}
@@ -160,10 +159,10 @@ void MediaCommandSetEffectTrackOutput::UndoE()
 			//opProject -> GetUnusedTracks() -> UnlockContainer();
 		}
 
-		//opOutputs -> LockContainer();		
+		//opOutputs -> LockContainer();
 		EMRealtimeOutputDescriptor* opOutput = opOutputs -> Find(m_vRecentOutputID);
 		//opOutputs -> UnlockContainer();
-		
+
 		if(opTrack != NULL && opOutput != NULL)
 			opTrack -> SetTrackDestination(opOutput);
 	} */

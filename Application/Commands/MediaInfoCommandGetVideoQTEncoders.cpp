@@ -1,7 +1,6 @@
 #include "MediaInfoCommandGetVideoQTEncoders.h"
 
 //#include "EMMediaEngine.h"
-#include "EMWinQuickTimeWriterSuper.h"
 //#include <list>
 
 MediaInfoCommandGetVideoQTEncoders::MediaInfoCommandGetVideoQTEncoders()

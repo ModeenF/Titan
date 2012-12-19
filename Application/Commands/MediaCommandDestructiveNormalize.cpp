@@ -7,7 +7,6 @@
 #include "EMMediaClip.h"
 #include "EMDestructiveNormalize.h"
 #include "EMFileInputDescriptor.h"
-#include "EMWinMediaUtility.h"
 
 
 MediaCommandDestructiveNormalize::MediaCommandDestructiveNormalize()

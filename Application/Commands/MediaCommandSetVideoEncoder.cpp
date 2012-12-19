@@ -2,8 +2,7 @@
 
 #include "EMMediaEngine.h"
 #include "EMMediaProject.h"
-#include "EMWinMediaSingletonMuxer.h"
-#include "EMWinQuickTimeWriterSuper.h"
+
 MediaCommandSetVideoEncoder::MediaCommandSetVideoEncoder()
 {
 }

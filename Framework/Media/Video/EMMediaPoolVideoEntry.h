@@ -2,7 +2,7 @@
 * Creator: Richard Kronfalt
 * Portability: Non-Native
 *-------------------------------------------------------
-* 
+*
 *******************************************************/
 
 #include "EMGlobals.h"
@@ -13,10 +13,8 @@
 #include "EMMediaGlobals.h"
 #include "EMMediaPoolEntry.h"
 #include "EMBitmap.h"
-#include "EMWinBitmap.h"
 
 #include "EMVideoFile.h"
-#include "EMWinVideoFile.h"
 
 #include <string>
 
@@ -41,12 +39,12 @@ public:
 	int64 GetNumChannels() const;
 	int64 BitDepth() const;
 	float* GetAspectRatio() const;
-	int64* NumberOfFramesInWFPS(float p_vFramerateCurrentFPS);	
+	int64* NumberOfFramesInWFPS(float p_vFramerateCurrentFPS);
 	string GetFormatString();
 	const char* GetVideoDimension() const;
 	void CloseAVIStream();
 private:
-	EMWinVideoFile* m_opVideoFile;
+	EMVideoFile* m_opVideoFile;
 
 };
 

@@ -5,9 +5,7 @@
 #include "EMProjectDataLoader.h"
 #include "EMProjectDataSaver.h"
 
-#ifdef PLATFORM_BEOS
 #include "EMBeBitmapContainer.h"
-#endif
 
 EMMediaPoolVideoEntry::EMMediaPoolVideoEntry(string p_oFileName)
 	:	EMMediaPoolEntry(p_oFileName, EM_TYPE_ANY_VIDEO), m_opVideoFile(NULL)

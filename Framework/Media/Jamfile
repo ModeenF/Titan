@@ -9,6 +9,8 @@ SubDirHdrs [ FDirName $(TOP) Framework ] ;
 SubDirHdrs [ FDirName $(TOP) Framework Globals ] ;
 SubDirHdrs [ FDirName $(TOP) Framework Gui ] ;
 SubDirHdrs [ FDirName $(TOP) Framework Media Audio ] ;
+SubDirHdrs [ FDirName $(TOP) Framework Media Image ] ;
+SubDirHdrs [ FDirName $(TOP) Framework Media Midi ] ;
 SubDirHdrs [ FDirName $(TOP) Framework Media Video ] ;
 
 SubDirHdrs [ FDirName $(TOP) Components ] ;
@@ -24,11 +26,9 @@ Library TitanFrameworkMedia :
 	EMBeMediaTimer.cpp
 	EMBeMediaUtility.cpp
 	EMBeOutputNode.cpp
-	EMBitmapBuffer.cpp
 	EMBufferDestination.cpp
 	EMBufferRepository.cpp
 	EMDescriptor.cpp
-	EMDestructivePlugin.cpp
 	EMEncoderDescriptor.cpp
 	EMEncoderRepository.cpp
 	EMFileInputDescriptor.cpp

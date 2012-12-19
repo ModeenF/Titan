@@ -2,7 +2,6 @@
 
 #include "EMInputRepository.h"
 #include "EMInputRepository.h"
-#include "EMWinRealtimeAudioInputDescriptor.h"
 #include "EMMediaSystemInspector.h"
 #include "EMMediaSignalMeter.h"
 #include "EMMediaInputAudioSignalMeter.h"
@@ -20,9 +19,9 @@ void* MediaInfoCommandGetInputSignalMeters::ExecuteE(void*, void*, void*)
 	float vTmp[5];
 
 	EMInputRepository* opInputs = EMInputRepository::Instance();
-	
+
 	opInputs -> LockContainer();
-	
+
 	try
 	{
 		opInputs -> Rewind();

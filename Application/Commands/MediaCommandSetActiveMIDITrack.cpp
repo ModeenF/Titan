@@ -10,9 +10,7 @@
 #include "EMRealtimeMIDIInputDescriptor.h"
 #include "EMRealtimeMIDIOutputDescriptor.h"
 
-#include "EMWinRealtimeMIDIOutputDescriptor.h" //TODO: Make non-native!
-#include "EMWinDXMIDIProducer.h" //TODO: Make non-native!
-#include "EMWinDXMIDIConsumer.h" //TODO: Make non-native!
+
 MediaCommandSetActiveMIDITrack::MediaCommandSetActiveMIDITrack(int32 p_vRecentTrackID)
 	:	m_vRecentTrackID(p_vRecentTrackID)
 {
@@ -20,12 +18,12 @@ MediaCommandSetActiveMIDITrack::MediaCommandSetActiveMIDITrack(int32 p_vRecentTr
 
 void* MediaCommandSetActiveMIDITrack::ExecuteE(void* p_upTrackID, void*, void*)
 {
-	//eo << "MediaCommandSetActiveMIDITrack" << ef; 
+	//eo << "MediaCommandSetActiveMIDITrack" << ef;
 	EMMediaEngine* opEngine = EMMediaEngine::Instance();
 	EMMediaProject* opProject = opEngine -> GetMediaProject();
 	EMInputRepository* opInputs = EMInputRepository::Instance();
 
-	int32 vTrackID = *(static_cast<int32*>(p_upTrackID)); 
+	int32 vTrackID = *(static_cast<int32*>(p_upTrackID));
 
 	EMMediaTrack* opTrack = NULL;
 	opProject -> GetUsedTracks() -> LockContainer();
@@ -51,14 +49,14 @@ void* MediaCommandSetActiveMIDITrack::ExecuteE(void* p_upTrackID, void*, void*)
 		}
 		opProject -> GetUnusedTracks() -> UnlockContainer();
 	}
-	
+
 	if(opTrack != NULL && (opTrack -> GetType() & EM_TYPE_MIDI) > 0)
 	{
 		EMMediaMIDITrack* opMIDITrack = static_cast<EMMediaMIDITrack*>(opTrack);
 //		EMRealtimeMIDIOutputDescriptor* opTrackDestination = static_cast<EMRealtimeMIDIOutputDescriptor*>(opMIDITrack -> GetTrackDestination());
 
 		//opProducer ->SetActiveMIDIRoutingOutputChannel(opMIDITrack
-		
+
 		EMMediaEngine::Instance() -> GetMediaProject() -> GetUsedTracks() -> SetAsActiveTrack(opMIDITrack);
 		EMMediaEngine::Instance() -> GetMediaProject() -> GetUnusedTracks() -> SetAsActiveTrack(opMIDITrack);
 		EMWinDXMIDIConsumer::Instance() -> SetTrackAsListener(opMIDITrack, static_cast<EMRealtimeMIDIInputDescriptor*>(opMIDITrack -> GetInput()), static_cast<EMRealtimeMIDIOutputDescriptor*>(opMIDITrack -> GetTrackDestination()));
@@ -66,7 +64,7 @@ void* MediaCommandSetActiveMIDITrack::ExecuteE(void* p_upTrackID, void*, void*)
 		EMMediaEngine::Instance() -> GetMediaProject() -> SetDirty(true);
 //		EMInputRepository::Instance() -> SetAsActiveMIDIInput(vInputID, vOutputID);
 //		((EMWinRealtimeMIDIOutputDescriptor*) opMIDIOutputDevice) -> GetProducer() -> SetActiveMIDIRoutingOutputChannel(opMIDITrack -> GetMIDIChannel());
-	} 
+	}
 	return NULL;
 }
 
@@ -82,7 +80,7 @@ void MediaCommandSetActiveMIDITrack::UndoE()
 		EMMediaEngine* opEngine = EMMediaEngine::Instance();
 		EMMediaProject* opProject = opEngine -> GetMediaProject();
 		EMInputRepository* opInputs = EMInputRepository::Instance();
-		
+
 		EMMediaTrack* opTrack = NULL;
 		opProject -> GetUsedTracks() -> LockContainer();
 		try
@@ -107,7 +105,7 @@ void MediaCommandSetActiveMIDITrack::UndoE()
 			}
 			opProject -> GetUnusedTracks() -> UnlockContainer();
 		}
-		
+
 		if(opTrack != NULL)
 		{
 			//opTrack -> SetDestination(opOutput);

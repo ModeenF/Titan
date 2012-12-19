@@ -7,7 +7,6 @@
 #include "EMMediaEngine.h"
 #include "EMSettingsRepository.h"
 #include "EMSettingIDs.h"
-#include "EMWinDirectXPlugin.h"
 
 char* EMDestructiveDXWrapper::m_opTemp = NULL;
 uint32 EMDestructiveDXWrapper::m_vLength = 0;
@@ -45,13 +44,13 @@ bool EMDestructiveDXWrapper::DoPlugin(char* p_opDataSource, char* p_opDataDest, 
 	char* opDst = reinterpret_cast<char*>(p_opDataDest);
 
 	char* opBufferData = static_cast<char*>(oBuffer.Data());
-	
+
 	try
 	{
 		opPlug = m_opDXEntry -> InstantiateNativePlugin();
 
 		if(vShowDialog || m_opTemp == NULL)
-		{	
+		{
 			opPlug -> ShowDialog();
 
 			if(m_opTemp != NULL)
@@ -100,7 +99,7 @@ bool EMDestructiveDXWrapper::DoPlugin(char* p_opDataSource, char* p_opDataDest, 
 		opDst += oBuffer.m_vSizeAvailable;
 		vFrame += oBuffer.m_vSizeAvailable / m_vBytesPerFrame;
 	}
-	
+
 //	delete opPlug;
 
 	return true;

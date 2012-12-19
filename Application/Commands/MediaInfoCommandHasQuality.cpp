@@ -1,7 +1,6 @@
 #include "MediaInfoCommandHasQuality.h"
 
 #include "EMMediaEngine.h"
-#include "EMWinMediaSingletonMuxer.h"
 
 #include <list>
 

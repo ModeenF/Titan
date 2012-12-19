@@ -3,8 +3,6 @@
 #include "EMMediaEngine.h"
 #include "EMEncoderRepository.h"
 #include "EMRealtimeEncoderDescriptor.h"
-#include "EMWinMediaSingletonMuxer.h"
-#include "EMWinQuickTimeWriterSuper.h"
 #include <list>
 
 MediaInfoCommandGetNumberAudioEncoders::MediaInfoCommandGetNumberAudioEncoders()
@@ -30,7 +28,7 @@ void* MediaInfoCommandGetNumberAudioEncoders::ExecuteE(void*, void*, void*)
 		while(opOutputs -> Current() != NULL)
 		{
 			int32 vOutputID = opOutputs -> Current() -> GetID();
-			
+
 			if((opOutputs -> Current() ->GetType () & EM_TYPE_ANY_AUDIO) > 0)
 				m_vNumAudioEnc++;
 

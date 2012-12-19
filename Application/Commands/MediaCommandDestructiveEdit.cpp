@@ -12,7 +12,6 @@
 #include "CommandIDs.h"
 #include "EMDestructivePlugin.h"
 #include "EMDestructiveDXWrapper.h"
-#include "EMWinMediaUtility.h"
 
 MediaCommandDestructiveEdit::MediaCommandDestructiveEdit()
 	:	m_opPlug(NULL),

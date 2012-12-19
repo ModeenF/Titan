@@ -2,7 +2,6 @@
 #include "EMMediaEngine.h"
 #include "EMMediaProject.h"
 #include "EMMediaVideoTransitionClip.h"
-#include "EMWinVideoTransitionClipRepository.h"
 #include "EMPluginRepository.h"
 
 
@@ -27,7 +26,7 @@ void* MediaCommandSetTransition::ExecuteE(void* p_upMediaClipID, void* p_upTrans
 
 	EMMediaEngine* opEngine = EMMediaEngine::Instance();
 	EMMediaProject* opProject = opEngine -> GetMediaProject();
- 
+
 	EMMediaClipRepository* opVideoTransitionClipRepository = opProject -> GetVideoTransitionClipRepository();
 
 	EMVideoTransitionClip* opClip;
@@ -48,7 +47,7 @@ void* MediaCommandSetTransition::ExecuteE(void* p_upMediaClipID, void* p_upTrans
 	if(opClip -> GetTransition() == NULL)
 	{
 		m_vOldTransID = -1;
-	} 
+	}
 	else
 	{
 		m_vOldTransID= opClip -> GetTransition() -> GetID();

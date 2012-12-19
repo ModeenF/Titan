@@ -7,7 +7,6 @@
 #include "EMMediaClip.h"
 #include "EMDestructiveCrop.h"
 #include "EMFileInputDescriptor.h"
-#include "EMWinMediaUtility.h"
 #include "EMMediaPool.h"
 #include "EMMediaEffectTrackRepository.h"
 #include "EMMediaEffectTrack.h"

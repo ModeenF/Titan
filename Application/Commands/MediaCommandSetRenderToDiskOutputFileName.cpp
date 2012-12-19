@@ -2,9 +2,6 @@
 
 #include "EMMediaEngine.h"
 #include "EMMediaProject.h"
-#include "EMWinMediaSingletonMuxer.h"
-#include "EMWinAudioDiskWriter.h"
-#include "EMWinQuickTimeWriterSuper.h"
 
 MediaCommandSetRenderToDiskOutputFileName::MediaCommandSetRenderToDiskOutputFileName()
 {

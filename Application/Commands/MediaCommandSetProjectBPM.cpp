@@ -3,7 +3,6 @@
 #include "EMMediaEngine.h"
 #include "EMMediaProject.h"
 #include "EMMediaMIDIEventRepository.h"
-#include "EMWinAudioClipRepository.h"
 
 MediaCommandSetProjectBPM::MediaCommandSetProjectBPM()
 {

@@ -2,8 +2,6 @@
 
 #include "EMMediaEngine.h"
 #include "EMMediaProject.h"
-#include "EMWinMediaSingletonMuxer.h"
-#include "EMWinQuickTimeWriterSuper.h"
 
 MediaCommandSetEncoderProperty::MediaCommandSetEncoderProperty()
 {
@@ -13,7 +11,7 @@ void* MediaCommandSetEncoderProperty::ExecuteE(void* p_vEncoderID, void* p_vProp
 {
 	int32 vpEncoderID = *static_cast<int32*>(p_vEncoderID);
 	int32 vpPropertyID = *static_cast<int32*>(p_vPropertyID); //Incoming value is one greater than should be
-	
+
 	//Because a 0 would create chaos we choose to decimate instead
 	vpPropertyID --;
 

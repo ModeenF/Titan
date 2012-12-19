@@ -6,7 +6,6 @@
 #include "EMMediaTrackRepository.h"
 #include "EMMediaMIDITrack.h"
 
-#include "EMWinDXMIDIConsumer.h"
 #include "EMRealtimeMIDIInputDescriptor.h"
 #include "EMRealtimeMIDIOutputDescriptor.h"
 
@@ -20,7 +19,7 @@ void* MediaCommandSetTrackMIDIChannel::ExecuteE(void* p_upTrackID, void* p_upMID
 {
 	//eo << "MediaCommandSetTrackMIDIChannel" << ef;
 	EMMediaEngine* opEngine = EMMediaEngine::Instance();
-	EMMediaProject* opProject = opEngine -> GetMediaProject(); 
+	EMMediaProject* opProject = opEngine -> GetMediaProject();
 	EMInputRepository* opInputs = EMInputRepository::Instance();
 
 	int32 vTrackID = *(static_cast<int32*>(p_upTrackID));
@@ -51,8 +50,8 @@ void* MediaCommandSetTrackMIDIChannel::ExecuteE(void* p_upTrackID, void* p_upMID
 		}
 		opProject -> GetUnusedTracks() -> UnlockContainer();
 	}
-	
-	
+
+
 	if(opTrack != NULL)
 	{
 		if((opTrack -> GetType() & EM_TYPE_MIDI) > 0)
@@ -86,7 +85,7 @@ void MediaCommandSetTrackMIDIChannel::UndoE()
 		EMMediaEngine* opEngine = EMMediaEngine::Instance();
 		EMMediaProject* opProject = opEngine -> GetMediaProject();
 		EMInputRepository* opInputs = EMInputRepository::Instance();
-		
+
 		EMMediaTrack* opTrack = NULL;
 		opProject -> GetUsedTracks() -> LockContainer();
 		try
@@ -111,7 +110,7 @@ void MediaCommandSetTrackMIDIChannel::UndoE()
 			}
 			opProject -> GetUnusedTracks() -> UnlockContainer();
 		}
-		
+
 		if(opTrack != NULL)
 		{
 			if((opTrack -> GetType() & EM_TYPE_MIDI) > 0)
