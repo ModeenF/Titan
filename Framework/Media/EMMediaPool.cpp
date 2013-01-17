@@ -1,5 +1,4 @@
-#ifndef __EM_MEDIA_POOL_CPP
-#define __EM_MEDIA_POOL_CPP
+#include "EMGlobals.h"
 
 #include "EMMediaPool.h"
 
@@ -229,11 +228,11 @@ EMFileInputDescriptor* EMMediaPool::InstantiateEntryE(int32 p_vMediaPoolEntryID)
 	}
 	else if((opEntry -> GetType() & EM_TYPE_ANY_VIDEO) > 0)
 	{
-		opDescriptor = EMBeVideoFileInputDescriptor(opEntry -> GetFileName());
+		opDescriptor = EM_new EMBeVideoFileInputDescriptor(opEntry -> GetFileName());
 	}
 	else if((opEntry -> GetType() & EM_TYPE_ANY_IMAGE) > 0)
 	{
-		opDescriptor = static_cast<EMMediaPoolImageEntry*>(opEntry) -> CloneDescriptor();
+		opDescriptor = ((EMMediaPoolImageEntry*)(opEntry))->CloneDescriptor();
 	}
 	else
 	{
@@ -408,4 +407,4 @@ bool EMMediaPool::ClearData()
 	return true;
 }
 
-#endif
+

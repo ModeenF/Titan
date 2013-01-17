@@ -3,23 +3,22 @@
 
 #include "EMGlobals.h"
 
-//#include <fstream>
+#include <fstream>
+#include <Locker.h>
 
-class __declspec(dllexport) EMMediaDebugLog
-{
+class EMMediaDebugLog {
 public:
-	static EMMediaDebugLog* Instance();
-	static void Delete();
+	explicit				EMMediaDebugLog();
+							~EMMediaDebugLog();
 
-	EMMediaDebugLog();
-	~EMMediaDebugLog();
-	void operator<<(const char* p_vpString);
-	void Log(const char* p_vpString);
+			void operator	<<(const char*);
+			void			Log(const char*);
 
 private:
-	static EMMediaDebugLog* m_opInstance;
-	HANDLE m_uSemaphore;
-	ofstream* m_opLogFile;
+			BLocker			fLock;
+			ofstream* 		fLogFile;
 };
+
+extern "C"	EMMediaDebugLog*	gMediaDebugLog;
 
 #endif

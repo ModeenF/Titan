@@ -14,38 +14,21 @@ class EMMediaFormat;
 class __declspec(dllexport) EMScalingUtils
 {
 public:
-	EMScalingUtils();
-	~EMScalingUtils();
+							EMScalingUtils();
+							~EMScalingUtils();
 
 	//bool InitScaleFunctions(int p_vSrcX, int p_vSrcY, int p_vDstX, int p_vDstY, int p_vBytesPerSourcePixel, int p_vBytesPerDestinationPixel, int p_vSkipBytesSrc, int p_vSkipBytesDst);
+		// LOONTODO: convert to rects, use Haiku scaling for "free" acceleration
+		// why was this commented out?
+		// This code seems more like a work-in-progress rather than anything functional...
+		// which is odd considering this is used elswhere in Titan...
 
-	bool InitScaleFunctions(EMMediaFormat* p_opSourceFormat, EMMediaFormat* p_opDestinationFormat);
+			bool			InitScaleFunctions(EMMediaFormat*, EMMediaFormat*);
 
-	void Scale(void *p_opSource, void *p_opDestination);
+			void 			Scale(void *source, void *destination);
 
-	void Lock();
-	void Release();
-
-protected:
-private:
-	int *m_pvAddX;
-	int *m_pvAddY;
-
-	int m_vDstX;
-	int m_vDstY;
-	int m_vSrcX;
-	int m_vSrcY;
-	int m_vBpSP;
-	int m_vBpDP;
-	int m_vSkipSrc;
-	int m_vSkipDst;
-	bool m_vConvert;
-
-	bool m_vSwapImage;
-
-	int *CreateAddBuffer(int p_vSrc, int p_vDst, int p_vStepSze);
-
-	const HANDLE m_oMutex;
+			void 			Lock();
+			void 			Release();
 
 
 };

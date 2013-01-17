@@ -86,10 +86,13 @@ bool EMMediaPoolEntry::SaveData(EMProjectDataSaver* p_opSaver)
 	p_opSaver -> SaveUInt32(static_cast<uint32>(m_vID));
 //	p_opSaver -> SaveUInt32(static_cast<uint32>(0)); //m_vUsed));
 
-	if((m_eType & EM_TYPE_ANY_AUDIO) > 0) //If it's an audio file, we can use a project-relative path when loading the project back in
-		p_opSaver -> SaveString(gMediaUtility -> GetFileName(GetFileName().c_str()));
-	else //But if it's a video file, we can't (since those files aren't copied in to the project!)
-		p_opSaver -> SaveString(GetFileName().c_str());
+	// Audio files can use relative paths since we copy them, video files
+	// are not copied carte-blanc.
+	if((m_eType & EM_TYPE_ANY_AUDIO) > 0)
+		p_opSaver->SaveString(
+			gMediaUtility->GetFileName(GetFileName().c_str()).c_str());
+	else
+		p_opSaver->SaveString(GetFileName().c_str());
 
 	return true;
 }

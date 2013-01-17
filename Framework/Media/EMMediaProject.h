@@ -82,113 +82,193 @@ class EMThread;
 class EMMediaProject : public EMListener, public EMThreadListener
 {
 public:
-	EMMediaProject();
-	virtual ~EMMediaProject();
-	bool ClearThreads();
-	EMMediaClipRepository* GetAudioClipRepository() const;
-	int32 GetID() const;
-	EMMediaPool* GetMediaPool() const;
-	EMMediaClipRepository* GetMIDIClipRepository() const;
-	EMMediaMIDIEventRepository* GetMIDIEventRepository() const;
-	int64 GetProjectEndTimeInFrames();
-	EMRecordingMIDITrackRepository* GetRecordingMIDITracks() const;
-	EMMediaClipRepository* GetVideoClipRepository() const;
-	EMMediaClipRepository* GetVideoTransitionClipRepository() const;
-	EMMediaTransitionTrackRepository* GetVideoTransitionTrackRepository() const;
-	EMMediaTrackRepository* GetUnusedTracks() const;
-	EMMediaTrackRepository* GetUsedTracks() const;
-	bool InitCheckE();
-	bool IsArmed() const;
-	bool IsDirty();
-	bool IsPlaying() const;
-	bool IsRenderingAudio() const;
-	bool IsRenderingVideo() const;
-	bool LoadData(EMProjectDataLoader* p_upLoader);
-	static bool LockAudio();
-	static bool LockVideo();
-	bool MessageReceived(EMListenerRepository* p_opSender, uint32 p_vMessage);
-	void OnThreadCreated(EMThread* p_opThread);
-	void OnThreadKilled(EMThread* p_opThread);
-	void PlaySingleBuffer();
-	bool PrepareToPlayE();
-	void RunAudio();
-	void RunVideo();
-	bool SaveData(EMProjectDataSaver* p_upSaver);
-	void SeekAndDisplay(int64 p_vNow);
-	void SetArmed(bool p_vFlag);
-	void SetDirty(bool p_vFlag);
-	void SetPreview();
-	void SetRenderingAudio(bool p_vFlag);
-	void SetRenderingVideo(bool p_vFlag);
-	void SetVideoWorkingSize(int32 p_vWidth, int32 p_vHeight);
-	void ShouldProduceAudio(bool p_vShouldproduceAudio, bool p_vEmergencyStop = false);
-	void ShouldProduceVideo(bool p_vShouldproduceVideo, bool p_vEmergencyStop = false);
-	void StartPlaybackE();
-	void StartRecordingE();
-	void StopPlaybackE();
-	void StopRecordingE();
-	void StopVideoAudioRenderingAtOnce();
-	void ThreadRun(EMThread* p_opThread);
-	static void UnlockAudio();
-	static void UnlockVideo();
+							EMMediaProject();
+	virtual					~EMMediaProject();
+
+			EMMediaClipRepository*
+							GetAudioClipRepository() const;
+
+			int32			GetID() const;
+
+			EMMediaPool* 	GetMediaPool() const;
+
+
+			EMMediaClipRepository*
+							GetMIDIClipRepository() const;
+
+			EMMediaMIDIEventRepository*
+							GetMIDIEventRepository() const;
+
+			int64			GetProjectEndTimeInFrames();
+
+			EMRecordingMIDITrackRepository*
+							GetRecordingMIDITracks() const;
+
+			EMMediaClipRepository*
+							GetVideoClipRepository() const;
+
+			EMMediaClipRepository*
+							GetVideoTransitionClipRepository() const;
+
+			EMMediaTransitionTrackRepository*
+							GetVideoTransitionTrackRepository() const;
+
+			EMMediaTrackRepository*
+							GetUnusedTracks() const;
+
+			EMMediaTrackRepository*
+							GetUsedTracks() const;
+
+
+			bool 			IsArmed() const;
+			bool 			IsDirty();
+			bool 			IsPlaying() const;
+			bool 			IsRenderingAudio() const;
+			bool 			IsRenderingVideo() const;
+
+			bool 			LoadData(EMProjectDataLoader* p_upLoader);
+
+	static	bool 			LockAudio();
+	static 	bool 			LockVideo();
+	static 	void 			UnlockAudio();
+	static 	void 			UnlockVideo();
+
+			void 			RunAudio();
+			void 			RunVideo();
+
+			bool 			MessageReceived(EMListenerRepository*, uint32);
+
+		// Thread Controls
+			bool	 		ClearThreads();
+			void 			ThreadRun(EMThread*);
+			void 			OnThreadCreated(EMThread* p_opThread);
+			void 			OnThreadKilled(EMThread* p_opThread);
+
+			void 			PlaySingleBuffer();
+
+			void 			StopVideoAudioRenderingAtOnce();
+
+			// TODO:  WTF??
+			void 			ShouldProduceAudio(bool, bool stop = false);
+			void 			ShouldProduceVideo(bool, bool stop = false);
+
+			// TODO: Set to what??
+			void 			SetPreview();
+
+			bool 			SaveData(EMProjectDataSaver*);
+
+			void 			SeekAndDisplay(int64 time);
+
+			// TODO: should these be private?
+			void 			SetArmed(bool);
+			void 			SetDirty(bool);
+			void 			SetRenderingAudio(bool);
+			void 			SetRenderingVideo(bool);
+
+			void 			SetVideoWorkingSize(int32 w, int32 h);
+
+			bool 			InitCheckE();
+			bool 			PrepareToPlayE();
+			void 			StartPlaybackE();
+			void 			StartRecordingE();
+			void 			StopPlaybackE();
+			void 			StopRecordingE();
+
 
 private:
-	list<EMMediaDataBuffer* >* GetLeastReferencedDestination(list<list<EMMediaDataBuffer* >* >* p_opSets);
-	EMMediaDataBuffer** GetLeastReferencedDestination(EMMediaDataBuffer* (*p_opDestinations)[64]);
-	list<EMMediaDataBuffer*>* GetList();
-	EMMediaTrack* GetNextTrack(EMMediaTrack* p_opTrack);
-	EMSilentVideoSource* GrabAnySilenceGenerator();
-	void MergeList(list<EMMediaBufferSource*>*opClipList, list<EMMediaClip*>*opVideoList, list<EMMediaClip*>*opTransList);
-	void PrepareLists();
-	void RecycleList(list<EMMediaDataBuffer*>* p_opList);
-	void RunBuffer(EMMediaDataBuffer** p_opBuffer, bool p_vIgnoreTransition = false);
-	void SplitLists(list<EMMediaDataBuffer*>* p_opBufferList, list<list<EMMediaDataBuffer*>*>* p_opSets);
+			list<EMMediaDataBuffer*>*
+							GetLeastReferencedDestination(list<list<EMMediaDataBuffer*>*>*);
 
-	int32 m_vID;
-	bool m_vTimeToShutdown;
-	bool m_vShouldProduceAudio;
-	bool m_vShouldProduceVideo;
-	bool m_vAudioOn;
-	bool m_vVideoOn;
-	bool m_vMidiOn;
-	EMMediaClipRepository* m_opAudioClipRepository;
-	EMMediaClipRepository* m_opVideoClipRepository;
-	EMMediaClipRepository* m_opVideoTransitionClipRepository;
-	EMMediaClipRepository* m_opMIDIClipRepository;
-	EMMediaEffectTrackRepository* m_opEffectTrackRepository;
-	EMMediaTransitionTrackRepository* m_opVideoTransitionTrackRepository;
-	EMMediaPool* m_opMediaPool;
-	bool m_vStarted;
-	bool m_vStopped;
-	int32 m_vProcessSingleAudioBuffer;
-	int32 m_vProcessSingleVideoBuffer;
-	EMSemaphore* m_opSemaphore;
-	EMMediaTrackRepository* m_opUsedTracks;
-	EMMediaTrackRepository* m_opUnusedTracks;
-	int64 m_vNumAudioSlots;
-	int64 m_vNumVideoSlots;
-	list<EMMediaDataBuffer*>** m_opPreAllocatedDestinationLists;
-	bool m_vIsArmed;
-	bool m_vIsRenderingAudio;
-	bool m_vIsRenderingVideo;
-	float m_vVideoWorkingFrameRate;
-	static EMSemaphore* m_opAudioProcessingSemaphore;
-	static EMSemaphore* m_opVideoProcessingSemaphore;
-	bool vFrameRateChangedSwitch;
-	bool m_vAudioThreadDead;
-	bool m_vVideoThreadDead;
-	EMMediaMIDIEventRepository* m_opMIDIEventRepository;
-	EMRecordingMIDITrackRepository* m_opRecordingMIDITrackRepository;
-	EMThread* m_opAudioThread;
-	EMThread* m_opVideoThread;
-	bool m_vAudioIsActive;
-	bool m_vVideoIsActive;
-	EMMediaDataBuffer* m_opAudioBufferList[64];
-	EMMediaDataBuffer* m_opAudioDestinations[64][64];
-	bool m_vIsDirty;
-	uint32 m_vProjectBPM;
-	string m_oProjectSignature;
-	int64 m_vCurrentLatestEnding;
+			EMMediaDataBuffer**
+							GetLeastReferencedDestination(EMMediaDataBuffer* (*dests)[64]);
+
+			list<EMMediaDataBuffer*>*
+							GetList();
+
+			EMMediaTrack*	GetNextTrack(EMMediaTrack* p_opTrack);
+
+			EMSilentVideoSource* GrabAnySilenceGenerator();
+
+			void 			MergeList(list<EMMediaBufferSource*>* clipList,
+								list<EMMediaClip*>* videoList,
+								list<EMMediaClip*>* transList);
+
+			void 			PrepareLists();
+			void 			RecycleList(list<EMMediaDataBuffer*>* p_opList);
+			void 			RunBuffer(EMMediaDataBuffer** p_opBuffer, bool p_vIgnoreTransition = false);
+			void 			SplitLists(list<EMMediaDataBuffer*>* p_opBufferList, list<list<EMMediaDataBuffer*>*>* p_opSets);
+
+			int32 			m_vID;
+			bool 			m_vTimeToShutdown;
+			bool 			m_vShouldProduceAudio;
+			bool 			m_vShouldProduceVideo;
+			bool 			m_vAudioOn;
+			bool 			m_vVideoOn;
+			bool 			m_vMidiOn;
+
+			EMMediaClipRepository
+						*	m_opAudioClipRepository,
+						*	m_opVideoClipRepository,
+						* 	m_opVideoTransitionClipRepository,
+						* 	m_opMIDIClipRepository;
+
+			EMMediaEffectTrackRepository*
+							m_opEffectTrackRepository;
+
+			EMMediaTransitionTrackRepository*
+							m_opVideoTransitionTrackRepository;
+
+			EMMediaPool* 	m_opMediaPool;
+			bool 			m_vStarted;
+			bool			m_vStopped;
+
+			int32 			m_vProcessSingleAudioBuffer;
+			int32 			m_vProcessSingleVideoBuffer;
+
+			EMSemaphore* 	m_opSemaphore;
+
+			EMMediaTrackRepository
+						*	m_opUsedTracks,
+						*	m_opUnusedTracks;
+
+			int64 			m_vNumAudioSlots;
+			int64 			m_vNumVideoSlots;
+
+			list<EMMediaDataBuffer*>**
+							m_opPreAllocatedDestinationLists;
+
+			bool 			m_vIsArmed;
+			bool 			m_vIsRenderingAudio;
+			bool 			m_vIsRenderingVideo;
+			float 			m_vVideoWorkingFrameRate;
+
+	static	EMSemaphore* 	m_opAudioProcessingSemaphore;
+	static	EMSemaphore* 	m_opVideoProcessingSemaphore;
+
+			bool 			vFrameRateChangedSwitch;
+			bool 			m_vAudioThreadDead;
+			bool			m_vVideoThreadDead;
+
+			EMMediaMIDIEventRepository*
+							m_opMIDIEventRepository;
+
+			EMRecordingMIDITrackRepository*
+							 m_opRecordingMIDITrackRepository;
+
+			EMThread* 		m_opAudioThread;
+			EMThread* 		m_opVideoThread;
+			bool 			m_vAudioIsActive;
+			bool 			m_vVideoIsActive;
+
+			list<EMMediaDataBuffer*>*
+							m_opAudioBufferList;
+			EMMediaDataBuffer*
+							m_opAudioDestinations[64][64];
+
+			bool 			m_vIsDirty;
+			uint32 			m_vProjectBPM;
+			string 			m_oProjectSignature;
+			int64			m_vCurrentLatestEnding;
 };
 
 #endif
