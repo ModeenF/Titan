@@ -92,7 +92,9 @@ int64 EMBeAudioClipRepository::FramesToNextClip(int64 p_vFromFrame)
 	return (vDistance == -1 ? static_cast<int64>(static_cast<uint64>(-1)) : vDistance);
 }
 
-void EMBeAudioClipRepository::GetNextBuffers(/*EMMediaTrack* p_opForTrack,*/ list<EMMediaDataBuffer*>* p_opList, EMMediaType p_eType, int64 p_vTimeNow, bool)
+void
+EMBeAudioClipRepository	::	GetNextBuffers(BObjectList<EMMediaDataBuffer*>* p_opList,
+	EMMediaType p_eType, int64 p_vTimeNow, bool _seeking)
 {
 //	Lock();
 

@@ -62,7 +62,7 @@
 #include "EMSilentVideoSource.h"
 #include "EMThreadListener.h"
 
-#include <list>
+#include <ObjectList.h>
 
 class EMListenerRepository;
 class EMMediaClipRepository;
@@ -260,10 +260,10 @@ private:
 			bool 			m_vAudioIsActive;
 			bool 			m_vVideoIsActive;
 
-			list<EMMediaDataBuffer*>*
+			BObjectList<EMMediaDataBuffer*>
 							m_opAudioBufferList;
-			EMMediaDataBuffer*
-							m_opAudioDestinations[64][64];
+			BObjectList<BObjectList<EMMediaDataBuffer*>* >
+							m_opAudioDestinations;
 
 			bool 			m_vIsDirty;
 			uint32 			m_vProjectBPM;

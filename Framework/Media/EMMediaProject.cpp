@@ -175,11 +175,9 @@ void EMMediaProject::OnThreadCreated(EMThread* p_opThread)
 	// TODO: move thread handling stuff to... THE THREADS (DUH!!!)
 	if(p_opThread == m_opAudioThread)
 	{
-		for(int y = 0; y < 64; y++)
-			for(int x = 0; x < 64; x++)
-				m_opAudioDestinations[y][x] = NULL;
+		m_opAudioDestinations.MakeEmpty();
 
-		m_opAudioBufferList->clear();
+		m_opAudioBufferList.MakeEmpty();
 	}
 	else if(p_opThread == m_opVideoThread)
 	{
@@ -321,11 +319,6 @@ void EMMediaProject::RecycleList(list<EMMediaDataBuffer*>* p_opList)
 
 	m_opSemaphore -> Release();
 	EMDebugger("m_vSemaphore! No room to store the list, in the preallocated repository of lists!");
-}
-
-uint32 NumBuffers(list<EMMediaDataBuffer*>* buffers)
-{
-	return buffers->size();
 }
 
 
@@ -500,7 +493,7 @@ void EMMediaProject::RunAudio()
 		//audio buffers from the clips
 		uint32 vNumBuffers = 0;
 		if(vProcessAudio) {
-			vNumBuffers = m_opAudioBufferList->size();
+			vNumBuffers = m_opAudioBufferList.CountItems();
 			( (EMBeAudioClipRepository*)(m_opAudioClipRepository) )
 				-> GetNextBuffers(m_opAudioBufferList, EM_TYPE_ANY_AUDIO, vNow);
 		}
@@ -508,7 +501,7 @@ void EMMediaProject::RunAudio()
 		if(vNumBuffers > 0)
 		{
 			//Ok, we should have some buffers now. Loop through the list until it's empty!
-			while(NumBuffers(m_opAudioBufferList) > 0)
+			while(m_opAudioBufferList.CountItems() > 0)
 			{
 				//Clear the destinations list.
 				for(uint8 y = 0; y < 64; y++)
@@ -532,7 +525,7 @@ void EMMediaProject::RunAudio()
 //							m_opAudioBufferList[x] = NULL;
 //						}
 
-					m_opAudioBufferList->clear();
+					m_opAudioBufferList.MakeEmpty();
 
 					m_opAudioThread -> Suspend(true);
 					vShouldIncrementTime = false;
@@ -545,7 +538,7 @@ void EMMediaProject::RunAudio()
 				{
 					//Get the first destination-list, only containing buffers with the exact same destination
 					opBuffersForDestination = GetLeastReferencedDestination(m_opAudioDestinations);
-					EMMediaDataBuffer* opDestinationCurrentlyBeingProcessed[64];
+					BObjectList<EMMediaDataBuffer*> opDestinationCurrentlyBeingProcessed;
 					memset(opDestinationCurrentlyBeingProcessed, 0, sizeof(EMMediaDataBuffer*) * 64);
 					for(register uint8 x = 0; x < 64 && opBuffersForDestination[x] != NULL; x++)
 					{
@@ -557,7 +550,7 @@ void EMMediaProject::RunAudio()
 					//Note that the result is stored. The result from the ProcessBuffer call is what should be
 					//further routed to other destinations (as set in the resulting EMMediaDataBuffer), or, if NULL,
 					//we should do nothing further.
-					if(NumBuffers(opDestinationCurrentlyBeingProcessed) > 0)
+					if(opDestinationCurrentlyBeingProcessed.CountItems() > 0)
 					{
 //						try
 //						{
@@ -568,7 +561,7 @@ void EMMediaProject::RunAudio()
 							//them. Make sure we don't miss a single buffer - cause we don't want a buffer leak on our hands!
 							if(m_vShouldProduceAudio || (m_vProcessSingleAudioBuffer > 0))
 							{
-								uint32 v = NumBuffers(opDestinationCurrentlyBeingProcessed);
+								uint32 v = opDestinationCurrentlyBeingProcessed.CountItems();
 								list<EMMediaDataBuffer*> oList;
 								for(register uint8 vI = 0; vI < v; vI++)
 									oList.push_back(opDestinationCurrentlyBeingProcessed[vI]);
@@ -614,18 +607,19 @@ void EMMediaProject::RunAudio()
 									opDestinationCurrentlyBeingProcessed[x] -> Recycle();
 									opDestinationCurrentlyBeingProcessed[x] = NULL;
 								}
-								for(y = 0; y < 64; y++)
+								for(y = 0; y < ; y++)
 									for(x = 0; x < 64; x++)
 										if(m_opAudioDestinations[y][x] != NULL)
 										{
 											m_opAudioDestinations[y][x] -> Recycle();
 											m_opAudioDestinations[y][x] = NULL;
 										}
-								for(x = 0; x < 64; x++)
+
+								for(x = 0; x < m_opAudioBufferList.CountItems(); x++)
 									if(m_opAudioBufferList[x] != NULL)
 									{
 										m_opAudioBufferList[x] -> Recycle();
-										m_opAudioBufferList[x] = NULL;
+										m_opAudioBufferList.RemoveItemAt(x);
 									}
 								break;
 							}
@@ -642,15 +636,8 @@ void EMMediaProject::RunAudio()
 
 					//If the opProcessingResult was other that NULL, then we have another buffer (and hopefully another destination - otherwise
 					//we probably have an infinite loop on our hands! :)) to route and process!
-					if(opProcessingResult != NULL)
-					{
-						for(register uint8 x = 0; x < 64; x++)
-							if(m_opAudioBufferList[x] == NULL)
-							{
-								m_opAudioBufferList[x] = opProcessingResult;
-								break;
-							}
-						opProcessingResult = NULL;
+					if(opProcessingResult != NULL) {
+						m_opAudioBufferList.AddItem(opProcessingResult);
 					}
 				}
 
@@ -668,8 +655,7 @@ void EMMediaProject::RunAudio()
 		else
 			::Sleep(1);
 
-		for(register uint8 x = 0; x < 64 && m_opAudioBufferList[x] != NULL; x++)
-			m_opAudioBufferList[x] = NULL;
+		m_opAudioBufferList.MakeEmpty();
 
 		//EMMediaDebugLog::Instance() ->Log("RunAudio (3) now returning the audio protection lock");
 		UnlockAudio();

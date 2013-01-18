@@ -2,13 +2,13 @@
 * Creator: Richard Kronfalt
 * Portability: Native
 *-------------------------------------------------------
-* 
+*
 * This class is a repository of all the clips that exist
 * within a song/project. To find out which track a clip
-* belongs to one has to ask the clip, since it has a 
+* belongs to one has to ask the clip, since it has a
 * pointer to the owning EMMediaTrack.
 *
-* This class supplies a way of accessing the data in 
+* This class supplies a way of accessing the data in
 * the clips, through the GetNextBuffers method.
 * It returns a number of EMMediaDataBuffers (through adding
 * them to a list which is sent in). The buffers returned
@@ -23,19 +23,19 @@
 * When asking GetNextBuffers for the next set of buffers
 * one has to supply a filtering-flag, for deciding which
 * clip-types to read buffers from, e.g. EM_TYPE_RAW_VIDEO,
-* EM_TYPE_ANY, EM_TYPE_ANY_AUDIO, etc. 
+* EM_TYPE_ANY, EM_TYPE_ANY_AUDIO, etc.
 *
 * If there are no active clips at "this" point in songtime
-* (as reported by ThenTime - see above), the method 
+* (as reported by ThenTime - see above), the method
 * just returns the sent in list unchanged, i.e., naturally,
 * without adding any EMMediaDataBuffers to it.
-* 
+*
 * This class also contains methods for investigating the
 * "song" as a whole, e.g. HasAudio and HasVideo returns
 * true if there are any audio or video clips respectively
-* in the song/project. 
+* in the song/project.
 *
-* FramesToNextClip returns the number of audio frames 
+* FramesToNextClip returns the number of audio frames
 * (calculated using the global audio format) to the start
 * of the next clip, from a certain point in time.
 *
@@ -60,22 +60,33 @@
 
 #include <list>
 
+#include <ObjectList.h>
+
 class EMBeVideoClipRepository : public EMMediaClipRepository
 {
 public:
-	EMBeVideoClipRepository();
-	~EMBeVideoClipRepository();
-	int32 GetID() const;
-	void GetNextBuffers(list<EMMediaDataBuffer*>* p_opList, EMMediaType p_eType, int64 p_vTimeNow, bool p_vSeeking = false);
-	bool InitCheckE();
-	void SeekAndDisplay(int64 p_vNow);
+							EMBeVideoClipRepository();
+							~EMBeVideoClipRepository();
+
+			int32 			GetID() const;
+			void 			GetNextBuffers(BObjectList<EMMediaDataBuffer*>*,
+								EMMediaType, int64 timeNow,
+								bool seeking = false);
+
+			bool 			InitCheckE();
+			void			SeekAndDisplay(int64 p_vNow);
 
 private:
-	EMMediaClip* GetPriorityClip(int64 p_vNow, int64 p_vFramesToNextClip, list<EMMediaDataBuffer*>* p_opList, list<int32>* p_oID);
-	bool IsSoloActivated();
-	void SeekTo(int64 p_vNewSongFrame);
-	int64 FramesToNextClip(int64 p_vFromFrame);
-	int32 m_vID;
+			EMMediaClip* 	GetPriorityClip(int64 now, int64 framesToNextClip,
+							 list<EMMediaDataBuffer*>*, list<int32>* ids);
+
+			bool			IsSoloActivated();
+
+			// TODO: why is this called "songFrame" [formerly p_vNewSongFrame]?
+			void			SeekTo(int64 songFrame);
+			int64 			FramesToNextClip(int64 fromFrame);
+
+			int32 			m_vID;
 };
 
 #endif

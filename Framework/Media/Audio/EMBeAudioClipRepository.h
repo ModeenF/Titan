@@ -64,17 +64,23 @@ class EMMediaFormat;
 class EMBeAudioClipRepository : public EMMediaClipRepository
 {
 public:
-	EMBeAudioClipRepository();
-	~EMBeAudioClipRepository();
-	int32 GetID() const;
-	void GetNextBuffers(list<EMMediaDataBuffer*>* p_opList, EMMediaType p_eType, int64 p_vTimeNow, bool p_vSeeking = false);
-	bool InitCheckE();
+							EMBeAudioClipRepository();
+							~EMBeAudioClipRepository();
+
+			int32 			GetID() const;
+
+			void 			GetNextBuffers(BObjectList<EMMediaDataBuffer*>*,
+									EMMediaType, int64 timeNow,
+									bool seeking = false);
+
+			bool			InitCheckE();
 
 private:
-	bool IsSoloActivated();
-	int64 FramesToNextClip(int64 p_vFromFrame);
-	int32 m_vID;
-	EMMediaFormat* m_opSystemAudioFormat;
+			bool 			IsSoloActivated();
+			int64 			FramesToNextClip(int64 p_vFromFrame);
+
+			int32 			m_vID;
+			EMMediaFormat*	m_opSystemAudioFormat;
 };
 
 #endif
