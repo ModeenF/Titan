@@ -288,9 +288,10 @@ void EMMediaProject::PrepareLists()
 		m_opPreAllocatedDestinationLists[vIndex] = EM_new list<EMMediaDataBuffer*>();
 }
 
-list<EMMediaDataBuffer*>* EMMediaProject::GetList()
+BObjectList<EMMediaDataBuffer>* EMMediaProject::GetList()
 {
 	m_opSemaphore -> Acquire();
+/*
 	for(int32 vIndex = 0; vIndex < 100; vIndex++)
 		if(m_opPreAllocatedDestinationLists[vIndex] != NULL)
 		{
@@ -299,15 +300,18 @@ list<EMMediaDataBuffer*>* EMMediaProject::GetList()
 			m_opSemaphore -> Release();
 			return opList;
 		}
-
+*/
 	m_opSemaphore -> Release();
+	EMDebugger("TODO: EMMediaProject::GetList() unimp!\n");
 	EMDebugger("ERROR! Could not find an available destination list from the preallocated repository of lists!");
 	return NULL;
 }
 
-void EMMediaProject::RecycleList(list<EMMediaDataBuffer*>* p_opList)
+void EMMediaProject::RecycleList(BObjectList<EMMediaDataBuffer>* p_opList)
 {
 	m_opSemaphore -> Acquire();
+	// TODO: implement proper object recycling with dynamic sizing...
+/*
 	for(int32 vIndex = 0; vIndex < 100; vIndex++)
 		if(m_opPreAllocatedDestinationLists[vIndex] == NULL)
 		{
@@ -316,8 +320,9 @@ void EMMediaProject::RecycleList(list<EMMediaDataBuffer*>* p_opList)
 			m_opSemaphore -> Release();
 			return;
 		}
-
+*/
 	m_opSemaphore -> Release();
+	EMDebugger("TODO: EMMediaProject::RecycleList unimp!\n");
 	EMDebugger("m_vSemaphore! No room to store the list, in the preallocated repository of lists!");
 }
 
@@ -331,23 +336,27 @@ uint32 NumDestinations(EMMediaDataBuffer* (*p_opArray)[64])
 	return vCount;
 }
 
-list<EMMediaDataBuffer* >* EMMediaProject::GetLeastReferencedDestination(list<list<EMMediaDataBuffer* >* >* p_opSets)
+BObjectList<EMMediaDataBuffer>*
+EMMediaProject	::	GetLeastReferencedDestination(
+	BObjectList<BObjectList<EMMediaDataBuffer> >* p_opSets)
 {
-	if(p_opSets -> size() < 1)
+	if(p_opSets -> CountItems() < 1)
 		return NULL;
 
-	list<EMMediaDataBuffer* >* opCurrentlyLeastReferenced = (*p_opSets -> begin());
-	int32 vMinimumRefCount = (*p_opSets -> begin()) -> front() -> m_opDestination -> GetProcessingReferenceCount();
+	BObjectList<EMMediaDataBuffer>* opCurrentlyLeastReferenced = p_opSets->ItemAt(0);
+	int32 vMinimumRefCount = p_opSets->ItemAt(0)->ItemAt(0)->m_opDestination
+		->GetProcessingReferenceCount();
 
-	list<list<EMMediaDataBuffer* >* >::const_iterator oListListIterator;
-	for(oListListIterator = (p_opSets -> begin())++; oListListIterator != p_opSets -> end(); oListListIterator++)
-	{
-		if((*oListListIterator) -> front() -> m_opDestination -> GetProcessingReferenceCount() < vMinimumRefCount)
-		{
-			opCurrentlyLeastReferenced = (*oListListIterator);
-			vMinimumRefCount = opCurrentlyLeastReferenced -> front() -> m_opDestination -> GetProcessingReferenceCount();
+	for (uint32 i = 0; i < p_opSets->CountItems(); ++i) {
+		if(p_opSets->ItemAt(i)->ItemAt(0)->m_opDestination->GetProcessingReferenceCount()
+			< vMinimumRefCount) {
+			opCurrentlyLeastReferenced = p_opSets->ItemAt(i);
+			vMinimumRefCount = opCurrentlyLeastReferenced->ItemAt(0)->m_opDestination
+				->GetProcessingReferenceCount();
 		}
+
 	}
+
 	return opCurrentlyLeastReferenced;
 }
 
@@ -396,6 +405,7 @@ void SplitArrays(EMMediaDataBuffer** p_opBufferArray, EMMediaDataBuffer* (*p_opD
 	}
 }
 
+/*
 EMMediaDataBuffer** EMMediaProject::GetLeastReferencedDestination(EMMediaDataBuffer* (*p_opDestinations)[64])
 {
 	EMMediaDataBuffer** opLeastReferenced = NULL;
@@ -417,6 +427,9 @@ EMMediaDataBuffer** EMMediaProject::GetLeastReferencedDestination(EMMediaDataBuf
 	}
 	return opLeastReferenced;
 }
+
+*/
+
 //This ugly little chunk of code splits one unordered list of EMMediaDataBuffers into a list of
 //lists! Each resulting list containing only buffers bound for a specific destination.
 //It empties the p_opBufferList during this process!
@@ -445,10 +458,13 @@ void EMMediaProject::SplitLists(list<EMMediaDataBuffer*>* p_opBufferList, list<l
 		{
 			//create new destination set and add to p_opSets.
 			//TODO: Don't do "new" here! Find some better solution! (...Performance, performance, performance!)
-			list<EMMediaDataBuffer*>* opNewList = GetList(); //new list<EMMediaDataBuffer*>();
-			p_opSets -> push_back(opNewList);
-			opNewList -> push_back(p_opBufferList -> front());
-			p_opBufferList -> pop_front();
+
+			// TODO: (loom)  re-factor for BObjectList
+
+//			list<EMMediaDataBuffer*>* opNewList = GetList(); //new list<EMMediaDataBuffer*>();
+//			p_opSets -> push_back(opNewList);
+//			opNewList -> push_back(p_opBufferList -> front());
+//			p_opBufferList -> pop_front();
 		}
 	}
 }
@@ -461,7 +477,7 @@ void EMMediaProject::RunAudio()
 	int64 vAudioBufferSize = opFormat -> m_vBufferSizeBytes;
 
 	EMMediaDataBuffer* opProcessingResult = NULL;
-	EMMediaDataBuffer** opBuffersForDestination = NULL; //[64];
+	BObjectList<EMMediaDataBuffer>* opBuffersForDestination = NULL;
 	bool vProcessAudio = false;
 	bool vShouldIncrementTime = false;
 	int64 v = 0;
@@ -495,7 +511,7 @@ void EMMediaProject::RunAudio()
 		if(vProcessAudio) {
 			vNumBuffers = m_opAudioBufferList.CountItems();
 			( (EMBeAudioClipRepository*)(m_opAudioClipRepository) )
-				-> GetNextBuffers(m_opAudioBufferList, EM_TYPE_ANY_AUDIO, vNow);
+				-> GetNextBuffers(&m_opAudioBufferList, EM_TYPE_ANY_AUDIO, vNow);
 		}
 
 		if(vNumBuffers > 0)
@@ -504,9 +520,7 @@ void EMMediaProject::RunAudio()
 			while(m_opAudioBufferList.CountItems() > 0)
 			{
 				//Clear the destinations list.
-				for(uint8 y = 0; y < 64; y++)
-					for(uint8 x = 0; x < 64; x++)
-						m_opAudioDestinations[y][x] = NULL;
+				m_opAudioDestinations.MakeEmpty();
 
 				//Split the unordered (m_opAudioBufferList) set of buffers into ordered sets of
 				//buffers, one list for each destination (m_opAudioDestinations is a list of list<..> pointers).
@@ -516,8 +530,9 @@ void EMMediaProject::RunAudio()
 //TODO: Refactor SplitArrays for list<>
 //				SplitArrays(m_opAudioBufferList, m_opAudioDestinations);
 
-				if(NumDestinations(m_opAudioDestinations) <= 0)
+				if(m_opAudioDestinations.CountItems() <= 0)
 				{
+// TODO: setup recycling and clear the list with BObjectList
 //					for(uint8 x = 0; x < 64; x++)
 //						if(m_opAudioBufferList[x] != NULL)
 //						{
@@ -534,18 +549,21 @@ void EMMediaProject::RunAudio()
 				}
 
 				//While there's more destination-lists
-				while(NumDestinations(m_opAudioDestinations) > 0)
+				while(m_opAudioDestinations.CountItems() > 0)
 				{
 					//Get the first destination-list, only containing buffers with the exact same destination
-					opBuffersForDestination = GetLeastReferencedDestination(m_opAudioDestinations);
+					opBuffersForDestination = GetLeastReferencedDestination(&m_opAudioDestinations);
 					BObjectList<EMMediaDataBuffer*> opDestinationCurrentlyBeingProcessed;
+
+	// TODO: (loon) should be obvious ;-)
+/*
 					memset(opDestinationCurrentlyBeingProcessed, 0, sizeof(EMMediaDataBuffer*) * 64);
 					for(register uint8 x = 0; x < 64 && opBuffersForDestination[x] != NULL; x++)
 					{
 						opDestinationCurrentlyBeingProcessed[x] = opBuffersForDestination[x];
 						opBuffersForDestination[x] = NULL;
 					}
-
+*/
 					//If it contains buffers, we should process it. This is where the actual Processing is initiated!!
 					//Note that the result is stored. The result from the ProcessBuffer call is what should be
 					//further routed to other destinations (as set in the resulting EMMediaDataBuffer), or, if NULL,

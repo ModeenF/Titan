@@ -69,7 +69,7 @@ public:
 							~EMBeVideoClipRepository();
 
 			int32 			GetID() const;
-			void 			GetNextBuffers(BObjectList<EMMediaDataBuffer*>*,
+			void 			GetNextBuffers(BObjectList<EMMediaDataBuffer>*,
 								EMMediaType, int64 timeNow,
 								bool seeking = false);
 

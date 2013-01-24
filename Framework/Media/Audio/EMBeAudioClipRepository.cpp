@@ -93,7 +93,7 @@ int64 EMBeAudioClipRepository::FramesToNextClip(int64 p_vFromFrame)
 }
 
 void
-EMBeAudioClipRepository	::	GetNextBuffers(BObjectList<EMMediaDataBuffer*>* p_opList,
+EMBeAudioClipRepository	::	GetNextBuffers(BObjectList<EMMediaDataBuffer>* p_opList,
 	EMMediaType p_eType, int64 p_vTimeNow, bool _seeking)
 {
 //	Lock();

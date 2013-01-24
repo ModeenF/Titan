@@ -74,7 +74,7 @@ public:
 	// TODO:  use PROPER overriding of new...
 	static					EMMediaClipRepository* New(EMMediaType);
 
-	virtual	void 			GetNextBuffers(BObjectList<EMMediaDataBuffer*>*,
+	virtual	void 			GetNextBuffers(BObjectList<EMMediaDataBuffer>*,
 								EMMediaType, int64 timeNow,
 								bool seeking = false) = 0;
 

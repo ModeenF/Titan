@@ -176,13 +176,14 @@ public:
 
 
 private:
-			list<EMMediaDataBuffer*>*
-							GetLeastReferencedDestination(list<list<EMMediaDataBuffer*>*>*);
+			BObjectList<EMMediaDataBuffer>*
+							GetLeastReferencedDestination(
+								BObjectList<BObjectList<EMMediaDataBuffer> >*);
 
-			EMMediaDataBuffer**
-							GetLeastReferencedDestination(EMMediaDataBuffer* (*dests)[64]);
+//			EMMediaDataBuffer**
+//							GetLeastReferencedDestination(EMMediaDataBuffer* (*dests)[64]);
 
-			list<EMMediaDataBuffer*>*
+			BObjectList<EMMediaDataBuffer>*
 							GetList();
 
 			EMMediaTrack*	GetNextTrack(EMMediaTrack* p_opTrack);
@@ -194,7 +195,7 @@ private:
 								list<EMMediaClip*>* transList);
 
 			void 			PrepareLists();
-			void 			RecycleList(list<EMMediaDataBuffer*>* p_opList);
+			void 			RecycleList(BObjectList<EMMediaDataBuffer>*);
 			void 			RunBuffer(EMMediaDataBuffer** p_opBuffer, bool p_vIgnoreTransition = false);
 			void 			SplitLists(list<EMMediaDataBuffer*>* p_opBufferList, list<list<EMMediaDataBuffer*>*>* p_opSets);
 
@@ -260,9 +261,11 @@ private:
 			bool 			m_vAudioIsActive;
 			bool 			m_vVideoIsActive;
 
-			BObjectList<EMMediaDataBuffer*>
+			BObjectList<EMMediaDataBuffer>
 							m_opAudioBufferList;
-			BObjectList<BObjectList<EMMediaDataBuffer*>* >
+
+			// BList may work just fine here...
+			BObjectList<BObjectList<EMMediaDataBuffer> >
 							m_opAudioDestinations;
 
 			bool 			m_vIsDirty;
