@@ -30,55 +30,63 @@ class EMSemaphore;
 class EMMediaEffectTrack : public EMBufferDestination
 {
 public:
-	EMMediaEffectTrack(EMMediaType p_eType);
-	EMMediaEffectTrack(EMMediaEffectTrack& oTrack);
+							EMMediaEffectTrack(EMMediaType);
+							EMMediaEffectTrack(EMMediaEffectTrack&);
 
-	~EMMediaEffectTrack();
+							~EMMediaEffectTrack();
 
-	string GetName() const;
-	bool InitCheckE();
-	bool PrepareToPlayE();
-	EMMediaDataBuffer* ProcessBufferE(list<EMMediaDataBuffer*>* p_opBufferList);
-	void SetName(string p_oName);
+			string 			GetName() const;
+			bool 			InitCheckE();
+			bool 			PrepareToPlayE();
+
+			EMMediaDataBuffer* ProcessBufferE(list<EMMediaDataBuffer*>*);
+			EMMediaDataBuffer* ProcessBufferE(BObjectList<EMMediaDataBuffer>*);
+
+			void 			SetName(string p_oName);
 
 	//Processing management
-	bool SetOutput(EMBufferDestination* p_opOutput);
-	EMBufferDestination* GetOutput() const;
+			bool 			SetOutput(EMBufferDestination* p_opOutput);
+			EMBufferDestination* GetOutput() const;
 
 	//Slot management
-	bool InsertEffect(EMPlugin* p_opPlugin, uint32 p_vSlotNumber);
-	bool SetEffect(EMPlugin* p_opPlugin, uint32 p_vSlotNumber);
-	bool DeleteEffect(uint32 p_vSlotNumber);
-	bool IsSlotEmpty(uint32 p_vSlotNumber);
-	uint32 GetNumberOfSlots() const;
-	int32 GetLastEffect();
-	uint32 CountEffects();
-	void DisplaySlots();
-	EMPlugin* FindEffect(int32 p_vID);
-	EMPlugin* GetSlot(uint32 p_vIndex);
-	int32 GetSlotFor(EMPlugin* p_opPlugin);
+			bool 			InsertEffect(EMPlugin*, uint32 slotNumber);
+			bool 			SetEffect(EMPlugin*, uint32 slotNumber);
 
-	bool SaveData(EMProjectDataSaver* p_opSaver);
-	bool LoadData(EMProjectDataLoader* p_opLoader);
+			bool 			DeleteEffect(uint32 slotNumber);
+			bool 			IsSlotEmpty(uint32 slotNumber);
 
-	bool RestoreAfterLoad();
+			uint32 			GetNumberOfSlots() const;
+			int32 			GetLastEffect();
+			uint32 			CountEffects();
+			void 			DisplaySlots();
 
-	bool IsObjectDeleted();
-	void SetDeleted(bool p_vState);
+			EMPlugin* 		FindEffect(int32 id);
+
+			EMPlugin* 		GetSlot(uint32 index);
+			int32 			GetSlotFor(EMPlugin*);
+
+			bool 			SaveData(EMProjectDataSaver* p_opSaver);
+			bool 			LoadData(EMProjectDataLoader* p_opLoader);
+
+			bool 			RestoreAfterLoad();
+
+			bool 			IsObjectDeleted();
+			void 			SetDeleted(bool p_vState);
 
 private:
-	bool MakeRoom(uint32 p_vSlotNumber);
-	EMBufferDestination* GetNextDestination(uint32 p_vCurrentSlot);
-	EMBufferDestination* GetPreviousDestination(uint32 p_vCurrentSlot);
+			bool 			MakeRoom(uint32 p_vSlotNumber);
+			EMBufferDestination* GetNextDestination(uint32 currentSlot);
+			EMBufferDestination* GetPreviousDestination(uint32 currentSlot);
 
-	string m_oName;
-	EMPlugin** m_opSlots;
-	uint32 m_vNumSlots;
-	EMBufferDestination* m_opOutput;
-	EMMediaTrack* m_opSourceMediaTrack;
-	EMSemaphore* m_opSemaphore;
-	int32 m_vOutputId;
-	bool m_vIsDeleted;
+			string 			m_oName;
+			EMPlugin** 		m_opSlots;
+			uint32 			m_vNumSlots;
+			EMBufferDestination* m_opOutput;
+			EMMediaTrack* 	m_opSourceMediaTrack;
+			EMSemaphore* 	m_opSemaphore;
+			int32 			m_vOutputId;
+			bool 			m_vIsDeleted;
 };
 
 #endif
+

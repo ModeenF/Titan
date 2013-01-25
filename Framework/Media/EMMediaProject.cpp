@@ -549,11 +549,10 @@ void EMMediaProject::RunAudio()
 				}
 
 				//While there's more destination-lists
-				while(m_opAudioDestinations.CountItems() > 0)
-				{
+				while(m_opAudioDestinations.CountItems() > 0) {
 					//Get the first destination-list, only containing buffers with the exact same destination
 					opBuffersForDestination = GetLeastReferencedDestination(&m_opAudioDestinations);
-					BObjectList<EMMediaDataBuffer*> opDestinationCurrentlyBeingProcessed;
+					BObjectList<EMMediaDataBuffer> opDestinationCurrentlyBeingProcessed;
 
 	// TODO: (loon) should be obvious ;-)
 /*
@@ -580,39 +579,31 @@ void EMMediaProject::RunAudio()
 							if(m_vShouldProduceAudio || (m_vProcessSingleAudioBuffer > 0))
 							{
 								uint32 v = opDestinationCurrentlyBeingProcessed.CountItems();
-								list<EMMediaDataBuffer*> oList;
-								for(register uint8 vI = 0; vI < v; vI++)
-									oList.push_back(opDestinationCurrentlyBeingProcessed[vI]);
+								BObjectList<EMMediaDataBuffer> oList;
+								for(uint32 vI = 0; vI < v; ++vI)
+									oList.AddItem(opDestinationCurrentlyBeingProcessed.ItemAt(vI));
 
 								UnlockAudio();
 
-								opProcessingResult = opDestinationCurrentlyBeingProcessed[0] -> m_opDestination -> ProcessBufferE(&oList);
+								opProcessingResult
+									= opDestinationCurrentlyBeingProcessed.ItemAt(0)
+									->m_opDestination->ProcessBufferE(&oList);
 
-//EMMediaDebugLog::Instance() ->Log("RunAudio (1) acquiring the audio protection lock (after ProcessBufferE)");
 								LockAudio();
-//EMMediaDebugLog::Instance() ->Log("RunAudio (1) now have the audio protection lock (after ProcessBufferE)");
 
-								//If the resulting buffer from the rescent processing has a destination that exists in the
+								//If the resulting buffer from the recent processing has a destination that exists in the
 								//"pending for processing" list, then we should add it there (in order to be able to route
 								//processing "backwards" into an "earlier" destination (eg an effect track to an effect track).
 								bool vStored = false;
-								for(register uint8 vY = 0; vY < 64 && opProcessingResult != NULL; vY++)
-								{
-									if(m_opAudioDestinations[vY][0] != NULL)
-									{
-										if(m_opAudioDestinations[vY][0] -> m_opDestination -> GetID() == opProcessingResult -> m_opDestination -> GetID())
-										{
-											for(uint8 vX = 0; vX < 64; vX++)
-											{
-												if(m_opAudioDestinations[vY][vX] == NULL)
-												{
-													m_opAudioDestinations[vY][vX] = opProcessingResult;
-													opProcessingResult = NULL;
-													vStored = true;
-													break;
-												}
-											}
-										}
+								for(uint32 vY = 0; vY < m_opAudioDestinations.CountItems(); ++vY) {
+									if(m_opAudioDestinations.ItemAt(vY)->ItemAt(0)
+										->m_opDestination->GetID()
+											== opProcessingResult->m_opDestination->GetID()) {
+
+										m_opAudioDestinations.ItemAt(vY)->AddItem(opProcessingResult);
+										opProcessingResult = NULL;
+										vStored = true;
+										break;
 									}
 								}
 							}
@@ -620,11 +611,13 @@ void EMMediaProject::RunAudio()
 							{
 								//Make sure we clear all the arrays (ie make sure we Recycle all buffers) if
 								//we were to stop in the middle of processing!
-								for(register uint8 x = 0; x < 64 && opDestinationCurrentlyBeingProcessed[x] != NULL; x++)
-								{
-									opDestinationCurrentlyBeingProcessed[x] -> Recycle();
-									opDestinationCurrentlyBeingProcessed[x] = NULL;
+								for(uint32 x = 0; x < opDestinationCurrentlyBeingProcessed.CountItems(); ++x) {
+									opDestinationCurrentlyBeingProcessed.ItemAt(x)->Recycle();
 								}
+								opDestinationCurrentlyBeingProcessed.MakeEmpty();
+
+	// TODO: why was this only partially completed before?
+/*
 								for(y = 0; y < ; y++)
 									for(x = 0; x < 64; x++)
 										if(m_opAudioDestinations[y][x] != NULL)
@@ -641,37 +634,30 @@ void EMMediaProject::RunAudio()
 									}
 								break;
 							}
-//						}
-//						catch(...)
-//						{
-//							vShouldIncrementTime = false;
-							//EMMediaDebugLog::Instance() ->Log("RunAudio (2) acquiring the audio protection lock");
-//							LockAudio();
-							//EMMediaDebugLog::Instance() ->Log("RunAudio (2) now have the audio protection lock");
-//							break;
-//						}
+*/
 					}
 
-					//If the opProcessingResult was other that NULL, then we have another buffer (and hopefully another destination - otherwise
-					//we probably have an infinite loop on our hands! :)) to route and process!
-					if(opProcessingResult != NULL) {
+					//If the opProcessingResult was other than NULL, then we
+					// have another buffer (and hopefully another destination
+					// - otherwise we probably have an infinite loop on our
+					// hands! :)) to route and process!
+
+					if(opProcessingResult != NULL)
 						m_opAudioBufferList.AddItem(opProcessingResult);
-					}
 				}
 
 				//Done with this set of destinations. Continue looping the bufferlist, since it may very well
 				//be other than empty now, since we've hopefully received some resulting buffers from the
 				//ProcessBuffer-call(s).
-				for(y = 0; y < 64; y++)
-					for(uint8 x = 0; x < 64 && m_opAudioDestinations[y][x] != NULL; x++)
-						m_opAudioDestinations[y][x] = NULL;
+//				for(y = 0; y < 64; y++)
+//					for(uint8 x = 0; x < 64 && m_opAudioDestinations[y][x] != NULL; x++)
+//						m_opAudioDestinations[y][x] = NULL;
+				// TODO: is this an acceptable alternative?
+				m_opAudioDestinations.MakeEmpty();
 
 				if(! vShouldIncrementTime)
 					break;
-			}
-		}
-		else
-			::Sleep(1);
+			}	// end audio destination loop
 
 		m_opAudioBufferList.MakeEmpty();
 
@@ -681,6 +667,7 @@ void EMMediaProject::RunAudio()
 
 		//IF ERROR OCCURED AND RENDERING STOP EVERYTHING!!
 		if(IsRenderingAudio())
+/*
 			if(EMBeMediaSingletonMuxer::Instance() -> ErrorHasOccured())
 			{
 				SetRenderingAudio(false);
@@ -690,7 +677,7 @@ void EMMediaProject::RunAudio()
 				EMMediaEngine::Instance() -> GetSettingsRepository() -> Notify(EM_RENDERING_COULD_NOT_START);
 				EMBeMediaSingletonMuxer::Instance() -> SetErrorHasOccured(false);
 			}
-
+*/
 		//Advance the time, measured in audio frames, to the nearest slot (either it's an audio slot or a video slot, or both).
 		if(vShouldIncrementTime && vNow == EMMediaTimer::Instance() -> AudioThenFrame() && (m_vProcessSingleAudioBuffer <= 0) && (EMMediaTimer::Instance() -> GetState() == EM_PLAYING || EMMediaTimer::Instance() -> GetState() == EM_RECORDING))
 		{
@@ -715,9 +702,7 @@ void EMMediaProject::RunAudio()
 			//eo << "Now suspending audio production thread..." << ef;
 			m_opAudioThread -> Suspend(true);
 		}
-	}
-	else
-		::Sleep(1);
+	} // end audio buffer loop
 
 }
 

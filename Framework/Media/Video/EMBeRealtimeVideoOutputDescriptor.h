@@ -26,25 +26,33 @@ class EMBeRealtimeVideoOutputDescriptor : public EMBeRealtimeOutputDescriptor,
 			public EMListener
 {
 public:
-	EMBeRealtimeVideoOutputDescriptor(media_input* p_spMediaInput);
-	virtual ~EMBeRealtimeVideoOutputDescriptor();
-	bool InitCheckE();
-	bool MessageReceived(EMListenerRepository* p_opSender, uint32 p_vMessage);
-	bool PrepareToPlayE();
-	EMMediaDataBuffer* ProcessBufferE(list<EMMediaDataBuffer*>* p_opBufferList);
-	void StartE();
-	void StopE();
-	bool ClearData();
-	bool SaveData(EMProjectDataSaver* p_opSaver);
-	bool LoadData(EMProjectDataLoader* p_opLoader);
+							EMBeRealtimeVideoOutputDescriptor(media_input*);
+	virtual 				~EMBeRealtimeVideoOutputDescriptor();
+
+			bool 			InitCheckE();
+
+			bool			MessageReceived(EMListenerRepository* sender,
+								uint32 message);
+
+			bool 			PrepareToPlayE();
+
+			EMMediaDataBuffer* ProcessBufferE(list<EMMediaDataBuffer*>*);
+			EMMediaDataBuffer* ProcessBufferE(BObjectList<EMMediaDataBuffer>*);
+
+			void 			StartE();
+			void 			StopE();
+			bool 			ClearData();
+
+			bool 			SaveData(EMProjectDataSaver*);
+			bool 			LoadData(EMProjectDataLoader*);
 
 private:
-	bool m_vAwaitingNewBufferFormat;
-	bool m_ReadyForFormatChange;
-	BBufferGroup* m_opBufferGroup;
-	BBufferGroup* m_opBufferGroupRclm;
-	BBuffer* m_opBuffer;
-	BBufferProducer* m_opNode;
+			bool m_vAwaitingNewBufferFormat;
+			bool m_ReadyForFormatChange;
+			BBufferGroup* m_opBufferGroup;
+			BBufferGroup* m_opBufferGroupRclm;
+			BBuffer* m_opBuffer;
+			BBufferProducer* m_opNode;
 };
 
 #endif
